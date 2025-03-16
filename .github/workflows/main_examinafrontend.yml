@@ -72,8 +72,8 @@ jobs:
           slot-name: 'Production'
           package: .
 
-      - name: Run npm install on Azure Web App
+      - name: Set App Service Startup Command
         run: |
-          az webapp ssh --name examinafrontend --resource-group examina --command "cd /home/site/wwwroot && npm install --production"
+            az webapp config set --resource-group examina --name examinafrontend --startup-file "npm install --production && npm start"
   
           
