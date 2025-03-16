@@ -30,7 +30,7 @@ jobs:
         run: npm run build
 
       - name: Zip artifact (excluding node_modules)
-        run: zip -r release.zip .next public package.json package-lock.json node_modules -x "node_modules/*"
+        run: zip -r release.zip .next public package.json package-lock.json
 
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v4
