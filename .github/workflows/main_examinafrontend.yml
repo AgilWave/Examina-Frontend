@@ -72,7 +72,7 @@ jobs:
           slot-name: 'Production'
           package: .
 
-      - name: Set App Service Startup Command
+      - name: Set App Service Startup Comman
         run: |
             az webapp config set --resource-group examina --name examinafrontend --startup-file "npm install --production && npm start"
   
