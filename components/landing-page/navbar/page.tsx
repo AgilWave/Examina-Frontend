@@ -132,21 +132,17 @@ function NavBar() {
       </div>
 
       <div
-        className={`fixed inset-0 bg-black/95 z-50 h-screen w-screen md:hidden transition-all duration-500 ease-in-out ${
-          isMenuOpen 
-            ? "opacity-100 translate-x-0" 
-            : "opacity-0 translate-x-full pointer-events-none"
+        className={`fixed inset-0 bg-black/95 z-50 h-[90%] rounded-b-[50px] w-screen md:hidden transition-all duration-500 ease-in-out ${
+          isMenuOpen
+            ? "opacity-100 translate-y-0"
+            : "opacity-0 -translate-y-full pointer-events-none"
         }`}
         ref={menuRef}
       >
         <div className="h-full flex flex-col">
           <div className="flex justify-between items-center p-4">
             <div className="flex-shrink-0">
-              <Image
-                src={Logo}
-                className="w-[130px]"
-                alt={"examinaLogo"}
-              />
+              <Image src={Logo} className="w-[130px]" alt={"examinaLogo"} />
             </div>
             <button
               className="text-white p-2 hover:text-gray-300"
@@ -175,8 +171,8 @@ function NavBar() {
               <div
                 key={item}
                 className={`text-white font-medium relative cursor-pointer text-xl py-4 transition-all duration-500 ease-in-out ${
-                  isMenuOpen 
-                    ? "opacity-100 translate-y-0" 
+                  isMenuOpen
+                    ? "opacity-100 translate-y-0"
                     : "opacity-0 translate-y-8"
                 }`}
                 style={{ transitionDelay: `${index * 100}ms` }}
@@ -189,10 +185,10 @@ function NavBar() {
               </div>
             ))}
           </div>
-          <div 
+          <div
             className={`flex justify-center pb-10 transition-all duration-500 ease-in-out ${
-              isMenuOpen 
-                ? "opacity-100 translate-y-0" 
+              isMenuOpen
+                ? "opacity-100 translate-y-0"
                 : "opacity-0 translate-y-8"
             }`}
             style={{ transitionDelay: `${navItems.length * 100 + 100}ms` }}
