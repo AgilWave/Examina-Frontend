@@ -6,13 +6,11 @@ import Line3Png from '../../../public/imgs/Line3.png';
 import Line4Png from '../../../public/imgs/Line4.png';
 import Tag from '../_components/tag';
 
-
 export default function Process() {
   return (
-    <div className="min-h-[150%] bg-black text-white flex flex-col items-center justify-center px-4 py-12">
-        
-        <div className="flex flex-col items-center justify-center gap-8 md:gap-11">
-            <Tag label="How It Works" />
+    <div className="bg-black text-white flex flex-col items-center justify-center px-4 py-12 gap-14">
+      <div className="flex flex-col items-center justify-center gap-8 md:gap-11">
+        <Tag label="How It Works" />
         <div className="flex flex-col items-center justify-center gap-4 md:gap-6">
           <div className="self-stretch text-center justify-start text-white text-2xl md:text-4xl font-bold">
             How Our Platform Works
@@ -23,51 +21,55 @@ export default function Process() {
         </div>
       </div>
 
-      <div className="w-full max-w-6xl mx-auto relative">
-
-        <div className="w-full md:w-80 h-48 px-8 py-3 md:absolute md:-left-10 md:top-[60px] bg-gradient-to-l from-stone-500/30 to-black/10 rounded-[20px] outline outline-1 outline-offset-[-1px] outline-cyan-500/50 flex flex-col justify-center items-center gap-2 mb-8 md:mb-0">
-          <div className="w-11 h-11 bg-gradient-to-br from-neutral-100 to-neutral-400/0 rounded-full border border-gray-200" />
-          <div className="text-center text-white text-xl font-semibold">Account Setup</div>
-          <div className="text-center text-white text-sm font-normal">
-            Sign up and customize your platform. Assign user roles and upload your institution's question banks.
+      <div className="w-full max-w-6xl mx-auto relative min-h-[800px] md:min-h-[600px]">
+        <div className="w-full md:w-80 h-48 px-8 py-3 md:absolute md:-left-10 md:top-[60px] bg-gradient-to-l from-stone-500/30 to-black/10 rounded-[20px] outline outline-offset-[-1px] outline-cyan-500/50 flex flex-col justify-center items-center gap-2 mb-8 md:mb-0">
+          <div className="w-11 h-11 bg-gradient-to-br from-neutral-100 to-neutral-400/0 rounded-full border border-gray-200 flex items-center justify-center text-cyan-400/95 text-2xl font-semibold">
+            1
           </div>
-          <div className="absolute left-[152.5px] top-[28px] text-center text-cyan-400/95 text-2xl font-semibold">1</div>
+          <div className="text-center text-white text-lg md:text-xl font-semibold">Account Setup</div>
+          <div className="text-center text-white  text-xs md:text-sm font-normal">
+            Sign up and customize your platform. Assign user roles and upload your institution&apos;s question banks.
+          </div>
         </div>
 
-        <div className="w-full md:w-80 h-48 px-8 py-3 md:absolute md:left-[220px] md:top-[337px] bg-gradient-to-l from-teal-700/50 to-black/10 rounded-[20px] outline outline-1 outline-offset-[-1px] outline-cyan-500/50 flex flex-col justify-center items-center gap-2 mb-8 md:mb-0">
-          <div className="w-11 h-11 bg-gradient-to-br from-neutral-100 to-neutral-400/0 rounded-full border border-gray-200" />
-          <div className="text-center text-white text-xl font-semibold">Create Exams</div>
-          <div className="text-center text-white text-sm font-normal">
+        <div className="w-full md:w-80 h-48 px-8 py-3 md:absolute md:left-[220px] md:top-[337px] bg-gradient-to-l from-teal-700/50 to-black/10 rounded-[20px] outline outline-offset-[-1px] outline-cyan-500/50 flex flex-col justify-center items-center gap-2 mb-8 md:mb-0">
+          <div className="w-11 h-11 bg-gradient-to-br from-neutral-100 to-neutral-400/0 rounded-full border border-gray-200 flex items-center justify-center text-cyan-400/95 text-2xl font-semibold">
+            2
+          </div>
+          <div className="text-center text-white text-lg md:text-xl font-semibold">Create Exams</div>
+          <div className="text-center text-white text-xs md:text-sm font-normal">
             Create exams with an intuitive interface using our question bank or custom questions. Set time limits, randomization, and proctoring rules.
           </div>
-          <div className="absolute left-[153.5px] top-[18px] text-center text-cyan-400/95 text-2xl font-semibold">2</div>
         </div>
 
-        <div className="w-full md:w-80 h-48 px-8 py-3 md:absolute md:left-[430px] md:top-0 bg-gradient-to-l from-stone-500/30 to-black/10 rounded-[20px] outline outline-1 outline-offset-[-1px] outline-cyan-500/50 flex flex-col justify-center items-center gap-2 mb-8 md:mb-0">
-          <div className="w-11 h-11 bg-gradient-to-br from-neutral-100 to-neutral-400/0 rounded-full border border-gray-200" />
-          <div className="text-center text-white text-xl font-semibold">Student Access</div>
-          <div className="text-center text-white text-sm font-normal">
+        <div className="w-full md:w-80 h-48 px-8 py-3 md:absolute md:left-[430px] md:top-0 bg-gradient-to-l from-stone-500/30 to-black/10 rounded-[20px] outline outline-offset-[-1px] outline-cyan-500/50 flex flex-col justify-center items-center gap-2 mb-8 md:mb-0">
+          <div className="w-11 h-11 bg-gradient-to-br from-neutral-100 to-neutral-400/0 rounded-full border border-gray-200 flex items-center justify-center text-cyan-400/95 text-2xl font-semibold">
+            3
+          </div>
+          <div className="text-center text-white text-lg md:text-xl font-semibold">Student Access</div>
+          <div className="text-center text-white  text-xs md:text-sm font-normal">
             Students access exams via secure login. They can upload required documents, pass security checks, and start the exam on their scheduled time.
           </div>
-          <div className="absolute left-[153px] top-[19px] text-center text-cyan-400/95 text-2xl font-semibold">3</div>
         </div>
 
-        <div className="w-full md:w-96 h-48 px-8 py-3 md:absolute md:left-[670px] md:top-[337px] bg-gradient-to-l from-teal-700/50 to-black/10 rounded-[20px] outline outline-1 outline-offset-[-1px] outline-cyan-500/50 flex flex-col justify-center items-center gap-2 mb-8 md:mb-0">
-          <div className="w-11 h-11 bg-gradient-to-br from-neutral-100 to-neutral-400/0 rounded-full border border-gray-200" />
-          <div className="text-center text-white text-xl font-semibold">Proctoring & Monitoring</div>
-          <div className="text-center text-white text-sm font-normal">
+        <div className="w-full md:w-96 h-48 px-8 py-3 md:absolute md:left-[670px] md:top-[337px] bg-gradient-to-l from-teal-700/50 to-black/10 rounded-[20px] outline outline-offset-[-1px] outline-cyan-500/50 flex flex-col justify-center items-center gap-2 mb-8 md:mb-0">
+          <div className="w-11 h-11 bg-gradient-to-br from-neutral-100 to-neutral-400/0 rounded-full border border-gray-200 flex items-center justify-center text-cyan-400/95 text-2xl font-semibold">
+            4
+          </div>
+          <div className="text-center text-white text-lg md:text-xl font-semibold">Proctoring & Monitoring</div>
+          <div className="text-center text-white  text-xs md:text-sm font-normal">
             AI monitors students in real-time to ensure integrity, flagging suspicious behavior and alerting proctors.
           </div>
-          <div className="absolute left-[184px] top-[38px] text-center text-cyan-400/95 text-2xl font-semibold">4</div>
         </div>
 
-        <div className="w-full md:w-80 h-48 px-8 py-3 md:absolute md:left-[880px] md:top-[42px] bg-gradient-to-l from-stone-500/30 to-black/10 rounded-[20px] outline outline-1 outline-offset-[-1px] outline-cyan-500/50 flex flex-col justify-center items-center gap-2 mb-8 md:mb-0">
-          <div className="w-11 h-11 bg-gradient-to-br from-neutral-100 to-neutral-400/0 rounded-full border border-gray-200" />
-          <div className="text-center text-white text-xl font-semibold">Instant Grading & Results</div>
-          <div className="text-center text-white text-sm font-normal">
+        <div className="w-full md:w-80 h-48 px-8 py-3 md:absolute md:left-[880px] md:top-[42px] bg-gradient-to-l from-stone-500/30 to-black/10 rounded-[20px] outline outline-offset-[-1px] outline-cyan-500/50 flex flex-col justify-center items-center gap-2 mb-8 md:mb-0">
+          <div className="w-11 h-11 bg-gradient-to-br from-neutral-100 to-neutral-400/0 rounded-full border border-gray-200 flex items-center justify-center text-cyan-400/95 text-2xl font-semibold">
+            5
+          </div>
+          <div className="text-center text-white text-lg md:text-xl font-semibold">Instant Grading & Results</div>
+          <div className="text-center text-white  text-xs md:text-sm font-normal">
             After the exam, results are auto-graded with instant feedback. Instructors get detailed performance analytics.
           </div>
-          <div className="absolute left-[153px] top-[28px] text-center text-cyan-400/95 text-2xl font-semibold">5</div>
         </div>
 
         <div className="hidden md:block">
