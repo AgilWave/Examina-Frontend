@@ -15,7 +15,7 @@ export default function LandingPage() {
         <HeroSection />
       </main>
 
-      <section className="flex-1 w-full px-4 sm:px-6 md:px-8 lg:px-16 xl:px-32 mt-6 md:mt-10">
+      <section className="flex-1 w-full px-4 sm:px-6 md:px-8 lg:px-16 xl:px-32 md:mt-10">
         <Benefits />
       </section>
     </div>
