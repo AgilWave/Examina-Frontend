@@ -2,6 +2,7 @@
 
 import HeroSection from "@/components/landing-page/hero-section/page";
 import NaVBar from "@/components/landing-page/navbar/page";
+import Process from "@/components/landing-page/process/page";
 
 export default function LandingPage() {
   return (
@@ -11,6 +12,9 @@ export default function LandingPage() {
     </div>
     <div className="flex-1 w-full px-4 sm:px-6 md:px-8 lg:px-16 xl:px-32 mt-6 md:mt-10">
       <HeroSection />
+    </div>
+    <div>
+    <Process />
     </div>
   </div>
   );
