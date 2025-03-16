@@ -1,7 +1,7 @@
 "use client";
 
 import HeroSection from "@/components/landing-page/hero-section/page";
-import NaVBar from "@/components/landing-page/navbar/page";
+import NavBar from "@/components/landing-page/navbar/page";
 import Process from "@/components/landing-page/process/page"; 
 import Benefits from "@/components/landing-page/benefits/page";
 
@@ -16,9 +16,9 @@ export default function LandingPage() {
         <HeroSection />
       </main>
       
-      <div>
+      <section className="flex-1 w-full px-4 sm:px-6 md:px-8 lg:px-16 xl:px-32 md:mt-10">
         <Process />
-      </div>
+      </section>
 
       <section className="flex-1 w-full px-4 sm:px-6 md:px-8 lg:px-16 xl:px-32 md:mt-10">
         <Benefits />

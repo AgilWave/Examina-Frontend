@@ -4,13 +4,24 @@ import Line1Png from '../../../public/imgs/Line1.png';
 import Line2Png from '../../../public/imgs/Line2.png';
 import Line3Png from '../../../public/imgs/Line3.png';
 import Line4Png from '../../../public/imgs/Line4.png';
+import Tag from '../_components/tag';
+
 
 export default function Process() {
   return (
-    <div className="min-h-screen bg-black text-white flex flex-col items-center justify-center px-4 py-12">
-      <div className="mb-2 inline-block"></div>
-      
-      <h1 className="text-3xl md:text-4xl font-bold mb-10 lg:mb-16 text-center">How Our Platform Works</h1>
+    <div className="min-h-[150%] bg-black text-white flex flex-col items-center justify-center px-4 py-12">
+        
+        <div className="flex flex-col items-center justify-center gap-8 md:gap-11">
+            <Tag label="How It Works" />
+        <div className="flex flex-col items-center justify-center gap-4 md:gap-6">
+          <div className="self-stretch text-center justify-start text-white text-2xl md:text-4xl font-bold">
+            How Our Platform Works
+          </div>
+          <div className="text-gray-400 text-sm md:text-lg font-base text-center max-w-4xl mx-auto leading-relaxed">
+            Explore how our platform streamlines exams with secure, seamless management for instructors and students.
+          </div>
+        </div>
+      </div>
 
       <div className="w-full max-w-6xl mx-auto relative">
 
