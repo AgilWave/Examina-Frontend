@@ -6,7 +6,7 @@ import Logo from "@/public/imgs/logo.png";
 function NavBar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
-  const menuRef = useRef(null);
+  const menuRef = useRef<HTMLDivElement | null>(null);
 
   // Handle scroll effect
   useEffect(() => {
@@ -18,16 +18,14 @@ function NavBar() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  // Close menu when clicking outside
   useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (isMenuOpen && menuRef.current && !menuRef.current.contains(event.target)) {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (isMenuOpen && menuRef.current && !menuRef.current.contains(event.target as Node)) {
         closeMenu();
       }
     };
 
-    // Close menu on escape key press
-    const handleEscKey = (event) => {
+    const handleEscKey = (event: KeyboardEvent) => {
       if (isMenuOpen && event.key === "Escape") {
         closeMenu();
       }
