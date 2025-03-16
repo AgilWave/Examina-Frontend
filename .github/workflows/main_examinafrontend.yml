@@ -30,7 +30,7 @@ jobs:
         run: npm run build
 
       - name: Zip artifact (excluding node_modules)
-        run: zip -r release.zip .next public package.json package-lock.json
+        run: zip -r release.zip .next public package.json package-lock.json node_modules
 
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v4
@@ -71,9 +71,3 @@ jobs:
           app-name: 'examinafrontend'
           slot-name: 'Production'
           package: .
-
-      - name: Set App Service Startup Comman
-        run: |
-            az webapp config set --resource-group examina --name examinafrontend --startup-file "npm install --production && npm start"
-  
-          
