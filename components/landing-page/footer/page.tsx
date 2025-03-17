@@ -51,7 +51,7 @@ function Footer() {
                         <ul>
 
 
-                            <p className="text-gray-800 pb-4">Subcribe</p>
+                            <p className="text-gray-800 pb-4">Subscribe</p>
                             <div className="flex w-56  rounded-[6px] bg-white border border-gray-300">
                                 <input type='search' name='search ' placeholder='Get product updates' className='w-full border-none bg-transperant px-2 py-2 text-gray-600 outline-none  text-sm' />
                                 <button className='bg-[#0C7E7D] text-white px-4 py-1 rounded-[5px]'><Image src={Logoarrow} alt="ic Arrow Go.png" /></button>
