@@ -109,7 +109,7 @@ export default function FeaturesSection() {
             </h2>
             <p className="text-gray-400 text-sm md:text-lg font-normal text-center max-w-4xl mx-auto leading-relaxed">
               Empowering Educational Institutions with Seamless Administration,
-              Secure Assessments, and Engaging Learning Experiences
+              Secure Assessments, and Engaging Learning Experience
             </p>
           </div>
         </motion.div>
