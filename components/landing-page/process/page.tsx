@@ -8,7 +8,7 @@ import Tag from '../_components/tag';
 
 export default function Process() {
   return (
-    <div className="bg-black text-white flex flex-col items-center justify-center px-4 py-12 gap-14">
+    <div className="w-full h-fullbg-black text-white flex flex-col items-center justify-center px-4 py-12 gap-14">
       <div className="flex flex-col items-center justify-center gap-8 md:gap-11">
         <Tag label="How It Works" />
         <div className="flex flex-col items-center justify-center gap-4 md:gap-6">
