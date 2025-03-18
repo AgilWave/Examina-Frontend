@@ -77,30 +77,25 @@ function Benefits() {
     wide = false,
   }: BenefitCardProps) => {
     return (
-      <div className={`bg-gradient-to-l from-cyan-400/80 to-cyan-500/10 p-0.5 rounded-3xl transition-all duration-300 ease-in-out hover:bg-gradient-to-tr hover:scale-105 ${
-        wide ? "md:flex-1" : "md:w-64 lg:w-full"
-      }`}>
-        <div
-          className="w-full h-full px-5 md:px-7 py-8 md:py-11 bg-gradient-to-l from-stone-700 to-black rounded-3xl shadow-[inset_0px_-9px_4px_0px_rgba(237,225,225,0.10)] flex flex-col justify-start items-start gap-2.5 hover:bg-gradient-to-tr hover:from-black hover:to-stone-700"
-        >
-          <div className="flex flex-col justify-center md:justify-start items-center md:items-start gap-6 w-full">
-            <div className="w-12 h-12 md:w-14 md:h-14 p-2 bg-gradient-to-b from-cyan-400/60 to-cyan-600/60 rounded-full shadow-[inset_0px_-4px_4px_0px_rgba(255,255,255,0.26)] outline outline-1 outline-offset-[-1px] outline-cyan-400/50 flex justify-center items-center">
-              {icon}
+     
+      <div className="w-full h-full px-5 md:px-7 py-8 md:py-11 bg-gradient-to-br from-cyan-500/20 to-black/15 hover:bg-gradient-to-tl hover:from-cyan-500/15 hover:to-black/20 rounded-[38px] shadow-[0px_0px_10px_0px_rgba(38,254,253,0.4)] hover:shadow-[0px_0px_12px_0px_rgba(38,254,253,0.5)] shadow-[inset_0px_-4px_4px_0px_rgba(255,255,255,0.26)] outline outline-[1.5px] outline-offset-[-1.5px] outline-cyan-400/50 hover:outline-cyan-400/70 overflow-hidden transition-all duration-300 ease-in-out hover:-translate-y-2 ">
+        <div className="flex flex-col justify-center md:justify-start items-center md:items-start gap-6 w-full">
+          <div className="w-12 h-12 md:w-14 md:h-14 p-2 bg-gradient-to-b from-cyan-400/60 to-cyan-600/60 rounded-full shadow-[inset_0px_-4px_4px_0px_rgba(255,255,255,0.26)] outline outline-1 outline-offset-[-1px] outline-cyan-400/50 flex justify-center items-center">
+            {icon}
+          </div>
+          <div className="flex flex-col justify-center md:justify-start items-center md:items-start gap-3 md:gap-4 w-full">
+            <div className="text-white text-lg md:text-xl font-semibold">
+              {title}
             </div>
-            <div className="flex flex-col justify-center md:justify-start items-center md:items-start gap-3 md:gap-4 w-full">
-              <div className="text-white text-lg md:text-xl font-semibold">
-                {title}
-              </div>
-              <div className="text-white/80 text-xs md:text-sm font-normal text-center md:text-left">
-                {description}
-              </div>
+            <div className="text-white/80 text-xs md:text-sm font-normal text-center md:text-left">
+              {description}
             </div>
           </div>
         </div>
       </div>
+    
     );
   };
-
   return (
     <section className="flex flex-col items-center justify-center w-full py-16 px-4 md:px-8 gap-14">
       <div className="flex flex-col items-center justify-center gap-8 md:gap-11">

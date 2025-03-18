@@ -1,3 +1,5 @@
+"use client";
+
 import Button from "@/components/common/button";
 import React, { useState, useEffect, useRef } from "react";
 import Image from "next/image";
@@ -64,85 +66,92 @@ function NavBar() {
   const navItems = ["Home", "Features", "Process", "Benefits", "FAQ"];
 
   return (
-    <div
-      className={`fixed top-0 left-0 w-full z-30 transition-all duration-300 ${
-        scrolled
-          ? "bg-black/80 backdrop-blur-md shadow-lg py-2"
-          : "bg-transparent py-4"
-      }`}
-    >
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center">
-          <div className="flex-shrink-0">
-            <Image
-              src={Logo}
-              className="w-[130px] md:w-[160px] sm:w-[120px]"
-              alt={"examinaLogo"}
-            />
-          </div>
+    <>
+      <div
+        className={`fixed top-0 left-0 w-full z-50 transition-all duration-300 ${
+          scrolled
+            ? "bg-black/80 backdrop-blur-md shadow-lg py-2"
+            : "bg-transparent py-4"
+        }`}
+      >
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 xl:px-32 2xl:px-8">
+          <div className="flex justify-between items-center">
+            <div className="flex-shrink-0">
+              <Image
+                src={Logo}
+                className="w-[130px] md:w-[160px] sm:w-[120px]"
+                alt="examinaLogo"
+                priority
+              />
+            </div>
 
-          <div className="hidden md:flex items-center space-x-6 lg:space-x-12">
-            {navItems.map((item) => (
-              <div
-                key={item}
-                className="relative text-white font-medium group cursor-pointer"
+            <div className="hidden md:flex items-center space-x-6 lg:space-x-12">
+              {navItems.map((item) => (
+                <div
+                  key={item}
+                  className="relative text-white font-medium group cursor-pointer"
+                >
+                  <span className="transition-colors duration-300 group-hover:text-gray-300">
+                    {item}
+                  </span>
+                  <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-white transition-all duration-300 group-hover:w-full"></span>
+                </div>
+              ))}
+            </div>
+
+            <div className="hidden md:block">
+              <Button label="Portal" />
+            </div>
+
+            <div className="md:hidden">
+              <button
+                type="button"
+                className="text-white inline-flex items-center justify-center p-2 rounded-md focus:outline-none"
+                onClick={toggleMenu}
+                aria-expanded={isMenuOpen}
+                aria-label={isMenuOpen ? "Close menu" : "Open menu"}
               >
-                <span className="transition-colors duration-300 group-hover:text-gray-300">
-                  {item}
-                </span>
-                <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-white transition-all duration-300 group-hover:w-full"></span>
-              </div>
-            ))}
-          </div>
-
-          <div className="hidden md:block">
-            <Button label="Portal" />
-          </div>
-
-          <div className="md:hidden">
-            <button
-              type="button"
-              className="text-white inline-flex items-center justify-center p-2 rounded-md focus:outline-none"
-              onClick={toggleMenu}
-              aria-expanded={isMenuOpen}
-              aria-label={isMenuOpen ? "Close menu" : "Open menu"}
-            >
-              <div className="w-6 h-6 relative">
-                <span
-                  className={`absolute h-0.5 w-full bg-white transform transition-all duration-300 ${
-                    isMenuOpen ? "rotate-45 top-3" : "rotate-0 top-1"
-                  }`}
-                ></span>
-                <span
-                  className={`absolute h-0.5 bg-white transform transition-all duration-300 ${
-                    isMenuOpen
-                      ? "w-0 opacity-0 left-1/2 top-3"
-                      : "w-full opacity-100 top-3"
-                  }`}
-                ></span>
-                <span
-                  className={`absolute h-0.5 w-full bg-white transform transition-all duration-300 ${
-                    isMenuOpen ? "-rotate-45 top-3" : "rotate-0 top-5"
-                  }`}
-                ></span>
-              </div>
-            </button>
+                <div className="w-6 h-6 relative">
+                  <span
+                    className={`absolute h-0.5 w-full bg-white transform transition-all duration-300 ${
+                      isMenuOpen ? "rotate-45 top-3" : "rotate-0 top-1"
+                    }`}
+                  ></span>
+                  <span
+                    className={`absolute h-0.5 bg-white transform transition-all duration-300 ${
+                      isMenuOpen
+                        ? "w-0 opacity-0 left-1/2 top-3"
+                        : "w-full opacity-100 top-3"
+                    }`}
+                  ></span>
+                  <span
+                    className={`absolute h-0.5 w-full bg-white transform transition-all duration-300 ${
+                      isMenuOpen ? "-rotate-45 top-3" : "rotate-0 top-5"
+                    }`}
+                  ></span>
+                </div>
+              </button>
+            </div>
           </div>
         </div>
       </div>
 
+      {/* Mobile Menu */}
       <div
-        className={`fixed inset-0 bg-black/95 z-50 h-[90%] rounded-b-[50px] w-screen md:hidden transition-all duration-500 ease-in-out ${
-          isMenuOpen
-            ? "opacity-100 translate-y-0"
-            : "opacity-0 -translate-y-full pointer-events-none"
+        className={`fixed inset-0 bg-black h-[80%] rounded-b-4xl z-50 md:hidden transition-transform duration-500 ease-in-out ${
+          isMenuOpen ? "translate-y-0" : "-translate-y-full"
         }`}
         ref={menuRef}
       >
-        <div className="h-full flex flex-col">
-          <div className="flex justify-between items-center p-4">
+        <div className=" flex flex-col items pt-4 justify-between h-full">
+          <div className="flex justify-between items-center px-4 sm:px-6">
             <div className="flex-shrink-0">
-              <Image src={Logo} className="w-[130px]" alt={"examinaLogo"} />
+              <Image
+                src={Logo}
+                className="w-[130px]"
+                alt="examinaLogo"
+                priority
+              />
             </div>
             <button
               className="text-white p-2 hover:text-gray-300"
@@ -166,38 +175,38 @@ function NavBar() {
             </button>
           </div>
 
-          <div className="flex-1 flex flex-col items-center justify-center">
+          <div className="flex-1 flex flex-col items-center justify-center space-y-8">
             {navItems.map((item, index) => (
               <div
                 key={item}
-                className={`text-white font-medium relative cursor-pointer text-xl py-4 transition-all duration-500 ease-in-out ${
+                className={`text-white font-medium text-2xl transition-all duration-300 ease-in-out transform ${
                   isMenuOpen
-                    ? "opacity-100 translate-y-0"
-                    : "opacity-0 translate-y-8"
+                    ? "translate-y-0 opacity-100"
+                    : "translate-y-4 opacity-0"
                 }`}
                 style={{ transitionDelay: `${index * 100}ms` }}
                 onClick={closeMenu}
               >
-                <span className="transition-colors duration-300 hover:text-gray-300">
+                <span className="hover:text-gray-300 text-lg transition-colors duration-300">
                   {item}
                 </span>
-                <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-white transition-all duration-500 group-hover:w-full"></span>
               </div>
             ))}
           </div>
+
           <div
-            className={`flex justify-center pb-10 transition-all duration-500 ease-in-out ${
+            className={`flex justify-center pb-12 transition-all duration-300 ease-in-out transform ${
               isMenuOpen
-                ? "opacity-100 translate-y-0"
-                : "opacity-0 translate-y-8"
+                ? "translate-y-0 opacity-100"
+                : "translate-y-4 opacity-0"
             }`}
-            style={{ transitionDelay: `${navItems.length * 100 + 100}ms` }}
+            style={{ transitionDelay: `${navItems.length * 100}ms` }}
           >
-            <Button label="Portal" onClick={closeMenu} />
+            <Button className="text-base" label="Portal" onClick={closeMenu} />
           </div>
         </div>
       </div>
-    </div>
+    </>
   );
 }
 

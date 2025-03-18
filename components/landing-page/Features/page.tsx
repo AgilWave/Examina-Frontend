@@ -24,7 +24,7 @@ export default function FeaturesSection() {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-12 gap-8 mb-8">
-          <div className="md:col-span-4 h-96 relative bg-gradient-to-br from-cyan-500/20 to-black/15 hover:bg-gradient-to-tl hover:from-cyan-500/15 hover:to-black/20 rounded-[38px] shadow-[0px_0px_10px_0px_rgba(38,254,253,0.4)] hover:shadow-[0px_0px_12px_0px_rgba(38,254,253,0.5)] shadow-[inset_0px_6px_4.4px_0px_rgba(0,0,0,0.57)] outline outline-[1.5px] outline-offset-[-1.5px] outline-cyan-400/50 hover:outline-cyan-400/70 overflow-hidden transition-all duration-300 ease-in-out hover:-translate-y-2">
+          <div className="md:col-span-4 h-96 relative bg-gradient-to-br from-cyan-500/20 to-black/15 hover:bg-gradient-to-tl hover:from-cyan-500/15 hover:to-black/20 rounded-[48px] shadow-[0px_0px_10px_0px_rgba(38,254,253,0.4)] hover:shadow-[0px_0px_12px_0px_rgba(38,254,253,0.5)] shadow-[inset_0px_6px_4.4px_0px_rgba(0,0,0,0.57)] outline outline-[1.5px] outline-offset-[-1.5px] outline-cyan-400/50 hover:outline-cyan-400/70 overflow-hidden transition-all duration-300 ease-in-out hover:-translate-y-2">
             <div className="relative w-full h-full">
               <Image
                 className="w-full h-full object-cover"
@@ -45,7 +45,7 @@ export default function FeaturesSection() {
             </div>
           </div>
 
-          <div className="md:col-span-8 h-96 relative bg-gradient-to-br from-cyan-500/20 to-black/15 hover:bg-gradient-to-tl hover:from-cyan-500/15 hover:to-black/20 rounded-[38px] shadow-[0px_0px_10px_0px_rgba(38,254,253,0.4)] hover:shadow-[0px_0px_12px_0px_rgba(38,254,253,0.5)] shadow-[inset_0px_6px_4.4px_0px_rgba(0,0,0,0.57)] outline outline-[1.5px] outline-offset-[-1.5px] outline-cyan-400/50 hover:outline-cyan-400/70 overflow-hidden transition-all duration-300 ease-in-out hover:-translate-y-2">
+          <div className="md:col-span-8 h-96 relative bg-gradient-to-br from-cyan-500/20 to-black/15 hover:bg-gradient-to-tl hover:from-cyan-500/15 hover:to-black/20 rounded-[48px] shadow-[0px_0px_10px_0px_rgba(38,254,253,0.4)] hover:shadow-[0px_0px_12px_0px_rgba(38,254,253,0.5)] shadow-[inset_0px_6px_4.4px_0px_rgba(0,0,0,0.57)] outline outline-[1.5px] outline-offset-[-1.5px] outline-cyan-400/50 hover:outline-cyan-400/70 overflow-hidden transition-all duration-300 ease-in-out hover:-translate-y-2">
             <div className="relative w-full h-full">
               <Image
                 className="w-full h-full object-cover"
@@ -69,7 +69,7 @@ export default function FeaturesSection() {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-12 gap-8">
-          <div className="md:col-span-8 h-96 relative bg-gradient-to-br from-cyan-500/20 to-black/15 hover:bg-gradient-to-tl hover:from-cyan-500/15 hover:to-black/20 rounded-[38px] shadow-[0px_0px_10px_0px_rgba(38,254,253,0.4)] hover:shadow-[0px_0px_12px_0px_rgba(38,254,253,0.5)] shadow-[inset_0px_6px_4.4px_0px_rgba(0,0,0,0.57)] outline outline-[1.5px] outline-offset-[-1.5px] outline-cyan-400/50 hover:outline-cyan-400/70 overflow-hidden transition-all duration-300 ease-in-out hover:-translate-y-2">
+          <div className="md:col-span-8 h-96 relative bg-gradient-to-br from-cyan-500/20 to-black/15 hover:bg-gradient-to-tl hover:from-cyan-500/15 hover:to-black/20 rounded-[48px] shadow-[0px_0px_10px_0px_rgba(38,254,253,0.4)] hover:shadow-[0px_0px_12px_0px_rgba(38,254,253,0.5)] shadow-[inset_0px_6px_4.4px_0px_rgba(0,0,0,0.57)] outline outline-[1.5px] outline-offset-[-1.5px] outline-cyan-400/50 hover:outline-cyan-400/70 overflow-hidden transition-all duration-300 ease-in-out hover:-translate-y-2">
             <div className="relative w-full h-full">
               <Image
                 className="w-full h-full object-cover pt-20 md:pt-8"
@@ -91,11 +91,11 @@ export default function FeaturesSection() {
             </div>
           </div>
 
-          <div className="md:col-span-4 h-96 relative bg-gradient-to-br from-cyan-500/15 to-black/20 hover:bg-gradient-to-tl hover:from-cyan-500/15 hover:to-black/20 rounded-[38px] shadow-[0px_0px_10px_0px_rgba(38,254,253,0.4)] hover:shadow-[0px_0px_12px_0px_rgba(38,254,253,0.5)] shadow-[inset_0px_6px_4.4px_0px_rgba(0,0,0,0.57)] outline outline-[1.5px] outline-offset-[-1.5px] outline-cyan-400/50 hover:outline-cyan-400/70 overflow-hidden transition-all duration-300 ease-in-out hover:-translate-y-2">
+          <div className="md:col-span-4 h-96 relative bg-gradient-to-br from-cyan-500/15 to-black/20 hover:bg-gradient-to-tl hover:from-cyan-500/15 hover:to-black/20 rounded-[48px] shadow-[0px_0px_10px_0px_rgba(38,254,253,0.4)] hover:shadow-[0px_0px_12px_0px_rgba(38,254,253,0.5)] shadow-[inset_0px_6px_4.4px_0px_rgba(0,0,0,0.57)] outline outline-[1.5px] outline-offset-[-1.5px] outline-cyan-400/50 hover:outline-cyan-400/70 overflow-hidden transition-all duration-300 ease-in-out hover:-translate-y-2">
             <div className="relative w-full h-full">
-              <div className="absolute bottom-0 w-full">
+              <div className="absolute bottom-0 w-full pt-20">
                 <Image
-                  className="w-full h-full object-cover"
+                  className="w-full h-full object-cover "
                   src={InsightsIMG}
                   alt="Insights"
                   width={400}
