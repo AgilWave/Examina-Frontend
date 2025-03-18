@@ -1,5 +1,7 @@
-import React from "react";
+import React, { useEffect } from "react";
 import Image from "next/image";
+import { motion, useAnimation } from "framer-motion";
+import { useInView } from "react-intersection-observer";
 import userManagementIMG from "@/public/imgs/usermi.png";
 import monitoringIMG from "@/public/imgs/monitoring.png";
 import QBIMG from "@/public/imgs/qb.png";
@@ -7,10 +9,99 @@ import InsightsIMG from "@/public/imgs/insights.png";
 import Tag from "../_components/tag";
 
 export default function FeaturesSection() {
+  // Create separate controls and refs for each element
+  const titleControls = useAnimation();
+  const firstRowControls = useAnimation();
+  const secondRowControls = useAnimation();
+  
+  // Create separate refs with lower threshold and triggerOnce: false
+  const [titleRef, titleInView] = useInView({
+    threshold: 0.1,
+    triggerOnce: false // Will trigger every time
+  });
+  
+  const [firstRowRef, firstRowInView] = useInView({
+    threshold: 0.1,
+    triggerOnce: false
+  });
+  
+  const [secondRowRef, secondRowInView] = useInView({
+    threshold: 0.1,
+    triggerOnce: false
+  });
+
+  // Trigger animations based on each section's visibility
+  useEffect(() => {
+    if (titleInView) {
+      titleControls.start("visible");
+    } else {
+      titleControls.start("hidden");
+    }
+  }, [titleControls, titleInView]);
+
+  useEffect(() => {
+    if (firstRowInView) {
+      firstRowControls.start("visible");
+    } else {
+      firstRowControls.start("hidden");
+    }
+  }, [firstRowControls, firstRowInView]);
+
+  useEffect(() => {
+    if (secondRowInView) {
+      secondRowControls.start("visible");
+    } else {
+      secondRowControls.start("hidden");
+    }
+  }, [secondRowControls, secondRowInView]);
+
+  // Animation variants
+  const containerVariants = {
+    hidden: {},
+    visible: {
+      transition: {
+        staggerChildren: 0.3 // Stagger children animations
+      }
+    }
+  };
+
+  const itemVariants = {
+    hidden: { 
+      opacity: 0, 
+      y: 30 
+    },
+    visible: { 
+      opacity: 1, 
+      y: 0,
+      transition: { 
+        duration: 0.8, 
+        ease: "easeOut" 
+      }
+    }
+  };
+
+  const titleVariants = {
+    hidden: { opacity: 0, y: -20 },
+    visible: { 
+      opacity: 1, 
+      y: 0,
+      transition: { 
+        duration: 0.7, 
+        ease: "easeOut" 
+      }
+    }
+  };
+
   return (
     <section className="bg-black text-white py-16 px-6">
-      <div className="max-w-6xl mx-auto flex flex-col items-center justify-center gap-14">
-        <div className="flex flex-col items-center justify-center gap-8 md:gap-11">
+      <div className="max-w-6xl mx-auto flex flex-col items-center justify-center gap-8">
+        <motion.div 
+          ref={titleRef}
+          className="flex flex-col items-center justify-center gap-8 md:gap-11"
+          initial="hidden"
+          animate={titleControls}
+          variants={titleVariants}
+        >
           <Tag label="Features" />
           <div className="flex flex-col items-center justify-center gap-4 md:gap-6">
             <h2 className="text-white text-2xl md:text-4xl font-bold text-center">
@@ -21,10 +112,19 @@ export default function FeaturesSection() {
               Secure Assessments, and Engaging Learning Experiences
             </p>
           </div>
-        </div>
+        </motion.div>
 
-        <div className="grid grid-cols-1 md:grid-cols-12 gap-8 mb-8">
-          <div className="md:col-span-4 h-96 relative bg-gradient-to-br from-cyan-500/20 to-black/15 hover:bg-gradient-to-tl hover:from-cyan-500/15 hover:to-black/20 rounded-[48px] shadow-[0px_0px_10px_0px_rgba(38,254,253,0.4)] hover:shadow-[0px_0px_12px_0px_rgba(38,254,253,0.5)] shadow-[inset_0px_6px_4.4px_0px_rgba(0,0,0,0.57)] outline outline-[1.5px] outline-offset-[-1.5px] outline-cyan-400/50 hover:outline-cyan-400/70 overflow-hidden transition-all duration-300 ease-in-out hover:-translate-y-2">
+        <motion.div 
+          ref={firstRowRef}
+          className="grid grid-cols-1 md:grid-cols-12 gap-8  w-full"
+          initial="hidden"
+          animate={firstRowControls}
+          variants={containerVariants}
+        >
+          <motion.div 
+            className="md:col-span-4 h-96 relative bg-gradient-to-br from-cyan-500/20 to-black/15 hover:bg-gradient-to-tl hover:from-cyan-500/15 hover:to-black/20 rounded-[48px] shadow-[0px_0px_10px_0px_rgba(38,254,253,0.4)] hover:shadow-[0px_0px_12px_0px_rgba(38,254,253,0.5)] shadow-[inset_0px_6px_4.4px_0px_rgba(0,0,0,0.57)] outline outline-[1.5px] outline-offset-[-1.5px] outline-cyan-400/50 hover:outline-cyan-400/70 overflow-hidden transition-all duration-300 ease-in-out hover:-translate-y-2"
+            variants={itemVariants}
+          >
             <div className="relative w-full h-full">
               <Image
                 className="w-full h-full object-cover"
@@ -43,9 +143,12 @@ export default function FeaturesSection() {
                 </div>
               </div>
             </div>
-          </div>
+          </motion.div>
 
-          <div className="md:col-span-8 h-96 relative bg-gradient-to-br from-cyan-500/20 to-black/15 hover:bg-gradient-to-tl hover:from-cyan-500/15 hover:to-black/20 rounded-[48px] shadow-[0px_0px_10px_0px_rgba(38,254,253,0.4)] hover:shadow-[0px_0px_12px_0px_rgba(38,254,253,0.5)] shadow-[inset_0px_6px_4.4px_0px_rgba(0,0,0,0.57)] outline outline-[1.5px] outline-offset-[-1.5px] outline-cyan-400/50 hover:outline-cyan-400/70 overflow-hidden transition-all duration-300 ease-in-out hover:-translate-y-2">
+          <motion.div 
+            className="md:col-span-8 h-96 relative bg-gradient-to-br from-cyan-500/20 to-black/15 hover:bg-gradient-to-tl hover:from-cyan-500/15 hover:to-black/20 rounded-[48px] shadow-[0px_0px_10px_0px_rgba(38,254,253,0.4)] hover:shadow-[0px_0px_12px_0px_rgba(38,254,253,0.5)] shadow-[inset_0px_6px_4.4px_0px_rgba(0,0,0,0.57)] outline outline-[1.5px] outline-offset-[-1.5px] outline-cyan-400/50 hover:outline-cyan-400/70 overflow-hidden transition-all duration-300 ease-in-out hover:-translate-y-2"
+            variants={itemVariants}
+          >
             <div className="relative w-full h-full">
               <Image
                 className="w-full h-full object-cover"
@@ -65,11 +168,20 @@ export default function FeaturesSection() {
                 </div>
               </div>
             </div>
-          </div>
-        </div>
+          </motion.div>
+        </motion.div>
 
-        <div className="grid grid-cols-1 md:grid-cols-12 gap-8">
-          <div className="md:col-span-8 h-96 relative bg-gradient-to-br from-cyan-500/20 to-black/15 hover:bg-gradient-to-tl hover:from-cyan-500/15 hover:to-black/20 rounded-[48px] shadow-[0px_0px_10px_0px_rgba(38,254,253,0.4)] hover:shadow-[0px_0px_12px_0px_rgba(38,254,253,0.5)] shadow-[inset_0px_6px_4.4px_0px_rgba(0,0,0,0.57)] outline outline-[1.5px] outline-offset-[-1.5px] outline-cyan-400/50 hover:outline-cyan-400/70 overflow-hidden transition-all duration-300 ease-in-out hover:-translate-y-2">
+        <motion.div 
+          ref={secondRowRef}
+          className="grid grid-cols-1 md:grid-cols-12 gap-8 w-full"
+          initial="hidden"
+          animate={secondRowControls}
+          variants={containerVariants}
+        >
+          <motion.div 
+            className="md:col-span-8 h-96 relative bg-gradient-to-br from-cyan-500/20 to-black/15 hover:bg-gradient-to-tl hover:from-cyan-500/15 hover:to-black/20 rounded-[48px] shadow-[0px_0px_10px_0px_rgba(38,254,253,0.4)] hover:shadow-[0px_0px_12px_0px_rgba(38,254,253,0.5)] shadow-[inset_0px_6px_4.4px_0px_rgba(0,0,0,0.57)] outline outline-[1.5px] outline-offset-[-1.5px] outline-cyan-400/50 hover:outline-cyan-400/70 overflow-hidden transition-all duration-300 ease-in-out hover:-translate-y-2"
+            variants={itemVariants}
+          >
             <div className="relative w-full h-full">
               <Image
                 className="w-full h-full object-cover pt-20 md:pt-8"
@@ -89,9 +201,12 @@ export default function FeaturesSection() {
                 </div>
               </div>
             </div>
-          </div>
+          </motion.div>
 
-          <div className="md:col-span-4 h-96 relative bg-gradient-to-br from-cyan-500/15 to-black/20 hover:bg-gradient-to-tl hover:from-cyan-500/15 hover:to-black/20 rounded-[48px] shadow-[0px_0px_10px_0px_rgba(38,254,253,0.4)] hover:shadow-[0px_0px_12px_0px_rgba(38,254,253,0.5)] shadow-[inset_0px_6px_4.4px_0px_rgba(0,0,0,0.57)] outline outline-[1.5px] outline-offset-[-1.5px] outline-cyan-400/50 hover:outline-cyan-400/70 overflow-hidden transition-all duration-300 ease-in-out hover:-translate-y-2">
+          <motion.div 
+            className="md:col-span-4 h-96 relative bg-gradient-to-br from-cyan-500/15 to-black/20 hover:bg-gradient-to-tl hover:from-cyan-500/15 hover:to-black/20 rounded-[48px] shadow-[0px_0px_10px_0px_rgba(38,254,253,0.4)] hover:shadow-[0px_0px_12px_0px_rgba(38,254,253,0.5)] shadow-[inset_0px_6px_4.4px_0px_rgba(0,0,0,0.57)] outline outline-[1.5px] outline-offset-[-1.5px] outline-cyan-400/50 hover:outline-cyan-400/70 overflow-hidden transition-all duration-300 ease-in-out hover:-translate-y-2"
+            variants={itemVariants}
+          >
             <div className="relative w-full h-full">
               <div className="absolute bottom-0 w-full pt-20">
                 <Image
@@ -112,8 +227,8 @@ export default function FeaturesSection() {
                 </div>
               </div>
             </div>
-          </div>
-        </div>
+          </motion.div>
+        </motion.div>
       </div>
     </section>
   );

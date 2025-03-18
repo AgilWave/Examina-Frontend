@@ -15,9 +15,8 @@ function NavBar() {
     const handleScroll = () => {
       setScrolled(window.scrollY > 20);
       
-      // Optional: Update active section based on scroll position
-      const sections = document.querySelectorAll("section[id]");
-      const scrollPosition = window.scrollY + 100; // Offset for better UX
+      const sections = document.querySelectorAll("section[id], main[id]");
+      const scrollPosition = window.scrollY + 100; 
       
       sections.forEach((section) => {
         const sectionTop = (section as HTMLElement).offsetTop;
@@ -83,18 +82,15 @@ function NavBar() {
     const sectionElement = document.getElementById(sectionId.toLowerCase());
     
     if (sectionElement) {
-      // Close menu if it's open (mobile)
       if (isMenuOpen) {
         closeMenu();
       }
       
-      // Smooth scroll to section
       window.scrollTo({
         top: sectionElement.offsetTop - 80, // Adjust offset to account for navbar height
         behavior: "smooth"
       });
       
-      // Update URL (optional)
       history.pushState(null, "", `#${sectionId.toLowerCase()}`);
     }
   };
