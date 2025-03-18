@@ -74,7 +74,6 @@ function Benefits() {
     title,
     description,
     icon,
-    wide = false,
   }: BenefitCardProps) => {
     return (
      
@@ -130,7 +129,6 @@ function Benefits() {
               title={benefit.title}
               description={benefit.description}
               icon={benefit.icon}
-              wide={benefit.wide}
             />
           ))}
         </div>
