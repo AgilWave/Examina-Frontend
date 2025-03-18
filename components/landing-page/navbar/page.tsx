@@ -8,11 +8,26 @@ import Logo from "@/public/imgs/logo.png";
 function NavBar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const [activeSection, setActiveSection] = useState("home");
   const menuRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     const handleScroll = () => {
       setScrolled(window.scrollY > 20);
+      
+      // Optional: Update active section based on scroll position
+      const sections = document.querySelectorAll("section[id]");
+      const scrollPosition = window.scrollY + 100; // Offset for better UX
+      
+      sections.forEach((section) => {
+        const sectionTop = (section as HTMLElement).offsetTop;
+        const sectionHeight = (section as HTMLElement).offsetHeight;
+        const sectionId = section.getAttribute("id") || "";
+        
+        if (scrollPosition >= sectionTop && scrollPosition < sectionTop + sectionHeight) {
+          setActiveSection(sectionId);
+        }
+      });
     };
 
     window.addEventListener("scroll", handleScroll);
@@ -63,6 +78,27 @@ function NavBar() {
     document.body.style.overflow = "auto";
   };
 
+  // Handle smooth scrolling
+  const scrollToSection = (sectionId: string) => {
+    const sectionElement = document.getElementById(sectionId.toLowerCase());
+    
+    if (sectionElement) {
+      // Close menu if it's open (mobile)
+      if (isMenuOpen) {
+        closeMenu();
+      }
+      
+      // Smooth scroll to section
+      window.scrollTo({
+        top: sectionElement.offsetTop - 80, // Adjust offset to account for navbar height
+        behavior: "smooth"
+      });
+      
+      // Update URL (optional)
+      history.pushState(null, "", `#${sectionId.toLowerCase()}`);
+    }
+  };
+
   const navItems = ["Home", "Features", "Process", "Benefits", "FAQ"];
 
   return (
@@ -89,12 +125,19 @@ function NavBar() {
               {navItems.map((item) => (
                 <div
                   key={item}
-                  className="relative text-white font-medium group cursor-pointer"
+                  className={`relative text-white font-medium group cursor-pointer ${
+                    activeSection === item.toLowerCase() ? "text-white" : "text-white/80"
+                  }`}
+                  onClick={() => scrollToSection(item)}
                 >
                   <span className="transition-colors duration-300 group-hover:text-gray-300">
                     {item}
                   </span>
-                  <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-white transition-all duration-300 group-hover:w-full"></span>
+                  <span 
+                    className={`absolute bottom-0 left-0 h-0.5 bg-white transition-all duration-300 ${
+                      activeSection === item.toLowerCase() ? "w-full" : "w-0 group-hover:w-full"
+                    }`}
+                  ></span>
                 </div>
               ))}
             </div>
@@ -185,9 +228,11 @@ function NavBar() {
                     : "translate-y-4 opacity-0"
                 }`}
                 style={{ transitionDelay: `${index * 100}ms` }}
-                onClick={closeMenu}
+                onClick={() => scrollToSection(item)}
               >
-                <span className="hover:text-gray-300 text-lg transition-colors duration-300">
+                <span className={`hover:text-gray-300 text-lg transition-colors duration-300 ${
+                  activeSection === item.toLowerCase() ? "text-white" : "text-white/80"
+                }`}>
                   {item}
                 </span>
               </div>

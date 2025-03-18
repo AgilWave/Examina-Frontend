@@ -14,19 +14,19 @@ export default function LandingPage() {
         <NavBar />
       </header>
 
-      <main className="flex-1 flex w-full px-4 sm:px-6 md:px-8 lg:px-16 xl:px-32 mt-6 md:mt-10">
+      <main id="home" className="flex-1 flex w-full px-4 sm:px-6 md:px-8 lg:px-16 xl:px-32 mt-6 md:mt-10">
         <HeroSection />
       </main>
 
-      <section className="flex-1 w-full px-4 sm:px-6 md:px-8 lg:px-16 xl:px-32 mt-6 md:mt-10">
+      <section id="features" className="flex-1 w-full px-4 sm:px-6 md:px-8 lg:px-16 xl:px-32 mt-6 md:mt-10">
         <Features />
       </section>
 
-      <section className="flex-1 w-full px-4 sm:px-6 md:px-8 lg:px-16 xl:px-32 md:mt-10">
+      <section id="process" className="flex-1 w-full px-4 sm:px-6 md:px-8 lg:px-16 xl:px-32 md:mt-10">
         <Process />
       </section>
 
-      <section className="flex-1 w-full px-4 sm:px-6 md:px-8 lg:px-16 xl:px-32 md:mt-10">
+      <section id="benefits" className="flex-1 w-full px-4 sm:px-6 md:px-8 lg:px-16 xl:px-32 md:mt-10">
         <Benefits />
       </section>
 
