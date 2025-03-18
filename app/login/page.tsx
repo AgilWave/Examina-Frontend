@@ -21,10 +21,9 @@ return (
 
 
         <div className="w-full max-w-7xl h-[700px] bg-white p-8 rounded-3xl shadow-lg text-center ml-75 mt-20">
-                {/* Logo */}
                 <div className="mb-6">
                   <Image
-                    src={University} // Replace with actual logo path
+                    src={University} 
                     alt="NIBM Logo"
                     width={380}
                     height={95}
@@ -32,7 +31,7 @@ return (
                   />
                 </div>
 
-                {/* Heading */}
+  
                 <h2 className="text-5xl font-bold text-black mt-20 relative">
                   Welcome to Examination Portal
                 </h2>
@@ -41,7 +40,7 @@ return (
                   examination experience!
                 </p>
 
-                {/* Role Selection Buttons */}
+      
                 <div className="mt-6 flex justify-center gap-4">
                   <button
                     className={`justify-start text-cyan-300 text-md font-semibold self-stretch self-stretch px-24 py-1.5 bg-gradient-to-b from-black to-teal-700 rounded-[60px] shadow-[0px_0px_3.799999952316284px_0px_rgba(0,14,14,0.82)] shadow-[inset_1px_5px_4px_0px_rgba(255,255,255,0.58)] outline outline-[1.50px] outline-offset-[-1.50px] outline-teal-600 inline-flex justify-center items-center gap-2.5 overflow-hidden ${
