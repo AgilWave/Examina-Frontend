@@ -4,6 +4,7 @@ import Button from "@/components/common/button";
 import React, { useState, useEffect, useRef } from "react";
 import Image from "next/image";
 import Logo from "@/public/imgs/logo.png";
+import Link from "next/link";
 
 function NavBar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -139,7 +140,12 @@ function NavBar() {
             </div>
 
             <div className="hidden md:block">
-              <Button label="Portal" />
+              <Link href="/login" passHref>
+                <Button 
+                  label="Portal" 
+                  className="bg-black border-primary"
+                />
+              </Link>
             </div>
 
             <div className="md:hidden">
