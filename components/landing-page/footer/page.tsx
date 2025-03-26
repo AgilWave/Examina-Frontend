@@ -4,76 +4,104 @@ import Logo from "@/public/imgs/landing-page/Footer/BottomLogo.png";
 import LogoIn from "@/public/imgs/landing-page/Footer/instagram.png";
 import LogoLn from "@/public/imgs/landing-page/Footer/linkedin.png";
 import LogoYT from "@/public/imgs/landing-page/Footer/youtube.png";
-import Logoarrow from "@/public/imgs/landing-page/Footer/ic Arrow Go.png";
+import { ArrowRight } from "lucide-react";
 
 function Footer() {
+  const currentYear = new Date().getFullYear();
+  const socialLinks = [
+    { icon: LogoIn, alt: "Instagram" },
+    { icon: LogoLn, alt: "LinkedIn" },
+    { icon: LogoYT, alt: "YouTube" }
+  ];
+
+  const footerLinks = [
+    {
+      title: "Features",
+      links: ["Features", "Contact us", "Benefits"]
+    },
+    {
+      title: "Quick Links",
+      links: ["FAQ", "About us"]
+    },
+    {
+      title: "Resources",
+      links: ["NIBM World Wide", "NIBM LMS"]
+    }
+  ];
+
   return (
-    <footer className="bg-white dark:bg-gray-900 w-full rounded-t-3xl md:rounded-t-[50px] ">
-      <div className="bg-gray-50 flex flex-col justify-around items-start pt-20 rounded-t-3xl md:rounded-t-[50px] ">
-        <div className="flex flex-col md:flex-row justify-around items-start w-full px-4">
-          <div className="w-[291px] px-5">
-            <ul>
-              <p className="text-gray-800 text-3xl pb-6">
-                <Image src={Logo} alt="examinaLogo" />
-              </p>
-              <div className="flex gap-6 pb-5">
-                <p className="text-gray-500 pb-4">
-                  AI-powered online examination platform for secure, scalable,
-                  and efficient test management with real-time analytics and
-                  proctoring.
-                </p>
-              </div>
-            </ul>
-          </div>
-          <div className="px-5 pb-5 pt-3">
-            <ul>
-              <p className="text-gray-800 pb-2 ">Features</p>
-              <p className="text-gray-800 pb-2 ">Contact us</p>
-              <p className="text-gray-800 pb-2">Benefits</p>
-            </ul>
+    <footer className="bg-white dark:bg-gray-900 w-full rounded-t-3xl md:rounded-t-[50px]">
+      <div className="bg-gray-50 py-12 px-4 md:px-8 lg:px-16 rounded-t-3xl md:rounded-t-[50px]">
+        <div className="container mx-auto grid grid-cols-1 md:grid-cols-5 gap-8">
+          <div className="md:col-span-2 space-y-4">
+            <div className="w-48 mb-4">
+              <Image 
+                src={Logo} 
+                alt="Examina Logo" 
+                className="w-full h-auto"
+              />
+            </div>
+            <p className="text-gray-600 text-sm leading-relaxed">
+              AI-powered online examination platform for secure, scalable, 
+              and efficient test management with real-time analytics and proctoring.
+            </p>
           </div>
 
-          <div className="px-5 pb-5 pt-3">
-            <ul>
-              <p className="text-gray-800 pb-2">FAQ</p>
-              <p className="text-gray-800 pb-2">About us</p>
-            </ul>
-          </div>
+          {footerLinks.map((section, index) => (
+            <div key={index} className="space-y-4">
+              <h4 className="text-gray-800 font-semibold text-lg">{section.title}</h4>
+              <ul className="space-y-2">
+                {section.links.map((link, linkIndex) => (
+                  <li 
+                    key={linkIndex} 
+                    className="text-gray-600 text-sm hover:text-teal-600 
+                    transition-colors cursor-pointer"
+                  >
+                    {link}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))}
 
-          <div className="px-5 pb-5 pt-3">
-            <ul>
-              <p className="text-gray-800 pb-2">NIBM World Wide</p>
-              <p className="text-gray-800 pb-2">NIBM LMS</p>
-            </ul>
-          </div>
-
-          <div className="px-5 pb-5 pt-2">
-            <ul>
-              <p className="text-gray-800 pb-4">Subscribe</p>
-              <div className="flex w-56  rounded-[6px] bg-white border border-gray-300">
+          <div className="md:col-span-2 space-y-6">
+            <div>
+              <h4 className="text-gray-800 font-semibold text-lg mb-4">Subscribe</h4>
+              <div className="flex border border-gray-300 rounded-lg overflow-hidden">
                 <input
-                  type="search"
-                  name="search "
+                  type="email"
                   placeholder="Get product updates"
-                  className="w-full border-none bg-transperant px-2 py-2 text-gray-600 outline-none  text-sm"
+                  className="flex-grow px-4 py-3 text-sm text-gray-700 outline-none"
                 />
-                <button className="bg-[#0C7E7D] text-white px-4 py-1 rounded-[5px]">
-                  <Image src={Logoarrow} alt="ic Arrow Go.png" />
+                <button className="bg-[#0C7E7D] text-white px-4 hover:bg-teal-700 transition-colors cursor-pointer">
+                <ArrowRight size={24} className="text-white" />
                 </button>
               </div>
-              <div className="flex gap-3 pt-4">
-                <Image src={LogoIn} alt="instagram.png" />
-                <Image src={LogoLn} alt="linkdin.png" />
-                <Image src={LogoYT} alt="youtube.png" />
-              </div>
-            </ul>
+            </div>
+
+            <div className="flex space-x-4">
+              {socialLinks.map((social, index) => (
+                <div 
+                  key={index} 
+                  className="p-2 bg-gray-200 rounded-full hover:bg-teal-100 
+                  transition-all cursor-pointer"
+                >
+                  <Image 
+                    src={social.icon} 
+                    alt={social.alt} 
+                    width={24} 
+                    height={24} 
+                  />
+                </div>
+              ))}
+            </div>
           </div>
         </div>
-        <div className="h-[1px] w-full bg-gray-600 block my-4"></div>
-        <div className="px-4 md:px-6">
-          <p className="text-gray-800 text-center pb-4 px-6">
-            © {new Date().getFullYear()} Examina. All rights reserved.
-          </p>
+
+        <div className="border-t border-gray-300 my-8"></div>
+
+        <div className="text-center text-gray-600 text-sm">
+          © {currentYear} Examina. All Rights Reserved.
         </div>
       </div>
     </footer>
