@@ -21,7 +21,7 @@ const Button: React.FC<ButtonProps> = ({
       className={`
         px-12 py-3 
         cursor-pointer 
-        rounded-3xl 
+        rounded-4xl 
         outline-2 
         outline-offset-[-2px] 
         outline-primary 
