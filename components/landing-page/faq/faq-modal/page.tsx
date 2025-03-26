@@ -35,7 +35,7 @@ const FAQCard = ({ question, answer }: FAQCardProps) => {
         <div
           className="
             text-white 
-            text-lg 
+            md:text-lg 
             font-bold 
             cursor-pointer
             flex 

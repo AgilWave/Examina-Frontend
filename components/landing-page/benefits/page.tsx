@@ -96,7 +96,7 @@ function Benefits() {
     );
   };
   return (
-    <section className="flex flex-col items-center justify-center w-full py-16 px-4 md:px-8 gap-14">
+    <section className="flex flex-col items-center justify-center w-full py-8 px-4 md:px-8 gap-14">
       <div className="flex flex-col items-center justify-center gap-8 md:gap-11">
         <Tag label="Benefits" />
         <div className="flex flex-col items-center justify-center gap-4 md:gap-6">

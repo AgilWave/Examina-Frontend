@@ -1,10 +1,11 @@
 "use client";
 
 import Button from "@/components/common/button";
+import Link from "next/link";
 import React, { useState, useEffect, useRef } from "react";
 import Image from "next/image";
 import Logo from "@/public/imgs/logo.png";
-import Link from "next/link";
+
 
 function NavBar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);

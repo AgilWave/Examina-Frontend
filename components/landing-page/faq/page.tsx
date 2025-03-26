@@ -4,7 +4,7 @@ import FAQCard from "./faq-modal/page";
 
 function page() {
   return (
-    <div className="flex flex-col items-center justify-center gap-8 md:gap-11">
+    <div className="flex flex-col items-center justify-center gap-8 md:gap-11 py-8 ">
       <Tag label="FAQ" />
 
       <h1 className="text-4xl md:text-5xl font-semibold text-white text-center">

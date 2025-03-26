@@ -93,7 +93,7 @@ export default function FeaturesSection() {
   };
 
   return (
-    <section className="bg-black text-white py-16 px-6">
+    <section className="bg-black text-white pb-8 pt-10 px-6">
       <div className="max-w-6xl mx-auto flex flex-col items-center justify-center gap-8">
         <motion.div 
           ref={titleRef}
