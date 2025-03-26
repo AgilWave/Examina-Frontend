@@ -6,6 +6,7 @@ import Footer from "@/components/landing-page/footer/page";
 import NavBar from "@/components/landing-page/navbar/page";
 import Process from "@/components/landing-page/process/page";
 import Benefits from "@/components/landing-page/benefits/page";
+import FAQSection from "@/components/landing-page/faq/page";
 
 export default function LandingPage() {
   return (
@@ -28,6 +29,11 @@ export default function LandingPage() {
 
       <section id="benefits" className="flex-1 w-full px-4 sm:px-6 md:px-8 lg:px-16 xl:px-32 md:mt-10">
         <Benefits />
+      </section>
+
+      {/* faq section */}
+      <section id="faq" className="flex-1 w-full px-4 sm:px-6 md:px-8 lg:px-16 xl:px-32 md:mt-10">
+        <FAQSection />
       </section>
 
       <footer className="w-full px-4 sm:px-6 md:px-8 lg:px-16 xl:px-32 mt-6 md:mt-10 md:max-w-11/12 mx-auto">
