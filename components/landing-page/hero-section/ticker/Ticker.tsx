@@ -21,7 +21,7 @@ const LogoTicker = () => {
   ];
 
   return (
-    <div className="w-full md:max-w-11/12 flex flex-col items-center bg-black py-4">
+    <div className="w-full md:max-w-11/12 flex flex-col items-center bg-black pt-4">
       <div className="w-full text-center text-white font-medium text-base mb-6">
         Powered by Microsoft Technologies
       </div>
