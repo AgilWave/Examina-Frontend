@@ -11,11 +11,17 @@ export function middleware(req: NextRequest) {
         '/robots.txt',
         '/sitemap.xml',
         '/images/',
-        '/icons/'
+        '/icons/',
+        '/icons',
+        '.svg',
+        '.png',
+        '.jpg',
+        '.jpeg',
+        '.ico'
     ];
 
     const isStaticAsset = staticAssetPaths.some(path =>
-        url.pathname.startsWith(path)
+        url.pathname.includes(path) || url.pathname.endsWith(path)
     );
 
     if (host?.includes('examina.live') && !host.includes('admin') && url.pathname.startsWith('/admin')) {
@@ -43,10 +49,12 @@ export const config = {
     matcher: [
         '/:path*',
         '/_next/static/:path*',
-        '/_next/image/:path*',
+        '/_next/image',
         '/favicon.ico',
         '/manifest.json',
         '/robots.txt',
-        '/sitemap.xml'
+        '/sitemap.xml',
+        '/icons/:path*',
+        '/icon:path*'
     ],
 };
