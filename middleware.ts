@@ -4,32 +4,33 @@ export function middleware(req: NextRequest) {
     const url = req.nextUrl.clone();
     const host = req.headers.get('host');
 
-    const staticAssetPaths = [
-        '/_next/static/',
+    const isImageOptimizationRequest = url.pathname === '/_next/image';
+
+    // Comprehensive static asset check
+    const staticAssetPatterns = [
+        '/_next/static',
+        '/_next/image',
+        '/_next/static/media',
         '/favicon.ico',
         '/manifest.json',
         '/robots.txt',
         '/sitemap.xml',
         '/images/',
         '/icons/',
-        '/icons',
-        '.svg',
-        '.png',
-        '.jpg',
-        '.jpeg',
-        '.ico'
     ];
 
-    const isStaticAsset = staticAssetPaths.some(path =>
-        url.pathname.includes(path) || url.pathname.endsWith(path)
+
+    const isStaticAsset = staticAssetPatterns.some(path => 
+        url.pathname.includes(path) || url.pathname.startsWith(path)
     );
+
 
     if (host?.includes('examina.live') && !host.includes('admin') && url.pathname.startsWith('/admin')) {
         return NextResponse.redirect(new URL('/', req.url));
     }
 
     if (host?.includes('admin.examina.live')) {
-        if (isStaticAsset) {
+        if (isStaticAsset || isImageOptimizationRequest) {
             return NextResponse.next();
         }
 
@@ -50,11 +51,10 @@ export const config = {
         '/:path*',
         '/_next/static/:path*',
         '/_next/image',
+        '/_next/static/media/:path*',
         '/favicon.ico',
         '/manifest.json',
         '/robots.txt',
-        '/sitemap.xml',
-        '/icons/:path*',
-        '/icon:path*'
+        '/sitemap.xml'
     ],
 };
