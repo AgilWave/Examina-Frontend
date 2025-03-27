@@ -29,14 +29,12 @@ export function middleware(req: NextRequest) {
 
         const authToken = req.cookies.get('authToken');
 
-        // Redirect to admin login for unauthenticated requests
         if (!authToken) {
             if (url.pathname !== '/login') {
                 return NextResponse.redirect(new URL('/login', req.url));
             }
         }
 
-        // Rewrite all paths to admin routes
         return NextResponse.rewrite(new URL(`/admin${url.pathname}`, req.url));
     }
 }
@@ -45,6 +43,7 @@ export const config = {
     matcher: [
         '/:path*',
         '/_next/static/:path*',
+        '/_next/image/:path*',
         '/favicon.ico',
         '/manifest.json',
         '/robots.txt',
