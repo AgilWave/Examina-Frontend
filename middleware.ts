@@ -18,19 +18,25 @@ export function middleware(req: NextRequest) {
         url.pathname.startsWith(path)
     );
 
-    if (host?.includes('examina.live') && !host.includes('admin') && url.pathname.startsWith('/admin')) {
-        return NextResponse.redirect(new URL('/', req.url));
+    const normalizedHost = host?.toLowerCase() ?? '';
+
+    if (normalizedHost.includes('examina.live') && !normalizedHost.includes('admin')) {
+        if (url.pathname.startsWith('/admin')) {
+            return NextResponse.redirect(new URL('/', req.url));
+        }
     }
 
-    if (host?.includes('admin.examina.live')) {
+    if (normalizedHost.includes('admin.examina.live')) {
         if (isStaticAsset) {
             return NextResponse.next();
         }
 
+        if (url.pathname.startsWith('/admin/login')) {
+            return NextResponse.redirect(new URL('/login', req.url));
+        }
+
         if (url.pathname.startsWith('/admin')) {
             return NextResponse.rewrite(new URL(url.pathname.replace('/admin', ''), req.url));
-        } else {
-            return NextResponse.redirect(new URL('/admin' + url.pathname, req.url));
         }
     }
 
