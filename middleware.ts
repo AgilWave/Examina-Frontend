@@ -14,33 +14,25 @@ export function middleware(req: NextRequest) {
         '/icons/'
     ];
 
-    const isStaticAsset = staticAssetPaths.some(path => 
+    const isStaticAsset = staticAssetPaths.some(path =>
         url.pathname.startsWith(path)
     );
 
-    const normalizedHost = host?.toLowerCase() ?? '';
-
-    if (normalizedHost.includes('examina.live') && !normalizedHost.includes('admin')) {
-        if (url.pathname.startsWith('/admin')) {
-            return NextResponse.redirect(new URL('/', req.url));
-        }
+    if (host?.includes('examina.live') && !host.includes('admin') && url.pathname.startsWith('/admin')) {
+        return NextResponse.redirect(new URL('/', req.url));
     }
 
-    if (normalizedHost.includes('admin.examina.live')) {
+    if (host?.includes('admin.examina.live')) {
         if (isStaticAsset) {
             return NextResponse.next();
-        }
-
-        if (url.pathname.startsWith('/admin/login')) {
-            return NextResponse.redirect(new URL('/login', req.url));
         }
 
         if (url.pathname.startsWith('/admin')) {
             return NextResponse.rewrite(new URL(url.pathname.replace('/admin', ''), req.url));
         }
-    }
 
-    return NextResponse.next();
+        return NextResponse.next();
+    }
 }
 
 export const config = {
