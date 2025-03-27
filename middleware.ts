@@ -6,7 +6,6 @@ export function middleware(req: NextRequest) {
 
     const isImageOptimizationRequest = url.pathname === '/_next/image';
 
-    // Comprehensive static asset check
     const staticAssetPatterns = [
         '/_next/static',
         '/_next/image',
@@ -20,7 +19,7 @@ export function middleware(req: NextRequest) {
     ];
 
 
-    const isStaticAsset = staticAssetPatterns.some(path => 
+    const isStaticAsset = staticAssetPatterns.some(path =>
         url.pathname.includes(path) || url.pathname.startsWith(path)
     );
 
