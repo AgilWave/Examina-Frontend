@@ -1,25 +1,19 @@
-import type { NextConfig } from "next";
-
-const nextConfig: NextConfig = {
+/** @type {import('next').NextConfig} */
+const nextConfig = {
   async rewrites() {
     return [
       {
-        source: '/admin/:path*',
-        has: [{ type: 'host', value: 'admin.examina.live' }],
-        destination: '/admin/:path*',
-      }
+        source: '/:path*',
+        destination: '/:path*',
+        has: [
+          {
+            type: 'host',
+            value: 'admin.examina.live',
+          },
+        ],
+      },
     ];
   },
+}
 
-  async redirects() {
-    return [
-      {
-        source: '/admin/login',
-        destination: '/admin/login',
-        permanent: false,
-      }
-    ];
-  }
-};
-
-export default nextConfig;
+module.exports = nextConfig
