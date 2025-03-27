@@ -4,7 +4,6 @@
   "private": true,
   "scripts": {
     "dev": "next dev --turbopack",
-    "dev:admin": "next dev --turbopack --port 3001",
     "build": "next build",
     "start": "next start -p ${PORT:-8080}",
     "lint": "next lint"
