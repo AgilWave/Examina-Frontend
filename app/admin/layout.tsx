@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
-import "./globals.css";
+import "@/app/globals.css";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -13,7 +13,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Examina - Admin Panel",
+  title: "Examina - Adm",
   description: "Examina is a cutting-edge online examination platform designed to provide a seamless and secure testing experience for educational institutions and organizations. Our system ensures fair assessments with advanced AI-powered proctoring, real-time monitoring, and strict exam integrity measures.",
 };
 

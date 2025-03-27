@@ -9,7 +9,7 @@ const nextConfig: NextConfig = {
         destination: '/login',
       },
       {
-        source: '/:path*',
+        source: '/admin/:path*',
         has: [{ type: 'host', value: 'admin.examina.live' }],
         destination: '/admin/:path*',
       },
