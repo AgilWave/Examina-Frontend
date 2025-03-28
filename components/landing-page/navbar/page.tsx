@@ -79,7 +79,6 @@ function NavBar() {
     document.body.style.overflow = "auto";
   };
 
-  // Handle smooth scrolling
   const scrollToSection = (sectionId: string) => {
     const sectionElement = document.getElementById(sectionId.toLowerCase());
     
@@ -89,7 +88,7 @@ function NavBar() {
       }
       
       window.scrollTo({
-        top: sectionElement.offsetTop - 80, // Adjust offset to account for navbar height
+        top: sectionElement.offsetTop - 80, 
         behavior: "smooth"
       });
       
@@ -250,7 +249,9 @@ function NavBar() {
             }`}
             style={{ transitionDelay: `${navItems.length * 100}ms` }}
           >
-            <Button className="text-base" label="Portal" onClick={closeMenu} />
+            <Link href="/login" passHref>
+              <Button label="Portal" className="text-base" onClick={closeMenu} />
+            </Link>
           </div>
         </div>
       </div>
