@@ -5,6 +5,7 @@ import loginSchema from "@/utils/schemas/loginSchema";
 import miniLogo from "@/public/imgs/loginlogo.png";
 import logo from "@/public/imgs/university.png";
 import InputField from "@/components/ui/inputs";
+import { useState } from "react";
 
 const validateLoginData = (data: { email: string; password: string }) => {
   const errors: { [key: string]: string } = {};
@@ -33,8 +34,8 @@ const isValidEmail = (email: string) => {
 };
 
 function Login() {
-  const [email, setEmail] = React.useState("");
-  const [errors] = React.useState<{[key: string]: string}>({});
+    const [email, setEmail] = useState("");
+    const [errors] = useState<{ [key: string]: string }>({});
   
   const handleSubmit = async (formData: FormData) => {
     const email = formData.get("email") as string;
