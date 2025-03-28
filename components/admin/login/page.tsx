@@ -1,7 +1,7 @@
-'use client';
+"use client";
 import React from "react";
 import Image from "next/image";
-import { loginAction } from "@/services/actions/auth"; 
+import { loginAction } from "@/services/actions/auth";
 import loginSchema from "@/utils/schemas/loginSchema";
 import miniLogo from "@/public/imgs/loginlogo.png";
 import logo from "@/public/imgs/university.png";
@@ -35,24 +35,23 @@ const isValidEmail = (email: string) => {
 };
 
 function Login() {
-    const [email, setEmail] = useState("");
-    const [errors] = useState<{ [key: string]: string }>({});
-  
+  const [email, setEmail] = useState("");
+  const [errors, setErrors] = useState<{ [key: string]: string }>({});
+
   const handleSubmit = async (formData: FormData) => {
-    const email = formData.get("email") as string;
-    
+    const password = formData.get('password') as string;
     const loginData = {
-      username: email, 
-      password: formData.get("password") as string,
+      username: email,
+      password: password,
     };
 
     const validationResult = validateLoginData({
       email,
-      password: loginData.password
+      password: loginData.password,
     });
 
     if (!validationResult.isValid) {
-      console.error("Validation failed:", validationResult.errors);
+      setErrors(validationResult.errors);
       return;
     }
 
@@ -60,7 +59,7 @@ function Login() {
       const result = await loginAction(loginData);
 
       if (result.success) {
-       
+        // Handle success logic here
       } else {
         console.error("Login failed:", result.message || "Login failed");
       }
@@ -110,7 +109,7 @@ function Login() {
           </p>
 
           <form action={handleSubmit} className="space-y-6">
-          <InputField
+            <InputField
               label="Email"
               name="email"
               type="email"
