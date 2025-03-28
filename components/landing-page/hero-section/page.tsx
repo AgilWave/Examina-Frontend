@@ -6,7 +6,7 @@ import DashbardImg from "@/public/imgs/landing-page/Admin Dashboard-Dark Mode.pn
 
 function HeroSection() {
   return (
-    <div className="flex flex-col items-center md:justify-center w-full h-180 md:min-h-screen bg-black mt-14 gap-3">
+    <div className="flex flex-col items-center md:justify-center w-full h-150 lg:h-230 bg-black mt-14 gap-3">
       <div className="relative bg-white rounded-3xl md:rounded-[50px] overflow-hidden w-full h-[80%] md:h-[85%] max-w-6xl mx-auto p-4 md:p-8 shadow-lg">
         <div className="flex flex-col justify-center items-center gap-3 md:gap-4 lg:gap-6">
           <h1 className="self-stretch mt-5 md:mt-6 text-center text-black text-[28px] sm:text-3xl md:text-4xl lg:text-6xl font-bold capitalize leading-tight md:leading-snug lg:leading-[74.67px]">
@@ -44,10 +44,8 @@ function HeroSection() {
       -translate-x-1/2 
       -bottom-4 
       w-[95%] 
-      h-[320px] 
-      md:h-[210px] 
-      xl:h-[230px] 
-      2xl:h-[400px] 
+      h-[240px] 
+      md:h-[400px] 
       bg-zinc-800 
       rounded-t-[33px] 
       md:rounded-t-[63px] 
