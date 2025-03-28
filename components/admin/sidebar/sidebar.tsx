@@ -4,7 +4,9 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import university from '@/public/imgs/unidashboard.png';
-import PowerdBy from '@/public/imgs/bottomlogo.png';
+import PoweredBy from '@/public/imgs/bottomlogo.png';
+import examinaMobile from '@/public/imgs/examinacrop.png'
+import NIBMCrop from '@/public/imgs/nibmcrop.png'
 import { usePathname } from 'next/navigation';
 import { LayoutGrid, Settings, BookCopy, GraduationCap } from 'lucide-react';
 
@@ -24,37 +26,49 @@ const Sidebar = () => {
   }, []);
 
   const menuItems = [
-    { name: 'Overview', icon: LayoutGrid, href: '/' },
+    { name: 'Overview', icon: LayoutGrid, href: '' },
     { name: 'Exams', icon: GraduationCap, href: '/exams' },
     { name: 'Reports', icon: BookCopy, href: '/reports' },
+    { name: 'Configurations', icon: Settings, href: '/config' },
   ];
 
   return (
     <aside
       className={`h-screen bg-black text-white flex flex-col justify-between border-r border-[#26FEFD36]
-        ${isMobile ? 'w-20' : 'w-64'}`}
+        ${isMobile ? 'w-15' : 'w-64'}`}
     >
       {/* Logo - Responsive */}
       <div className="flex justify-center w-full">
         <div 
           className={`relative ${
             isMobile 
-              ? 'w-12 h-10 mt-2' 
+              ? 'w-10 h-10 mt-2' 
               : 'w-40 h-20 md:w-48 md:h-24'
           }`}
         >
-          <Image
-            src={university}
-            alt="Logo"
-            fill
-            className="object-contain"
-            priority
-          />
+          {isMobile ? (
+            <Image
+              src={NIBMCrop}
+              alt="Logo"
+              fill
+              className="object-contain"
+              priority
+            />
+          ) : (
+            <Image
+              src={university}
+              alt="Logo"
+              fill
+              className="object-contain"
+              priority
+            />
+          )}
         </div>
       </div>
 
+
       {/* Menu Items */}
-      <nav className="flex flex-col gap-4 mt-6 p-5">
+      <nav className="flex flex-col gap-4 mt-6 md:p-5 p-2">
         {!isMobile && <h3>Menu</h3>}
         {menuItems.map(({ name, icon: Icon, href }) => (
           <Link key={name} href={href}>
@@ -89,7 +103,7 @@ const Sidebar = () => {
               <p>Powered By</p>
             </div>
             <Image
-              src={PowerdBy}
+              src={PoweredBy}
               alt="Powered By Logo"
               fill
               className="w-16 h-8 object-contain"
@@ -100,7 +114,7 @@ const Sidebar = () => {
             className="relative w-12 h-6"
           >
             <Image
-              src={PowerdBy}
+              src={examinaMobile}
               alt="Powered By Logo"
               fill
               className="object-contain"
