@@ -12,7 +12,6 @@ import { LayoutGrid, Settings, BookCopy, GraduationCap } from 'lucide-react';
 
 const Sidebar = () => {
   const pathname = usePathname();
-  const [hovered, setHovered] = useState<string | null>(null);
   const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
@@ -66,7 +65,6 @@ const Sidebar = () => {
         </div>
       </div>
 
-
       {/* Menu Items */}
       <nav className="flex flex-col gap-4 mt-6 md:p-5 p-2">
         {!isMobile && <h3>Menu</h3>}
@@ -76,8 +74,6 @@ const Sidebar = () => {
               className={`flex items-center gap-3 p-3 rounded-lg cursor-pointer transition-all duration-300
                 ${pathname === href ? 'bg-gradient-to-r from-[#00928F] to-[#0BA5A4] text-white shadow-inner'
                   : 'text-gray-300 hover:bg-gradient-to-r hover:from-[#00928F] hover:to-[#0BA5A4]'}`}
-              onMouseEnter={() => setHovered(name)}
-              onMouseLeave={() => setHovered(null)}
               title={isMobile ? name : undefined}
             >
               <Icon size={20} />
