@@ -21,7 +21,9 @@ const InputField: React.FC<InputFieldProps> = ({
 }) => {
   return (
     <div>
-      <label className="block text-sm font-medium text-gray-700 mb-1">{label}</label>
+      <label className="block text-sm font-medium text-gray-700 mb-1">
+        {label}
+      </label>
       <input
         type={type}
         name={name}

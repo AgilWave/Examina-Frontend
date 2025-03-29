@@ -1,70 +1,43 @@
 "use client";
 import React from "react";
 import Image from "next/image";
-import { loginAction } from "@/services/actions/auth";
-import loginSchema from "@/utils/schemas/loginSchema";
+import { LoginAdmin } from "@/services/actions/auth";
 import miniLogo from "@/public/imgs/loginlogo.png";
 import logo from "@/public/imgs/university.png";
-import InputField from "@/components/ui/inputs";
 import { useState } from "react";
-
-const validateLoginData = (data: { email: string; password: string }) => {
-  const errors: { [key: string]: string } = {};
-
-  if (!data.email) {
-    errors.email = loginSchema.email.message;
-  } else if (loginSchema.email.email && !isValidEmail(data.email)) {
-    errors.email = loginSchema.email.message;
-  }
-
-  if (!data.password) {
-    errors.password = loginSchema.password.message;
-  } else if (data.password.length < (loginSchema.password.min || 6)) {
-    errors.password = loginSchema.password.message;
-  }
-
-  return {
-    isValid: Object.keys(errors).length === 0,
-    errors,
-  };
-};
-
-const isValidEmail = (email: string) => {
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  return emailRegex.test(email);
-};
+import { toast } from "sonner";
+import { useRouter } from "next/navigation";
 
 function Login() {
   const [email, setEmail] = useState("");
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
+  const router = useRouter();
 
   const handleSubmit = async (formData: FormData) => {
-    const password = formData.get('password') as string;
+    const password = formData.get("password") as string;
     const loginData = {
       username: email,
       password: password,
     };
 
-    const validationResult = validateLoginData({
-      email,
-      password: loginData.password,
-    });
-
-    if (!validationResult.isValid) {
-      setErrors(validationResult.errors);
-      return;
-    }
-
     try {
-      const result = await loginAction(loginData);
-
+      const result = await LoginAdmin({
+        email: loginData.username,
+        password: loginData.password,
+      });
       if (result.success) {
-        // Handle success logic here
+        toast.success("Login successful!");
+        if (result.redirect) {
+          router.push(result.redirect);
+        } else {
+          router.push("/dashboard");
+        }
       } else {
-        console.error("Login failed:", result.message || "Login failed");
+        toast.error(result.message || "Login failed!");
       }
     } catch (error) {
-      console.error("An unexpected error occurred", error);
+      console.error("Login error:", error);
+      setErrors({ email: "An error occurred during login" });
     }
   };
 
@@ -109,15 +82,26 @@ function Login() {
           </p>
 
           <form action={handleSubmit} className="space-y-6">
-            <InputField
-              label="Email"
-              name="email"
-              type="email"
-              placeholder="Enter your email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              error={errors.email}
-            />
+            {/* username or email */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Username or Email
+              </label>
+              <input
+                type="text"
+                name="email"
+                className="w-full text-black px-4 py-3 border border-gray-300 rounded-2xl 
+                focus:outline-none focus:ring-2 focus:ring-teal-600 focus:border-transparent
+                transition-all duration-200"
+                placeholder="Enter your username or email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+              />
+              {errors.email && (
+                <p className="text-red-500 text-xs mt-1">{errors.email}</p>
+              )}
+            </div>
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">

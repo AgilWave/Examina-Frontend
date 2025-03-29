@@ -2,8 +2,52 @@
 import Image from "next/image";
 import miniLogo from "@/public/imgs/loginlogo.png";
 import University from "@/public/imgs/university.png";
+import { signIn, useSession, SessionProvider } from "next-auth/react";
+import { useState } from "react";
+import { useEffect } from "react";
+import { loginActionMS } from "@/services/actions/auth";
 
-export default function LoginPage() {
+function LoginPageContent() {
+  const [loadingStudent, setLoadingStudent] = useState(false);
+  const [loadingLecturer, setLoadingLecturer] = useState(false);
+  const { data: session } = useSession();
+
+  useEffect(() => {
+    const handleMicrosoftAuth = async () => {
+      if (session?.idToken) {
+        try {
+          const response = await loginActionMS({
+            idToken: session.idToken,
+          });
+
+          if (response.status !== 200 && response.status !== 201) {
+            throw new Error("Authentication failed");
+          }
+        } catch (error) {
+          console.error("Authentication error:", error);
+        }
+      }
+    };
+
+    handleMicrosoftAuth();
+  }, [session]);
+
+  const handleLogin = async (role: string) => {
+    if (role === "student") {
+      setLoadingStudent(true);
+    } else {
+      setLoadingLecturer(true);
+    }
+
+    try {
+      await signIn("microsoft-entra-id");
+    } catch (error) {
+      console.error("Login error:", error);
+      setLoadingStudent(false);
+      setLoadingLecturer(false);
+    }
+  };
+
   return (
     <div className="min-h-screen w-full flex items-center justify-center bg-gradient-to-br from-black via-gray-900 to-teal-900 relative overflow-hidden p-4">
       <div className="absolute inset-0 overflow-hidden">
@@ -55,6 +99,7 @@ export default function LoginPage() {
 
               <div className="flex flex-col space-y-4">
                 <button
+                  onClick={() => handleLogin("student")}
                   className="w-full py-3 rounded-full 
                   bg-gradient-to-tl from-teal-600 to-black
                   text-white font-semibold 
@@ -63,10 +108,36 @@ export default function LoginPage() {
                   transform hover:scale-105 
                   shadow-lg hover:shadow-xl"
                 >
-                  Student
+                  {loadingStudent ? (
+                    <div className="flex items-center justify-center space-x-2">
+                      <svg
+                        className="animate-spin h-5 w-5 text-white"
+                        xmlns="http://www.w3.org/2000/svg"
+                        viewBox="0 0 24 24"
+                      >
+                        <circle
+                          className="opacity-25"
+                          cx="12"
+                          cy="12"
+                          r="10"
+                          fill="none"
+                          strokeWidth="4"
+                        />
+                        <path
+                          className="opacity-75"
+                          fill="currentColor"
+                          d="M4 12a8 8 0 1 1 16 0A8 8 0 0 1 4 12z"
+                        />
+                      </svg>
+                      <span>Loading...</span>
+                    </div>
+                  ) : (
+                    "Student"
+                  )}
                 </button>
 
                 <button
+                  onClick={() => handleLogin("lecturer")}
                   className="w-full py-3 rounded-full 
                   bg-gradient-to-tl from-teal-600 to-black
                   text-white font-semibold 
@@ -75,7 +146,32 @@ export default function LoginPage() {
                   transform hover:scale-105 
                   shadow-lg hover:shadow-xl"
                 >
-                  Instructor
+                  {loadingLecturer ? (
+                    <div className="flex items-center justify-center space-x-2">
+                      <svg
+                        className="animate-spin h-5 w-5 text-white"
+                        xmlns="http://www.w3.org/2000/svg"
+                        viewBox="0 0 24 24"
+                      >
+                        <circle
+                          className="opacity-25"
+                          cx="12"
+                          cy="12"
+                          r="10"
+                          fill="none"
+                          strokeWidth="4"
+                        />
+                        <path
+                          className="opacity-75"
+                          fill="currentColor"
+                          d="M4 12a8 8 0 1 1 16 0A8 8 0 0 1 4 12z"
+                        />
+                      </svg>
+                      <span>Loading...</span>
+                    </div>
+                  ) : (
+                    "Lecturer"
+                  )}
                 </button>
               </div>
             </div>
@@ -96,5 +192,13 @@ export default function LoginPage() {
         © {new Date().getFullYear()} Examina. All rights reserved.
       </div>
     </div>
+  );
+}
+
+export default function LoginPage() {
+  return (
+    <SessionProvider>
+      <LoginPageContent />
+    </SessionProvider>
   );
 }
