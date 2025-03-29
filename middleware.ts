@@ -76,7 +76,7 @@ export async function middleware(req: NextRequest) {
                 return NextResponse.redirect(new URL('/login', req.url));
             }
         } else {
-            if (url.pathname === '/login') {
+            if (url.pathname === '/' || url.pathname === '/login') {
                 return NextResponse.redirect(new URL('/dashboard', req.url));
             }
         }
