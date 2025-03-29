@@ -1,21 +1,20 @@
-import crypto from 'crypto';
+import CryptoJS from 'crypto-js';
 
-const algorithm = 'aes-256-cbc';
-const key = crypto.scryptSync('examina', 'salt', 32);
-const iv = crypto.randomBytes(16);
+// Generate a 32-byte key using SHA256
+const key = CryptoJS.SHA256('examina');
 
 export function encrypt(text: string): string {
-    const cipher = crypto.createCipheriv(algorithm, key, iv);
-    let encrypted = cipher.update(text, 'utf8', 'hex');
-    encrypted += cipher.final('hex');
-    return iv.toString('hex') + ':' + encrypted;
+    const iv = CryptoJS.lib.WordArray.random(16); // Generate a random IV
+    const encrypted = CryptoJS.AES.encrypt(text, key, { iv: iv });
+
+    return iv.toString(CryptoJS.enc.Hex) + ':' + encrypted.toString(); // Store IV with encrypted text
 }
 
 export function decrypt(encryptedText: string): string {
     const [ivHex, encrypted] = encryptedText.split(':');
-    const ivBuffer = Buffer.from(ivHex, 'hex');
-    const decipher = crypto.createDecipheriv(algorithm, key, ivBuffer);
-    let decrypted = decipher.update(encrypted, 'hex', 'utf8');
-    decrypted += decipher.final('utf8');
-    return decrypted;
+
+    const iv = CryptoJS.enc.Hex.parse(ivHex); // Convert IV back to binary format
+    const decrypted = CryptoJS.AES.decrypt(encrypted, key, { iv: iv });
+
+    return decrypted.toString(CryptoJS.enc.Utf8); // Convert back to readable text
 }

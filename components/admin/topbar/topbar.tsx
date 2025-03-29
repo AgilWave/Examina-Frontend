@@ -1,45 +1,64 @@
 "use client";
 
-import Image from 'next/image';
-import defaultUserAvatar from '@/public/imgs/useraccount.png';
-import React, { useState, useRef, useEffect } from 'react';
-import { Search, Bell, ChevronDown, User, Settings, LogOut, X } from 'lucide-react';
+import Image from "next/image";
+import defaultUserAvatar from "@/public/imgs/useraccount.png";
+import React, { useState, useRef, useEffect } from "react";
+import {
+  Search,
+  Bell,
+  ChevronDown,
+  User,
+  Settings,
+  LogOut,
+  X,
+} from "lucide-react";
+import Cookies from "js-cookie";
+import { decrypt } from "@/lib/encryption";
 
-interface TopbarProps {
-  userName?: string;
-  userAvatar?: string;
-}
-
-const Topbar: React.FC<TopbarProps> = ({ 
-  userName = "Shehal Herath", 
-  userAvatar = defaultUserAvatar
-}) => {
+const Topbar = () => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isSearchExpanded, setIsSearchExpanded] = useState(false);
-  const [searchQuery, setSearchQuery] = useState('');
+  const [userName, setUserName] = useState("");
+  const [searchQuery, setSearchQuery] = useState("");
   const dropdownRef = useRef<HTMLDivElement>(null);
   const searchRef = useRef<HTMLDivElement>(null);
+  const userAvatar = defaultUserAvatar;
 
-  // Close dropdown when clicking outside
+  useEffect(() => {
+    const userData = Cookies.get("userDetails");
+    if (userData) {
+      const decryptedData = decrypt(userData);
+      const parsedData = JSON.parse(decryptedData);
+      setUserName(parsedData.name || "");
+    }
+  }, []);
+
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(event.target as Node)
+      ) {
         setIsDropdownOpen(false);
       }
-      if (searchRef.current && !searchRef.current.contains(event.target as Node) && isSearchExpanded) {
+      if (
+        searchRef.current &&
+        !searchRef.current.contains(event.target as Node) &&
+        isSearchExpanded
+      ) {
         setIsSearchExpanded(false);
-        setSearchQuery('');
+        setSearchQuery("");
       }
     };
 
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [isSearchExpanded]);
 
   const toggleSearch = () => {
     setIsSearchExpanded(!isSearchExpanded);
     if (!isSearchExpanded) {
-      setSearchQuery('');
+      setSearchQuery("");
     }
   };
 
@@ -49,7 +68,7 @@ const Topbar: React.FC<TopbarProps> = ({
       <div className="flex-1 flex items-center">
         {/* Mobile Search Button (hidden on desktop and when search is expanded) */}
         {!isSearchExpanded && (
-          <button 
+          <button
             onClick={toggleSearch}
             className="md:hidden p-2 text-gray-400 hover:text-white focus:outline-none"
           >
@@ -58,13 +77,17 @@ const Topbar: React.FC<TopbarProps> = ({
         )}
 
         {/* Search Container */}
-        <div 
+        <div
           ref={searchRef}
-          className={`${isSearchExpanded ? 'absolute -left-60 right-40 md:justify-items-start md:relative md:left-0 md:right-0' : 'hidden md:block'} ml-[260px]`}
+          className={`${
+            isSearchExpanded
+              ? "absolute -left-60 right-40 md:justify-items-start md:relative md:left-0 md:right-0"
+              : "hidden md:block"
+          } ml-[260px]`}
         >
           <div className="relative flex items-center">
             {isSearchExpanded && (
-              <button 
+              <button
                 onClick={toggleSearch}
                 className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-white md:hidden"
               >
@@ -100,7 +123,7 @@ const Topbar: React.FC<TopbarProps> = ({
 
         {/* User Profile */}
         <div className="relative" ref={dropdownRef}>
-          <div 
+          <div
             onClick={() => setIsDropdownOpen(!isDropdownOpen)}
             className="flex items-center space-x-2 cursor-pointer"
           >
@@ -109,15 +132,19 @@ const Topbar: React.FC<TopbarProps> = ({
               <span className="text-xs text-gray-400">Admin</span>
             </div>
             <div className="w-8 h-8 md:w-10 md:h-10 rounded-full overflow-hidden border border-teal-500">
-              <Image 
-                src={userAvatar} 
-                alt="User Avatar" 
+              <Image
+                src={userAvatar}
+                alt="User Avatar"
                 width={40}
                 height={40}
                 className="w-full h-full object-cover"
               />
             </div>
-            <ChevronDown className={`h-4 w-4 text-white transition-transform ${isDropdownOpen ? 'rotate-180' : ''}`} />
+            <ChevronDown
+              className={`h-4 w-4 text-white transition-transform ${
+                isDropdownOpen ? "rotate-180" : ""
+              }`}
+            />
           </div>
 
           {isDropdownOpen && (
