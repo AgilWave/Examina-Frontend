@@ -1,14 +1,14 @@
-'use client';
+"use client";
 
-import { useState, useEffect } from 'react';
-import Link from 'next/link';
-import Image from 'next/image';
-import university from '@/public/imgs/unidashboard.png';
-import PoweredBy from '@/public/imgs/bottomlogo.png';
-import examinaMobile from '@/public/imgs/examinacrop.png'
-import NIBMCrop from '@/public/imgs/nibmcrop.png'
-import { usePathname } from 'next/navigation';
-import { LayoutGrid, Settings, BookCopy, GraduationCap } from 'lucide-react';
+import { useState, useEffect } from "react";
+import Link from "next/link";
+import Image from "next/image";
+import university from "@/public/imgs/unidashboard.png";
+import PoweredBy from "@/public/imgs/bottomlogo.png";
+import examinaMobile from "@/public/imgs/examinacrop.png";
+import NIBMCrop from "@/public/imgs/nibmcrop.png";
+import { usePathname } from "next/navigation";
+import { LayoutGrid, Settings, BookCopy, GraduationCap } from "lucide-react";
 
 const Sidebar = () => {
   const pathname = usePathname();
@@ -20,29 +20,27 @@ const Sidebar = () => {
     };
 
     handleResize();
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
   }, []);
 
   const menuItems = [
-    { name: 'Overview', icon: LayoutGrid, href: '' },
-    { name: 'Exams', icon: GraduationCap, href: '/exams' },
-    { name: 'Reports', icon: BookCopy, href: '/reports' },
-    { name: 'Configurations', icon: Settings, href: '/config' },
+    { name: "Overview", icon: LayoutGrid, href: "/admin/dashboard/overview" },
+    { name: "Exams", icon: GraduationCap, href: "/admin/dashboard/exams" },
+    { name: "Reports", icon: BookCopy, href: "/admin/dashboard/reports" },
+    { name: "Configurations", icon: Settings, href: "/admin/dashboard/config" },
   ];
 
   return (
     <aside
       className={`h-screen bg-black text-white flex flex-col justify-between border-r border-[#26FEFD36]
-        ${isMobile ? 'w-15' : 'w-64'}`}
+        ${isMobile ? "w-15" : "w-64"}`}
     >
       {/* Logo - Responsive */}
       <div className="flex justify-center w-full">
-        <div 
+        <div
           className={`relative ${
-            isMobile 
-              ? 'w-10 h-10 mt-2' 
-              : 'w-40 h-20 md:w-48 md:h-24'
+            isMobile ? "w-10 h-10 mt-2" : "w-40 h-20 md:w-48 md:h-24"
           }`}
         >
           {isMobile ? (
@@ -72,8 +70,11 @@ const Sidebar = () => {
           <Link key={name} href={href}>
             <div
               className={`flex items-center gap-3 p-3 rounded-lg cursor-pointer transition-all duration-300
-                ${pathname === href ? 'bg-gradient-to-r from-[#00928F] to-[#0BA5A4] text-white shadow-inner'
-                  : 'text-gray-300 hover:bg-gradient-to-r hover:from-[#00928F] hover:to-[#0BA5A4]'}`}
+                ${
+                  pathname === href
+                    ? "bg-gradient-to-r from-[#00928F] to-[#0BA5A4] text-white shadow-inner"
+                    : "text-gray-300 hover:bg-gradient-to-r hover:from-[#00928F] hover:to-[#0BA5A4]"
+                }`}
               title={isMobile ? name : undefined}
             >
               <Icon size={20} />
@@ -88,9 +89,9 @@ const Sidebar = () => {
       </nav>
 
       {/* Footer - Responsive */}
-      <div 
+      <div
         className={`flex flex-col items-center w-full mt-auto pb-4 ${
-          isMobile ? 'text-center' : ''
+          isMobile ? "text-center" : ""
         }`}
       >
         {!isMobile ? (
@@ -106,9 +107,7 @@ const Sidebar = () => {
             />
           </div>
         ) : (
-          <div 
-            className="relative w-12 h-6"
-          >
+          <div className="relative w-12 h-6">
             <Image
               src={examinaMobile}
               alt="Powered By Logo"
