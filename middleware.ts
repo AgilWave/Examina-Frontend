@@ -66,6 +66,11 @@ export async function middleware(req: NextRequest) {
             return NextResponse.next();
         }
 
+        if (url.pathname.startsWith('/admin')) {
+            const newPath = url.pathname.replace('/admin', '');
+            return NextResponse.redirect(new URL(newPath, req.url));
+        }
+
         if (!adminJwt) {
             if (url.pathname !== '/login') {
                 return NextResponse.redirect(new URL('/login', req.url));
