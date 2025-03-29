@@ -9,15 +9,13 @@ import InsightsIMG from "@/public/imgs/insights.png";
 import Tag from "../_components/tag";
 
 export default function FeaturesSection() {
-  // Create separate controls and refs for each element
   const titleControls = useAnimation();
   const firstRowControls = useAnimation();
   const secondRowControls = useAnimation();
   
-  // Create separate refs with lower threshold and triggerOnce: false
   const [titleRef, titleInView] = useInView({
     threshold: 0.1,
-    triggerOnce: false // Will trigger every time
+    triggerOnce: false 
   });
   
   const [firstRowRef, firstRowInView] = useInView({
@@ -30,7 +28,6 @@ export default function FeaturesSection() {
     triggerOnce: false
   });
 
-  // Trigger animations based on each section's visibility
   useEffect(() => {
     if (titleInView) {
       titleControls.start("visible");
@@ -55,12 +52,11 @@ export default function FeaturesSection() {
     }
   }, [secondRowControls, secondRowInView]);
 
-  // Animation variants
   const containerVariants = {
     hidden: {},
     visible: {
       transition: {
-        staggerChildren: 0.3 // Stagger children animations
+        staggerChildren: 0.3 
       }
     }
   };

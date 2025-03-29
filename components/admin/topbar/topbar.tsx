@@ -64,9 +64,7 @@ const Topbar = () => {
 
   return (
     <div className="w-full h-16 bg-black text-white flex items-center justify-between px-4 md:px-6 shadow-sm border-b border-[#26FEFD36] relative">
-      {/* Left side - Search Bar */}
       <div className="flex-1 flex items-center">
-        {/* Mobile Search Button (hidden on desktop and when search is expanded) */}
         {!isSearchExpanded && (
           <button
             onClick={toggleSearch}
@@ -76,7 +74,6 @@ const Topbar = () => {
           </button>
         )}
 
-        {/* Search Container */}
         <div
           ref={searchRef}
           className={`${
@@ -111,9 +108,7 @@ const Topbar = () => {
         </div>
       </div>
 
-      {/* Right Side Icons */}
       <div className="flex items-center space-x-4 md:space-x-6">
-        {/* Notification Icon */}
         <div className="relative">
           <Bell className="h-5 w-5 md:h-6 md:w-6 text-white hover:text-gray-300 cursor-pointer" />
           <span className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full h-4 w-4 flex items-center justify-center text-xs">
@@ -121,7 +116,6 @@ const Topbar = () => {
           </span>
         </div>
 
-        {/* User Profile */}
         <div className="relative" ref={dropdownRef}>
           <div
             onClick={() => setIsDropdownOpen(!isDropdownOpen)}
