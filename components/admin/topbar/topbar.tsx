@@ -28,6 +28,7 @@ const Topbar: React.FC<TopbarProps> = ({
       }
       if (searchRef.current && !searchRef.current.contains(event.target as Node) && isSearchExpanded) {
         setIsSearchExpanded(false);
+        setSearchQuery('');
       }
     };
 
@@ -37,60 +38,44 @@ const Topbar: React.FC<TopbarProps> = ({
 
   const toggleSearch = () => {
     setIsSearchExpanded(!isSearchExpanded);
-    if (!isSearchExpanded && searchRef.current) {
-      const input = searchRef.current.querySelector('input');
-      input?.focus();
-    } else {
+    if (!isSearchExpanded) {
       setSearchQuery('');
     }
   };
 
   return (
     <div className="w-full h-16 bg-black text-white flex items-center justify-between px-4 md:px-6 shadow-sm border-b border-[#26FEFD36] relative">
-      {/* Search Bar - Positioned properly for expansion */}
-      <div className={`relative flex items-center ${isSearchExpanded ? 'fixed left-0 right-0 top-16 bg-black z-40 px-4 py-2' : 'ml-[260px]'}`}>
-        {!isSearchExpanded ? (
+      {/* Left side - Search Bar */}
+      <div className="flex-1 flex items-center">
+        {/* Mobile Search Button (hidden on desktop and when search is expanded) */}
+        {!isSearchExpanded && (
           <button 
             onClick={toggleSearch}
-            className="md:hidden p-2 text-gray-400 hover:text-white focus:outline-none absolute left-4"
+            className="md:hidden p-2 text-gray-400 hover:text-white focus:outline-none"
           >
             <Search className="h-5 w-5" />
           </button>
-        ) : (
-          <div 
-            ref={searchRef}
-            className="w-full relative"
-          >
-            <div className="relative flex items-center">
-              <input
-                type="text"
-                placeholder="Search..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className={`
-                  w-full pl-10 pr-4 py-2
-                  bg-[#D9D9D933] border-gray-700 rounded-3xl
-                  text-[#D9D9D9] focus:outline-none focus:ring-2
-                  focus:ring-teal-600 focus:border-transparent
-                `}
-              />
+        )}
+
+        {/* Search Container */}
+        <div 
+          ref={searchRef}
+          className={`${isSearchExpanded ? 'absolute -left-60 right-40 md:justify-items-start md:relative md:left-0 md:right-0' : 'hidden md:block'} ml-[260px]`}
+        >
+          <div className="relative flex items-center">
+            {isSearchExpanded && (
               <button 
                 onClick={toggleSearch}
-                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-white"
+                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-white md:hidden"
               >
                 <X className="h-5 w-5" />
               </button>
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
-            </div>
-          </div>
-        )}
-        
-        {/* Desktop Search - Always visible */}
-        <div className="hidden md:block relative ml-0">
-          <div className="relative">
+            )}
             <input
               type="text"
               placeholder="Search..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
               className={`
                 w-full pl-10 pr-4 py-2
                 bg-[#D9D9D933] border-gray-700 rounded-3xl
@@ -104,7 +89,7 @@ const Topbar: React.FC<TopbarProps> = ({
       </div>
 
       {/* Right Side Icons */}
-      <div className="flex items-center space-x-4 md:space-x-6 ml-auto mr-4">
+      <div className="flex items-center space-x-4 md:space-x-6">
         {/* Notification Icon */}
         <div className="relative">
           <Bell className="h-5 w-5 md:h-6 md:w-6 text-white hover:text-gray-300 cursor-pointer" />
@@ -144,7 +129,7 @@ const Topbar: React.FC<TopbarProps> = ({
                 <li className="px-4 py-2 hover:bg-teal-600/50 flex items-center cursor-pointer transition-colors">
                   <Settings className="mr-2 h-4 w-4" /> Settings
                 </li>
-                <li className="border-t border-gray-700">
+                <li className="border-t border-teal-600">
                   <div className="px-4 py-2 hover:bg-red-600/50 flex items-center cursor-pointer transition-colors text-white">
                     <LogOut className="mr-2 h-4 w-4" /> Logout
                   </div>
