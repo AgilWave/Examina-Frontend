@@ -4,9 +4,9 @@ import {FileText  } from "lucide-react";
 
 const ReportContent: FC = () => {
   const items = [
-    { icon: <FileText   size={30} color="#FFFFFF" />, title: "Report 1", link: "/admin/dashboard/admin/report1" },
-    { icon: <FileText    size={30} color="#FFFFFF" />, title: "Report 2", link: "/admin/dashboard/admin/report1" },
-    { icon: <FileText    size={30} color="#FFFFFF" />, title: "Reoport 3", link: "/admin/dashboard/admin/report1" },
+    { icon: <FileText   size={30} color="#FFFFFF" />, title: "Report 1", link: "/admin/dashboard/reports/report1" },
+    { icon: <FileText    size={30} color="#FFFFFF" />, title: "Report 2", link: "/admin/dashboard/reports/report1" },
+    { icon: <FileText    size={30} color="#FFFFFF" />, title: "Reoport 3", link: "/admin/dashboard/reports/report1" },
   ];
 
   return (
