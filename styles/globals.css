@@ -192,3 +192,22 @@ body {
     @apply bg-background text-foreground;
   }
 }
+
+/* Custom Scrollbar Styles */
+.scrollbar-custom::-webkit-scrollbar {
+  width: 6px; /* Thin scrollbar */
+}
+
+.scrollbar-custom::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.4); /* Dark track */
+  border-radius: 10px;
+}
+
+.scrollbar-custom::-webkit-scrollbar-thumb {
+  background: #00928F; /* Cyan scrollbar */
+  border-radius: 10px;
+}
+
+.scrollbar-custom::-webkit-scrollbar-thumb:hover {
+  background: #0891b2; /* Darker cyan on hover */
+}

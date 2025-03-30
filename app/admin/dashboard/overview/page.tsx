@@ -1,10 +1,12 @@
-const Overview = () => {
+import Overview from '@/components/admin/Dashboard/overview/page'
+
+const OverviewTab = () => {
     return (
       <div>
-        <h1>Dashboard Content</h1>
+        <Overview />
       </div>
     );
   };
   
-  export default Overview;
+  export default OverviewTab;
   
