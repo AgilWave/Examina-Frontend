@@ -30,7 +30,7 @@ function Login() {
         if (result.redirect) {
           router.push(result.redirect);
         } else {
-          router.push("/dashboard");
+          router.push("/dashboard/overview");
         }
       } else {
         toast.error(result.message || "Login failed!");
@@ -82,7 +82,6 @@ function Login() {
           </p>
 
           <form action={handleSubmit} className="space-y-6">
-            {/* username or email */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 Username or Email
@@ -90,9 +89,13 @@ function Login() {
               <input
                 type="text"
                 name="email"
-                className="w-full text-black px-4 py-3 border border-gray-300 rounded-2xl 
-                focus:outline-none focus:ring-2 focus:ring-teal-600 focus:border-transparent
-                transition-all duration-200"
+                className="w-full text-black bg-white px-4 py-3 border border-gray-300 rounded-2xl 
+    focus:outline-none focus:ring-2 focus:ring-teal-600 focus:border-transparent
+    transition-all duration-200
+    [&:-webkit-autofill]:bg-white [&:-webkit-autofill]:text-black
+    [&:-webkit-autofill:hover]:bg-white [&:-webkit-autofill:focus]:bg-white
+    [&:-webkit-autofill]:shadow-[inset_0_0_0px_1000px_rgb(255,255,255)]
+    [&:-webkit-autofill]:[-webkit-text-fill-color:rgb(0,0,0)]"
                 placeholder="Enter your username or email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
@@ -110,9 +113,13 @@ function Login() {
               <input
                 type="password"
                 name="password"
-                className="w-full text-black px-4 py-3 border border-gray-300 rounded-2xl 
-                focus:outline-none focus:ring-2 focus:ring-teal-600 focus:border-transparent
-                transition-all duration-200"
+                className="w-full text-black bg-white px-4 py-3 border border-gray-300 rounded-2xl 
+    focus:outline-none focus:ring-2 focus:ring-teal-600 focus:border-transparent
+    transition-all duration-200
+    [&:-webkit-autofill]:bg-white [&:-webkit-autofill]:text-black
+    [&:-webkit-autofill:hover]:bg-white [&:-webkit-autofill:focus]:bg-white
+    [&:-webkit-autofill]:shadow-[inset_0_0_0px_1000px_rgb(255,255,255)]
+    [&:-webkit-autofill]:[-webkit-text-fill-color:rgb(0,0,0)]"
                 placeholder="Enter your password"
                 required
               />

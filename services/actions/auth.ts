@@ -76,6 +76,8 @@ export async function LogoutAction() {
 
     const responseData = await res.json();
     cookieStore.delete("jwt");
+    cookieStore.delete("userDetails");
+    cookieStore.delete("adminjwt");
     return responseData;
   } catch (error) {
     console.error("Error during logout:", error);
@@ -116,7 +118,7 @@ export async function LoginAdmin({
       cookieStore.set("userDetails", encryptedUserDetails)
       const origin =
         process.env.NEXT_Admin_PUBLIC_URL || "http://localhost:3000";
-      const redirectUrl = `${origin}/admin/dashboard`;
+      const redirectUrl = `${origin}/admin/dashboard/overview`;
       return {
         success: true,
         message: "Login successful",
