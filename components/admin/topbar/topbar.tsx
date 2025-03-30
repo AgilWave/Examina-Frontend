@@ -3,6 +3,7 @@
 import Image from "next/image";
 import defaultUserAvatar from "@/public/imgs/useraccount.png";
 import React, { useState, useRef, useEffect } from "react";
+import { useTheme } from "next-themes"; // Import useTheme
 import {
   Search,
   Bell,
@@ -11,18 +12,50 @@ import {
   Settings,
   LogOut,
   X,
+  Moon,
+  Sun,
 } from "lucide-react";
 import Cookies from "js-cookie";
 import { decrypt } from "@/lib/encryption";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import { LogoutAction } from "@/services/actions/auth";
+import { Switch } from "@/components/ui/switch";
 
 const Topbar = () => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isSearchExpanded, setIsSearchExpanded] = useState(false);
   const [userName, setUserName] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
+  const [isAlertOpen, setIsAlertOpen] = useState(false);
+  const [mounted, setMounted] = useState(false);
+
+  const { theme, setTheme } = useTheme();
+
   const dropdownRef = useRef<HTMLDivElement>(null);
   const searchRef = useRef<HTMLDivElement>(null);
   const userAvatar = defaultUserAvatar;
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  const handleLogout = async () => {
+    try {
+      await LogoutAction();
+      window.location.href = "/login";
+    } catch (error) {
+      console.error("Logout failed:", error);
+    }
+  };
 
   useEffect(() => {
     const userData = Cookies.get("userDetails");
@@ -62,13 +95,19 @@ const Topbar = () => {
     }
   };
 
+  if (!mounted) {
+    return (
+      <div className="w-full h-16 bg-white dark:bg-black text-gray-800 dark:text-gray-100 flex items-center justify-between px-4 md:px-6 shadow-sm border-b border-gray-200 dark:border-gray-700 relative"></div>
+    );
+  }
+
   return (
-    <div className="w-full h-16 bg-black text-white flex items-center justify-between px-4 md:px-6 shadow-sm border-b border-[#26FEFD36] relative">
+    <div className="w-full h-16 bg-white dark:bg-black text-gray-800 dark:text-gray-100 flex items-center justify-between px-4 md:px-6 shadow-sm border-b border-gray-200 dark:border-gray-700 relative">
       <div className="flex-1 flex items-center">
         {!isSearchExpanded && (
           <button
             onClick={toggleSearch}
-            className="md:hidden p-2 text-gray-400 hover:text-white focus:outline-none"
+            className="md:hidden p-2 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 focus:outline-none"
           >
             <Search className="h-5 w-5" />
           </button>
@@ -97,10 +136,11 @@ const Topbar = () => {
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className={`
-                w-full pl-10 pr-4 py-2
-                bg-[#D9D9D933] border-gray-700 rounded-3xl
-                text-[#D9D9D9] focus:outline-none focus:ring-2
-                focus:ring-teal-600 focus:border-transparent
+                 w-full pl-10 pr-4 py-2
+      bg-gray-100 dark:bg-[#0A0A0A] border-gray-300 dark:border-gray-600 rounded-3xl
+      text-gray-700 dark:text-gray-200 placeholder-gray-500 dark:placeholder-gray-400
+      focus:outline-none focus:ring-2
+      focus:ring-teal-500 focus:border-transparent
               `}
             />
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
@@ -109,8 +149,23 @@ const Topbar = () => {
       </div>
 
       <div className="flex items-center space-x-4 md:space-x-6">
+        <div suppressHydrationWarning className="flex items-center space-x-2">
+          <Switch
+            checked={theme === "dark"}
+            onCheckedChange={() =>
+              setTheme(theme === "dark" ? "light" : "dark")
+            }
+            className="bg-gray-600 cursor-pointer"
+          />
+          {theme === "light" ? (
+            <Sun className="h-5 w-5 text-yellow-500" />
+          ) : (
+            <Moon className="h-5 w-5 text-gray-400" />
+          )}
+        </div>
+
         <div className="relative">
-          <Bell className="h-5 w-5 md:h-6 md:w-6 text-white hover:text-gray-300 cursor-pointer" />
+          <Bell className="h-5 w-5 md:h-6 md:w-6 text-gray-600 dark:text-gray-300 hover:text-gray-800 dark:hover:text-gray-100 cursor-pointer" />
           <span className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full h-4 w-4 flex items-center justify-center text-xs">
             3
           </span>
@@ -123,7 +178,9 @@ const Topbar = () => {
           >
             <div className="hidden md:flex flex-col items-end">
               <span className="text-sm font-medium">{userName}</span>
-              <span className="text-xs text-gray-400">Admin</span>
+              <span className="text-xs text-gray-600 dark:text-gray-400 ">
+                Admin
+              </span>
             </div>
             <div className="w-8 h-8 md:w-10 md:h-10 rounded-full overflow-hidden border border-teal-500">
               <Image
@@ -135,23 +192,31 @@ const Topbar = () => {
               />
             </div>
             <ChevronDown
-              className={`h-4 w-4 text-white transition-transform ${
+              className={`h-4 w-4 dark:text-white text-black transition-transform ${
                 isDropdownOpen ? "rotate-180" : ""
               }`}
             />
           </div>
 
           {isDropdownOpen && (
-            <div className="absolute right-0 mt-2 w-48 bg-black border border-teal-600 rounded-lg shadow-lg z-50 overflow-hidden">
+            <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg z-50 overflow-hidden">
               <ul className="py-1">
-                <li className="px-4 py-2 hover:bg-teal-600/50 flex items-center cursor-pointer transition-colors">
-                  <User className="mr-2 h-4 w-4" /> Profile
+                <li className="px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center cursor-pointer transition-colors text-gray-800 dark:text-gray-200">
+                  <User className="mr-2 h-4 w-4 text-gray-500 dark:text-gray-400" />{" "}
+                  Profile
                 </li>
-                <li className="px-4 py-2 hover:bg-teal-600/50 flex items-center cursor-pointer transition-colors">
-                  <Settings className="mr-2 h-4 w-4" /> Settings
+                <li className="px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center cursor-pointer transition-colors text-gray-800 dark:text-gray-200">
+                  <Settings className="mr-2 h-4 w-4 text-gray-500 dark:text-gray-400" />{" "}
+                  Settings
                 </li>
-                <li className="border-t border-teal-600">
-                  <div className="px-4 py-2 hover:bg-red-600/50 flex items-center cursor-pointer transition-colors text-white">
+                <li className="border-t border-teal-800 dark:border-teal-600">
+                  <div
+                    className="px-4 py-2 hover:bg-red-100 dark:hover:bg-red-900/50 flex items-center cursor-pointer transition-colors text-red-600 dark:text-red-400"
+                    onClick={() => {
+                      setIsAlertOpen(true);
+                      setIsDropdownOpen(false); 
+                    }}
+                  >
                     <LogOut className="mr-2 h-4 w-4" /> Logout
                   </div>
                 </li>
@@ -159,6 +224,31 @@ const Topbar = () => {
             </div>
           )}
         </div>
+
+        <AlertDialog open={isAlertOpen} onOpenChange={setIsAlertOpen}>
+          <AlertDialogContent className="bg-white dark:bg-black border border-teal-800 dark:border-teal-600 rounded-xl shadow-lg">
+            <AlertDialogHeader>
+              <AlertDialogTitle className="text-gray-800 dark:text-gray-100">
+                Are you sure you want to log out?
+              </AlertDialogTitle>
+              <AlertDialogDescription className="text-gray-600 dark:text-gray-400">
+                You&apos;ll need to log in again to access your account.
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+
+            <AlertDialogFooter className="flex gap-3 mt-4">
+              <AlertDialogCancel className="bg-white dark:bg-black px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
+                Cancel
+              </AlertDialogCancel>
+              <AlertDialogAction
+                onClick={handleLogout}
+                className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors cursor-pointer"
+              >
+                Yes, log me out
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
       </div>
     </div>
   );
