@@ -1,6 +1,14 @@
 import { FC } from "react";
-import Link from "next/link";
 import { ClipboardList, Clock, Code, GraduationCap, Shield } from "lucide-react";
+import SectionTiles from "@/components/ui/section-tiles";
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+} from "@/components/ui/breadcrumb";
 
 const Dashboard: FC = () => {
   const items = [
@@ -12,19 +20,47 @@ const Dashboard: FC = () => {
   ];
 
   return (
-    <div className="flex flex-wrap gap-6 justify-start p-10 md:p-20 lg:p-24">
-      {items.map((item, index) => (
-        <Link key={index} href={item.link}>
-          <div
-            className="w-40 h-40 flex flex-col items-center justify-center border-2 border-teal-400 rounded-4xl shadow-md p-4 text-center transition-all transform hover:scale-105 hover:shadow-xl hover:bg-gradient-to-tl hover:from-cyan-500/15 hover:to-black/20 sm:w-48 sm:h-48 md:w-56 md:h-56 cursor-pointer"
-          >
-            <div className="w-12 h-12 sm:w-16 sm:h-16 flex items-center justify-center bg-[#158584] rounded-full text-teal-500 mb-2">
-              {item.icon}
-            </div>
-            <p className="text-sm font-regular text-white mt-4 sm:mt-6 md:text-base md:mt-10">{item.title}</p>
+    <div className="h-fit bg-gradient-to-br text- dark:text-white p-1 md:p-8">
+      <div className="max-w-8xl mx-auto">
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8">
+          <div className="flex flex-col gap-2">
+            <Breadcrumb className="text-gray-400" aria-label="Breadcrumb">
+              <BreadcrumbList>
+                <BreadcrumbItem>
+                  <BreadcrumbLink
+                    href="/admin/dashboard/overview"
+                    className="text-black/80 dark:text-gray-400"
+                  >
+                    Dashboard
+                  </BreadcrumbLink>
+                </BreadcrumbItem>
+                <BreadcrumbSeparator>/</BreadcrumbSeparator>
+                <BreadcrumbItem>
+                  <BreadcrumbPage className="text-black/50 dark:text-gray-400">
+                    Exams
+                  </BreadcrumbPage>
+                </BreadcrumbItem>
+              </BreadcrumbList>
+            </Breadcrumb>
+            <h1 className="text-3xl font-bold text-black/90 dark:text-gray-100">
+            Examination Section
+            </h1>
+            <p className="text-gray-500 dark:text-gray-400">
+              Manage all examination-related tasks and configurations here.
+            </p>
           </div>
-        </Link>
-      ))}
+        </div>
+        <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-5 md:w-fit gap-4 md:gap-8">
+          {items.map((item, index) => (
+            <SectionTiles
+              key={index}
+              link={item.link}
+              icon={item.icon}
+              title={item.title}
+            />
+          ))}
+        </div>
+      </div>
     </div>
   );
 };
