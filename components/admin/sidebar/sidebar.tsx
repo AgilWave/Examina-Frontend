@@ -8,7 +8,7 @@ import PoweredBy from "@/public/imgs/bottomlogo.png";
 import examinaMobile from "@/public/imgs/examinacrop.png";
 import NIBMCrop from "@/public/imgs/nibmcrop.png";
 import { usePathname } from "next/navigation";
-import { LayoutGrid, Settings, BookCopy, GraduationCap } from "lucide-react";
+import { LayoutGrid, Settings, BookCopy, GraduationCap, UserCog  } from "lucide-react";
 
 const Sidebar = () => {
   const pathname = usePathname();
@@ -29,6 +29,7 @@ const Sidebar = () => {
     { name: "Exams", icon: GraduationCap, href: "/admin/dashboard/exams" },
     { name: "Reports", icon: BookCopy, href: "/admin/dashboard/reports" },
     { name: "Configurations", icon: Settings, href: "/admin/dashboard/config" },
+    { name: "Admin", icon: UserCog , href: "/admin/dashboard/admin" },
   ];
 
   return (
