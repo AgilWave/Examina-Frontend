@@ -27,7 +27,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Plus, Eye, Pencil, Trash } from "lucide-react";
+import { Plus } from "lucide-react";
 import {
   Breadcrumb,
   BreadcrumbItem,
