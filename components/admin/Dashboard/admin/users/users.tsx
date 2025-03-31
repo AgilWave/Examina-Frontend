@@ -94,6 +94,7 @@ export default function UserTable() {
     name: "",
     email: "",
     username: "",
+    isBlacklisted: false,
   });
 
   // Filter users based on search input and blacklist filter
@@ -114,7 +115,10 @@ export default function UserTable() {
 
   // Add User Function
   const handleAddUser = () => {
-    setUsers([...users, { id: users.length + 1, ...newUser }]);
+    setUsers([...users, {
+      id: users.length + 1, ...newUser,
+      isBlacklisted: false
+    }]);
     setNewUser({ name: "", email: "", username: "", isBlacklisted: false });
     setIsAddOpen(false);
   };
