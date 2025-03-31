@@ -76,8 +76,6 @@ export async function LogoutAction() {
 
     const responseData = await res.json();
     cookieStore.delete("jwt");
-    cookieStore.delete("userDetails");
-    cookieStore.delete("adminjwt");
     return responseData;
   } catch (error) {
     console.error("Error during logout:", error);
@@ -110,6 +108,13 @@ export async function LoginAdmin({
 
     const responseBody = await res.json();
 
+    if (!responseBody.isSuccessful) {
+      return {
+        success: false,
+        message: responseBody.message || "Login failed",
+        status: res.status,
+      };
+    }
 
     if (responseBody.content.token && responseBody.content.user) {
       cookieStore.set("adminjwt", responseBody.content.token);
@@ -125,12 +130,6 @@ export async function LoginAdmin({
         redirect: redirectUrl,
       };
     }
-
-    return {
-      success: false,
-      message: responseBody.message || "Login failed",
-      status: res.status,
-    };
   } catch (error) {
     console.error("Error during login:", error);
     return {

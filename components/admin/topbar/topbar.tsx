@@ -3,6 +3,7 @@
 import Image from "next/image";
 import defaultUserAvatar from "@/public/imgs/useraccount.png";
 import React, { useState, useRef, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { useTheme } from "next-themes"; // Import useTheme
 import {
   Search,
@@ -29,6 +30,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { LogoutAction } from "@/services/actions/auth";
 import { Switch } from "@/components/ui/switch";
+import { toast } from "sonner";
 
 const Topbar = () => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -37,6 +39,7 @@ const Topbar = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [isAlertOpen, setIsAlertOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
+  const router = useRouter();
 
   const { theme, setTheme } = useTheme();
 
@@ -50,8 +53,16 @@ const Topbar = () => {
 
   const handleLogout = async () => {
     try {
-      await LogoutAction();
-      window.location.href = "/login";
+      const response = await LogoutAction();
+
+      if (response.isSuccessful) {
+        toast.success(response.message || "Logout successful!");
+        Cookies.remove("adminjwt");
+        Cookies.remove("userDetails");
+        router.push("/admin/login");
+      } else {
+        toast.error(response.message || "Logout failed!");
+      }
     } catch (error) {
       console.error("Logout failed:", error);
     }
@@ -214,7 +225,7 @@ const Topbar = () => {
                     className="px-4 py-2 hover:bg-red-100 dark:hover:bg-red-900/50 flex items-center cursor-pointer transition-colors text-red-600 dark:text-red-400"
                     onClick={() => {
                       setIsAlertOpen(true);
-                      setIsDropdownOpen(false); 
+                      setIsDropdownOpen(false);
                     }}
                   >
                     <LogOut className="mr-2 h-4 w-4" /> Logout

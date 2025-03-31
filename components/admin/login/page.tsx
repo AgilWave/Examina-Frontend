@@ -25,7 +25,7 @@ function Login() {
         email: loginData.username,
         password: loginData.password,
       });
-      if (result.success) {
+      if (result?.success) {
         toast.success("Login successful!");
         if (result.redirect) {
           router.push(result.redirect);
@@ -33,7 +33,7 @@ function Login() {
           router.push("/dashboard/overview");
         }
       } else {
-        toast.error(result.message || "Login failed!");
+        toast.error(result?.message || "Login failed!");
       }
     } catch (error) {
       console.error("Login error:", error);
