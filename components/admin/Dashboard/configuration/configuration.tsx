@@ -1,5 +1,5 @@
 import { FC } from "react";
-import { FileDiff } from "lucide-react";
+import { FileDiff, Cog  } from "lucide-react";
 import SectionTiles from "@/components/ui/section-tiles";
 import {
   Breadcrumb,
@@ -18,14 +18,9 @@ const ConfigContent: FC = () => {
       link: "/admin/dashboard/configs/batches",
     },
     {
-      icon: <FileDiff size={30} color="#FFFFFF" />,
-      title: "Exam Rules & Policies",
-      link: "/admin/dashboard/configs/logs",
-    },
-    {
-      icon: <FileDiff size={30} color="#FFFFFF" />,
-      title: "Students",
-      link: "/admin/dashboard/configs/students",
+      icon: <Cog  size={30} color="#FFFFFF" />,
+      title: "System Configurations",
+      link: "/admin/dashboard/configs/system-config",
     },
   ];
 
@@ -61,7 +56,7 @@ const ConfigContent: FC = () => {
             </p>
           </div>
         </div>
-        <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 md:w-fit gap-4 md:gap-8">
+        <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-5 md:w-fit gap-4 md:gap-8">
           {items.map((item, index) => (
             <SectionTiles
               key={index}

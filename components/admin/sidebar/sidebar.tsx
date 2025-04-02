@@ -70,7 +70,7 @@ const Sidebar = () => {
   };
 
   return (
-    <aside className="h-screen w-15 md:w-64 bg-white dark:bg-black text-black dark:text-white flex flex-col justify-between border-r border-[#26FEFD36]">
+    <aside className="h-screen w-15 md:w-64 bg-white dark:bg-black text-black dark:text-white flex flex-col justify-between border-r border-gray-200 dark:border-teal-600/50">
       <div className="flex justify-center w-full">
         <div className="md:hidden relative w-10 h-10 mt-2">
           {mounted && (

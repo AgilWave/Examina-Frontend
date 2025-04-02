@@ -108,12 +108,12 @@ const Topbar = () => {
 
   if (!mounted) {
     return (
-      <div className="w-full h-16 bg-white dark:bg-black text-gray-800 dark:text-gray-100 flex items-center justify-between px-4 md:px-6 shadow-sm border-b border-gray-200 dark:border-gray-700 relative"></div>
+      <div className="w-full h-16 bg-white dark:bg-black text-gray-800 dark:text-gray-100 flex items-center justify-between px-4 md:px-6 shadow-sm border-b border-gray-200 dark:border-teal-600/50 relative"></div>
     );
   }
 
   return (
-    <div className="w-full h-16 bg-white dark:bg-black text-gray-800 dark:text-gray-100 flex items-center justify-between px-4 md:px-6 shadow-sm border-b border-gray-200 dark:border-gray-700 relative">
+    <div className="w-full h-16 bg-white dark:bg-black text-gray-800 dark:text-gray-100 flex items-center justify-between px-4 md:px-6 shadow-sm border-b border-gray-200 dark:border-teal-600/50 relative">
       <div className="flex-1 flex items-center">
         {!isSearchExpanded && (
           <button
@@ -210,9 +210,9 @@ const Topbar = () => {
           </div>
 
           {isDropdownOpen && (
-            <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg z-50 overflow-hidden">
+            <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-black border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg z-50 overflow-hidden">
               <ul className="py-1">
-                <li className="px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center cursor-pointer transition-colors text-gray-800 dark:text-gray-200">
+                <li className="px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-950 flex items-center cursor-pointer transition-colors text-gray-800 dark:text-gray-200">
                   <User className="mr-2 h-4 w-4 text-gray-500 dark:text-gray-400" />{" "}
                   Profile
                 </li>
@@ -237,20 +237,18 @@ const Topbar = () => {
         </div>
 
         <AlertDialog open={isAlertOpen} onOpenChange={setIsAlertOpen}>
-          <AlertDialogContent className="bg-white dark:bg-black border border-teal-800 dark:border-teal-600 rounded-xl shadow-lg">
+          <AlertDialogContent>
             <AlertDialogHeader>
-              <AlertDialogTitle className="text-gray-800 dark:text-gray-100">
+              <AlertDialogTitle>
                 Are you sure you want to log out?
               </AlertDialogTitle>
-              <AlertDialogDescription className="text-gray-600 dark:text-gray-400">
+              <AlertDialogDescription>
                 You&apos;ll need to log in again to access your account.
               </AlertDialogDescription>
             </AlertDialogHeader>
 
             <AlertDialogFooter className="flex gap-3 mt-4">
-              <AlertDialogCancel className="bg-white dark:bg-black px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
-                Cancel
-              </AlertDialogCancel>
+              <AlertDialogCancel>Cancel</AlertDialogCancel>
               <AlertDialogAction
                 onClick={handleLogout}
                 className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors cursor-pointer"
