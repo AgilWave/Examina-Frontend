@@ -3,7 +3,6 @@ import { Table, TableBody, TableCell, TableRow } from "@/components/ui/table";
 import { useSelector } from "react-redux";
 import { RootState } from "@/redux/store";
 import { format } from "date-fns";
-import { Badge } from "@/components/ui/badge";
 import { Clock, Edit, FilePlus, User } from "lucide-react";
 
 function SystemDetails() {
