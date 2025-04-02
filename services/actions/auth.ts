@@ -121,9 +121,13 @@ export async function LoginAdmin({
       const userDetails = JSON.stringify(responseBody.content.user);
       const encryptedUserDetails = encrypt(userDetails);
       cookieStore.set("userDetails", encryptedUserDetails)
-      const origin =
-        process.env.NEXT_Admin_PUBLIC_URL || "http://localhost:3000";
-      const redirectUrl = `${origin}/admin/dashboard/overview`;
+      const origin = process.env.NEXT_Admin_PUBLIC_URL || "http://localhost:3000";
+      let redirectUrl = `${origin}/admin/dashboard/overview`;
+
+      if (responseBody.content.user.isFirstLogin) {
+        redirectUrl = `${origin}/admin/login/changePassword`;
+      }
+
       return {
         success: true,
         message: "Login successful",
