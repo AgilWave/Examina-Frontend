@@ -37,7 +37,7 @@ export async function middleware(req: NextRequest) {
         }
 
         if (adminJwt && url.pathname === '/admin/login') {
-            return NextResponse.redirect(new URL('/admin/dashboard', req.url));
+            return NextResponse.redirect(new URL('/admin/dashboard/overview', req.url));
         }
 
         return NextResponse.next();
@@ -77,7 +77,7 @@ export async function middleware(req: NextRequest) {
             }
         } else {
             if (url.pathname === '/' || url.pathname === '/login') {
-                return NextResponse.redirect(new URL('/dashboard', req.url));
+                return NextResponse.redirect(new URL('/dashboard/overview', req.url));
             }
         }
 
