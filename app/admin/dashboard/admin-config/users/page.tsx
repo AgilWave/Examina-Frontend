@@ -1,4 +1,4 @@
-import Users from '@/components/admin/Dashboard/admin/users/users'
+import Users from '@/components/admin/Dashboard/admin/users'
 
 const UsersTab = () => {
     return (

@@ -22,12 +22,12 @@ import {
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
 
-import avatar1 from '@/public/imgs/dashboard/common/overview/avatar1.png';
-import avatar2 from '@/public/imgs/dashboard/common/overview/avatar2.png';
-import avatar3 from '@/public/imgs/dashboard/common/overview/avatar3.png';
-import avatar4 from '@/public/imgs/dashboard/common/overview/avatar4.png';
-import avatar5 from '@/public/imgs/dashboard/common/overview/avatar5.png';
-import avatar6 from '@/public/imgs/dashboard/common/overview/avatar6.png';
+import avatar1 from "@/public/imgs/dashboard/common/overview/avatar1.png";
+import avatar2 from "@/public/imgs/dashboard/common/overview/avatar2.png";
+import avatar3 from "@/public/imgs/dashboard/common/overview/avatar3.png";
+import avatar4 from "@/public/imgs/dashboard/common/overview/avatar4.png";
+import avatar5 from "@/public/imgs/dashboard/common/overview/avatar5.png";
+import avatar6 from "@/public/imgs/dashboard/common/overview/avatar6.png";
 
 type ActivityStatus = "Ongoing" | "Pending" | "Completed";
 
@@ -99,7 +99,7 @@ const ServerIcon = () => (
 );
 
 const renderStatus = (status: ActivityStatus) => {
-  const baseStyles = "px-3 py-1.5 rounded-full text-sm font-medium";
+  const baseStyles = "px-3 py-1.5 rounded-lg text-sm font-medium";
 
   switch (status) {
     case "Ongoing":
@@ -215,7 +215,7 @@ const RecentAccessList: React.FC<{ accesses: RecentAccess[] }> = ({
               <p className="text-xs text-gray-400">{user.time}</p>
             </div>
           </div>
-          <button className="px-4 py-1.5 text-xs border border-cyan-500/50 dark:border-cyan-400/50 rounded-full text-cyan-700/80 dark:text-cyan-400 hover:bg-gray-200 dark:hover:bg-cyan-400/10 transition-all duration-300 cursor-pointer">
+          <button className="px-4 py-1.5 text-xs border border-cyan-500/50 dark:border-cyan-400/50 rounded-lg text-cyan-700/80 dark:text-cyan-400 hover:bg-gray-200 dark:hover:bg-cyan-400/10 transition-all duration-300 cursor-pointer">
             View
           </button>
         </li>
@@ -318,10 +318,10 @@ export default function AdminDashboard() {
           </div>
 
           <div className="mt-4 md:mt-0 flex items-center gap-4">
-            <button className="px-4 py-2 bg-gray-100 dark:bg-cyan-500/10 dark:hover:bg-cyan-500/40 cursor-pointer hover:bg-cyan-500/20 border border-cyan-500/30 rounded-full text-cyan-600 dark:text-cyan-400 transition-all duration-300 text-sm">
+            <button className="px-4 py-2 bg-gray-100 dark:bg-cyan-500/10 dark:hover:bg-cyan-500/40 cursor-pointer hover:bg-cyan-500/20 border border-cyan-500/30 rounded-lg text-cyan-600 dark:text-cyan-400 transition-all duration-300 text-sm">
               Export Data
             </button>
-            <button className="px-4 py-2 bg-teal-500/80 hover:bg-teal-500 rounded-full cursor-pointer text-white transition-all duration-300 text-sm font-medium">
+            <button className="px-4 py-2 bg-teal-500/80 hover:bg-teal-500 rounded-lg cursor-pointer text-white transition-all duration-300 text-sm font-medium">
               New Report
             </button>
           </div>
@@ -402,7 +402,7 @@ export default function AdminDashboard() {
               </h3>
               <Link
                 href="/access"
-                className="text-sm px-4 py-1.5 border border-cyan-700/50 dark:border-cyan-400/30 rounded-full text-cyan-700/80 dark:text-cyan-300 hover:bg-gray-100  dark:hover:bg-cyan-900/30 transition-all duration-300"
+                className="text-sm px-4 py-1.5 border border-cyan-700/50 dark:border-cyan-400/30 rounded-lg text-cyan-700/80 dark:text-cyan-300 hover:bg-gray-100  dark:hover:bg-cyan-900/30 transition-all duration-300"
               >
                 View all
               </Link>
@@ -417,7 +417,7 @@ export default function AdminDashboard() {
               </h2>
               <Link
                 href="/activities"
-                className="text-sm px-4 py-1.5 border border-cyan-700/50 dark:border-cyan-400/30 rounded-full text-cyan-700/80 dark:text-cyan-300 hover:bg-gray-100  dark:hover:bg-cyan-900/30 transition-all duration-300"
+                className="text-sm px-4 py-1.5 border border-cyan-700/50 dark:border-cyan-400/30 rounded-lg text-cyan-700/80 dark:text-cyan-300 hover:bg-gray-100  dark:hover:bg-cyan-900/30 transition-all duration-300"
               >
                 View all
               </Link>
