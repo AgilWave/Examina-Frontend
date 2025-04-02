@@ -71,7 +71,7 @@ export function GotoEditDialog({
     }else{
       setIsDialogOpen(true);
     }
-  }, [dialog.editClose]);
+  }, [dialog.editClose, setIsDialogOpen]);
 
   return (
     <>

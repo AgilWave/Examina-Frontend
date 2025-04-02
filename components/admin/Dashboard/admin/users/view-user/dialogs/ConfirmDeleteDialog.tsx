@@ -30,7 +30,6 @@ import { setViewDialog } from "@/redux/features/dialogState";
 export function ConfirmDeleteDialog() {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [userId, setUserId] = useState("");
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [loaderOpen, setLoaderOpen] = useState(false);
   const dispatch = useDispatch();
   const dialog = useSelector((state: RootState) => state.dialog);
