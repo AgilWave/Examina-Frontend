@@ -138,7 +138,7 @@ export async function LoginAdmin({
     console.error("Error during login:", error);
     return {
       success: false,
-      message: "An error occurred during login",
+      message: "An error occurred in login",
       status: 500,
     };
   }
