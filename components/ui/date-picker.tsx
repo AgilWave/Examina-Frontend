@@ -22,7 +22,6 @@ const StyledDatePicker = styled(MuiDatePicker)({
   "& .MuiOutlinedInput-notchedOutline": {
     border: "none",
   },
-  // Dark mode support
   "@media (prefers-color-scheme: dark)": {
     "& .MuiInputBase-root": {
       borderColor: "rgb(55, 65, 81)",
