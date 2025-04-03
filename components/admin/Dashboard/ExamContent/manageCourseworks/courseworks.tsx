@@ -46,7 +46,6 @@ export default function ExamDashboard() {
   const [isFilterOpen, setIsFilterOpen] = useState(false)
   const [selectedExam, setSelectedExam] = useState<Exam | null>(null)
   const [isAddExamOpen, setIsAddExamOpen] = useState(false)
-  const [filterBlacklist, setFilterBlacklist] = useState("all");
   const [filteredExams, setFilteredExams] = useState(cw); 
   const [selectedExamType, setSelectedExamType] = useState("all");
 
