@@ -14,7 +14,7 @@ export async function getAdminByID( dispatch: any, id: any) {
   };
   try {
     const response = await axios.get(
-      `${process.env.NEXT_PUBLIC_BACKEND_URL}/users/${id}`,
+      `${process.env.AUTH_BACKEND_URL}/users/${id}`,
       { headers }
     );
     if (response.data.isSuccessful) {

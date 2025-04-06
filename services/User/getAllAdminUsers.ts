@@ -25,7 +25,7 @@ export async function getAllAdminUsers(
         Authorization: `Bearer ${jwt}`,
     };
     try {
-        let url = `${process.env.NEXT_PUBLIC_BACKEND_URL}/users/Search?page=${page}&pageSize=${pageSize}&role=admin`;
+        let url = `${process.env.AUTH_BACKEND_URL}/users/Search?page=${page}&pageSize=${pageSize}&role=admin`;
         if (filterApplied) {
             url += `&isBlacklisted=${isBlacklisted}`;
         }
