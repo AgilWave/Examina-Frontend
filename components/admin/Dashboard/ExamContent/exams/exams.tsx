@@ -1,7 +1,7 @@
 // src/app/page.tsx
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Search } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
@@ -18,6 +18,8 @@ import {
     BreadcrumbPage,
     BreadcrumbSeparator,
   } from "@/components/ui/breadcrumb";
+import { ThemeProvider } from '@mui/material/styles'
+import { createTheme } from '@mui/material'
 
 interface Exam {
   id: string
@@ -121,6 +123,28 @@ export default function ExamDashboard() {
         }
     }
   }
+
+  const [isDarkMode, setIsDarkMode] = useState(false);
+
+  useEffect(() => {
+    // Check if dark mode is enabled using Tailwind's dark class on html element
+    const isDark = document.documentElement.classList.contains('dark');
+    setIsDarkMode(isDark);
+    
+    // Optional: Listen for changes to dark mode
+    const observer = new MutationObserver((mutations) => {
+      mutations.forEach((mutation) => {
+        if (mutation.attributeName === 'class') {
+          const isDark = document.documentElement.classList.contains('dark');
+          setIsDarkMode(isDark);
+        }
+      });
+    });
+    
+    observer.observe(document.documentElement, { attributes: true });
+    
+    return () => observer.disconnect();
+  }, []);
 
   return (
     <div className="h-fit bg-gradient-to-br text- dark:text-white p-1 md:p-8">
@@ -248,9 +272,11 @@ export default function ExamDashboard() {
               <div className="bg-white dark:bg-black dark:text-white text-black ">
                 <Label htmlFor="dateFilter">Date</Label>
                 <div className='bg-white dark:bg-black dark:text-white text-black border-teal-600 mt-2'>
-                  <DatePicker />
+                  <ThemeProvider theme={createTheme({ palette: { mode: isDarkMode ? 'dark' : 'light' } })}>
+                    <DatePicker />
+                  </ThemeProvider>
                 </div>
-              </div>
+                </div>
               <div>
                 <Label htmlFor="typeFilter">Exam Type</Label>
                 <Select onValueChange={handleFilterChange} value={selectedExamType}>
