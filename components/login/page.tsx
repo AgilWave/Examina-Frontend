@@ -3,34 +3,42 @@ import Image from "next/image";
 import miniLogo from "@/public/imgs/loginlogo.png";
 import University from "@/public/imgs/university.png";
 import { signIn, useSession, SessionProvider } from "next-auth/react";
-import { useState } from "react";
-import { useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { loginActionMS } from "@/services/actions/auth";
+import { toast } from "sonner";
+import { useRouter } from "next/navigation";
 
 function LoginPageContent() {
   const [loadingStudent, setLoadingStudent] = useState(false);
   const [loadingLecturer, setLoadingLecturer] = useState(false);
   const { data: session } = useSession();
+  const router = useRouter();
+  const loginProcessed = useRef(false);
 
   useEffect(() => {
     const handleMicrosoftAuth = async () => {
-      if (session?.idToken) {
+      if (session?.idToken && !loginProcessed.current) {
+        loginProcessed.current = true;
         try {
           const response = await loginActionMS({
             idToken: session.idToken,
           });
 
-          if (response.status !== 200 && response.status !== 201) {
-            throw new Error("Authentication failed");
+          if (response?.success && response?.redirect) {
+            router.push(response.redirect);
+            toast.success("Login successful");
+          } else if (!response?.success) {
+            toast.error(response?.message || "Login failed");
           }
         } catch (error) {
           console.error("Authentication error:", error);
+          toast.error("An error occurred during authentication");
         }
       }
     };
 
     handleMicrosoftAuth();
-  }, [session]);
+  }, [session, router]);
 
   const handleLogin = async (role: string) => {
     if (role === "student") {
@@ -45,6 +53,7 @@ function LoginPageContent() {
       console.error("Login error:", error);
       setLoadingStudent(false);
       setLoadingLecturer(false);
+      toast.error("Failed to initiate login");
     }
   };
 

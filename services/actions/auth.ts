@@ -1,6 +1,5 @@
 "use server";
 import { cookies } from "next/headers";
-import { NextResponse } from "next/server";
 import { encrypt } from "@/lib/encryption";
 import { BACKEND_URL } from "@/Constants/backend";
 
@@ -18,45 +17,45 @@ export async function loginActionMS({ idToken }: { idToken: string }) {
       },
     });
 
-    console.log("Response:", res);
-
-    if (res.status === 401) {
-      return NextResponse.json(
-        {
-          error: "Unauthorized",
-        },
-        { status: res.status }
-      );
-    }
-
-    if (res.status !== 200 && res.status !== 201) {
-      return NextResponse.json(
-        {
-          error: "Failed to login",
-        },
-        { status: res.status }
-      );
-    }
-
     const responseBody = await res.json();
-    if (responseBody.error) {
-      throw new Error(responseBody.error);
+
+    if (!responseBody.isSuccessful) {
+      return {
+        success: false,
+        message: responseBody.message || "Login failed",
+        status: res.status,
+      };
     }
-    if (responseBody.jwt) {
-      cookieStore.set("jwt", responseBody.jwt);
+
+    if (responseBody.error) {
+      return {
+        success: false,
+        message: responseBody.error,
+        status: res.status,
+      };
+    }
+
+    if (responseBody.content.jwt) {
+      cookieStore.set("jwt", responseBody.content.jwt);
+      const userDetails = JSON.stringify(responseBody.content.user);
+      const encryptedUserDetails = encrypt(userDetails);
+      cookieStore.set("userDetails", encryptedUserDetails);
       const origin = process.env.NEXT_PUBLIC_URL || "http://localhost:3000";
       const redirectUrl = `${origin}/dashboard`;
-      NextResponse.redirect(redirectUrl);
+      return {
+        success: true,
+        message: "Login successful",
+        status: res.status,
+        redirect: redirectUrl
+      };
     }
 
-    return {
-      status: res.status,
-    };
   } catch (error) {
     console.error("Error during login:", error);
     throw new Error("An error occurred during login");
   }
 }
+
 export async function LogoutAction() {
   const cookieStore = await cookies();
   try {
