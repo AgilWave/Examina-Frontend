@@ -9,6 +9,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import { BACKEND_URL } from "@/Constants/backend";
 
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
@@ -42,7 +43,7 @@ function CreateUser() {
         Authorization: `Bearer ${token}`,
       };
       const response = await axios.post(
-        `${process.env.NEXT_PUBLIC_BACKEND_URL}/users/Interact`,
+        `${BACKEND_URL}/users/Interact`,
         body,
         { headers }
       );

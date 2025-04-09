@@ -21,6 +21,7 @@ import axios from "axios";
 import Cookies from "js-cookie";
 import { useDispatch } from "react-redux";
 import { toast } from "sonner";
+import { BACKEND_URL } from "@/Constants/backend";  
 
 function BlackListSwitch() {
   const user = useSelector((state: RootState) => state.user);
@@ -61,7 +62,7 @@ function BlackListSwitch() {
       };
       
       const response = await axios.patch(
-        `${process.env.NEXT_PUBLIC_BACKEND_URL}/users/Interact/Update/Blacklist/${id}`,
+        `${BACKEND_URL}/users/Interact/Update/Blacklist/${id}`,
         body,
         { headers }
       );

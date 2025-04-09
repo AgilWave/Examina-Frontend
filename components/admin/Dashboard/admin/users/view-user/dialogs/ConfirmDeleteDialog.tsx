@@ -26,6 +26,7 @@ import Cookies from "js-cookie";
 import { Input } from "@/components/ui/input";
 import { Trash } from "lucide-react";
 import { setViewDialog } from "@/redux/features/dialogState";
+import { BACKEND_URL } from "@/Constants/backend";
 
 export function ConfirmDeleteDialog() {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -50,7 +51,7 @@ export function ConfirmDeleteDialog() {
         Authorization: `Bearer ${jwt}`,
       };
       const response = await axios.delete(
-        `${process.env.NEXT_PUBLIC_BACKEND_URL}/users/Interact/${id}`,
+        `${BACKEND_URL}/users/Interact/${id}`,
         { headers }
       );
       if (response.data.isSuccessful) {
