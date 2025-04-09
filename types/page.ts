@@ -5,4 +5,10 @@ export interface PageState {
     nextPage: number;
     prevPage: number;
   };
+  students: {
+    totalPages: number;
+    page: number;
+    nextPage: number;
+    prevPage: number;
+  };
 }

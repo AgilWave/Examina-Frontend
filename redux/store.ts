@@ -4,11 +4,13 @@ import { configureStore, combineReducers } from "@reduxjs/toolkit";
 import dialogReducer from "./features/dialogState";
 import pageReducer from "./features/pageSlice";
 import userReducer from "./features/UserSlice";
+import studentReducer from "./features/StudentSlice";
 
 const rootReducer = combineReducers({
   dialog: dialogReducer,
   page: pageReducer,
   user: userReducer,
+  student: studentReducer,
 });
 
 export const store = configureStore({
