@@ -9,6 +9,7 @@ import { useRouter } from "next/navigation";
 import Cookies from "js-cookie";
 import { decrypt } from "@/lib/encryption";
 import axios from "axios";
+import { BACKEND_URL } from "@/Constants/backend";
 
 function ChangePassword() {
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
@@ -36,7 +37,7 @@ function ChangePassword() {
 
     try {
       const response = await axios.patch(
-        `${process.env.NEXT_PUBLIC_BACKEND_URL}/users/Interact/UpdatePassword/${id}`,
+        `${BACKEND_URL}/users/Interact/UpdatePassword/${id}`,
         { password },
         {
           headers: {
