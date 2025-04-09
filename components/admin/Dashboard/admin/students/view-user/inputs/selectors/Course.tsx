@@ -14,32 +14,58 @@ import { Label } from "@/components/ui/label";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "@/redux/store";
-import { setViewCourse } from "@/redux/features/StudentSlice";
+import { setViewCourseId } from "@/redux/features/StudentSlice";
 import { BookOpen, GraduationCap, Lock } from "lucide-react";
+import api from "@/lib/axiosInstance";
+import Cookies from "js-cookie";
+
+interface Course {
+  id: number;
+  name: string;
+  facultyId: number;
+}
 
 export function Course() {
   const dispatch = useDispatch();
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [course, setCourse] = useState("");
   const student = useSelector((state: RootState) => state.student);
+  const [courses, setCourses] = useState<Course[]>([]);
+  const facultyId = student.viewStudent.student.facultyId || "";
+
+  const getCourses = async () => {
+    try {
+      if (facultyId) {  
+        const response = await api.get(`/course/Search?facultyId=${facultyId}`, {
+          headers: {
+            Authorization: `Bearer ${Cookies.get("adminjwt")}`,
+          },
+        });
+        if (response.data.isSuccessful) {
+          setCourses(response.data.listContent);
+        } else {
+          setCourses([]);
+        }
+      } else {
+        setCourses([]);
+      }
+    } catch (error) {
+      console.error("Error fetching courses:", error);
+    }
+  };
 
   useEffect(() => {
-    setCourse(student.viewStudent.course || "computerScience");
-  }, [student.viewStudent.course]);
+    getCourses();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [facultyId]);
+
+  useEffect(() => {
+    setCourse(String(student.viewStudent.student.courseId) || "");
+  }, [student.viewStudent.student.courseId]);
 
   const handleChange = (value: string) => {
     setCourse(value);
-    dispatch(setViewCourse(value));
-  };
-
-  const getCourseIcon = (courseName: string) => {
-    switch (courseName) {
-      case "computerScience":
-        return <GraduationCap className="h-4 w-4 text-blue-500 mr-2" />;
-      case "dataScienceAnalytics":
-        return <GraduationCap className="h-4 w-4 text-purple-500 mr-2" />;
-      default:
-        return null;
-    }
+    dispatch(setViewCourseId(value));
   };
 
   return (
@@ -52,9 +78,9 @@ export function Course() {
       
       <div className="relative">
         <Select 
-          value={course} 
+          value={String(student.viewStudent.student.courseId) || ""}
           onValueChange={(value) => handleChange(value)} 
-          disabled={student.editBlocked}
+          disabled={student.editBlocked || courses.length === 0}
         >
           <SelectTrigger 
             className={`
@@ -71,18 +97,12 @@ export function Course() {
           <SelectContent className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-md shadow-md">
             <SelectGroup>
               <SelectLabel className="px-2 py-1.5 text-sm text-slate-500 dark:text-slate-400">Select a Course</SelectLabel>
-              <SelectItem value="computerScience" className="flex items-center py-2 cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-700">
-                <div className="flex items-center">
+              {courses.map((course) => (
+                <SelectItem key={course.id} value={course.id.toString()} className="flex items-center py-2 cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-700">
                   <GraduationCap className="h-4 w-4 text-blue-500 mr-2" />
-                  Computer Science
-                </div>
-              </SelectItem>
-              <SelectItem value="dataScienceAnalytics" className="flex items-center py-2 cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-700">
-                <div className="flex items-center">
-                  <GraduationCap className="h-4 w-4 text-purple-500 mr-2" />
-                  Data Science & Analytics
-                </div>
-              </SelectItem>
+                  {course.name}
+                </SelectItem>
+              ))}
             </SelectGroup>
           </SelectContent>
         </Select>
@@ -94,16 +114,6 @@ export function Course() {
         )}
       </div>
       
-      {course && !student.editBlocked && (
-        <div className="flex items-center mt-1 text-xs text-slate-600 dark:text-slate-300">
-          {getCourseIcon(course)}
-          {course === "computerScience" ? (
-            "BS in Computer Science (Software Development)"
-          ) : course === "dataScienceAnalytics" ? (
-            "BS in Data Science & Analytics"
-          ) : ""}
-        </div>
-      )}
       
       {student.editBlocked && (
         <p className="text-xs text-slate-500 mt-1 flex items-center">

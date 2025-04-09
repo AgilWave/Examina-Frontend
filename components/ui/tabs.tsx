@@ -5,6 +5,15 @@ import * as TabsPrimitive from "@radix-ui/react-tabs"
 
 import { cn } from "@/lib/utils"
 
+function Skeleton({ className, ...props }: React.ComponentProps<"div">) {
+  return (
+    <div
+      className={cn("animate-pulse rounded bg-gray-200 dark:bg-gray-700", className)}
+      {...props}
+    />
+  )
+}
+
 function Tabs({
   className,
   ...props
@@ -20,8 +29,23 @@ function Tabs({
 
 function TabsList({
   className,
+  isLoading = false,
+  loadingItems = 3,
   ...props
-}: React.ComponentProps<typeof TabsPrimitive.List>) {
+}: React.ComponentProps<typeof TabsPrimitive.List> & { 
+  isLoading?: boolean;
+  loadingItems?: number;
+}) {
+  if (isLoading) {
+    return (
+      <div className="flex gap-2">
+        {Array(loadingItems).fill(0).map((_, index) => (
+          <Skeleton key={`loading-tab-${index}`} className="h-9 w-24" />
+        ))}
+      </div>
+    )
+  }
+
   return (
     <TabsPrimitive.List
       data-slot="tabs-list"
@@ -36,8 +60,13 @@ function TabsList({
 
 function TabsTrigger({
   className,
+  isLoading = false,
   ...props
-}: React.ComponentProps<typeof TabsPrimitive.Trigger>) {
+}: React.ComponentProps<typeof TabsPrimitive.Trigger> & { isLoading?: boolean }) {
+  if (isLoading) {
+    return <Skeleton className="h-[calc(100%-1px)] w-24" />
+  }
+
   return (
     <TabsPrimitive.Trigger
       data-slot="tabs-trigger"
@@ -52,8 +81,13 @@ function TabsTrigger({
 
 function TabsContent({
   className,
+  isLoading = false,
   ...props
-}: React.ComponentProps<typeof TabsPrimitive.Content>) {
+}: React.ComponentProps<typeof TabsPrimitive.Content> & { isLoading?: boolean }) {
+  if (isLoading) {
+    return <Skeleton className="h-32 w-full" />
+  }
+
   return (
     <TabsPrimitive.Content
       data-slot="tabs-content"

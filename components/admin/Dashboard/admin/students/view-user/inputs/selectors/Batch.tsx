@@ -14,32 +14,58 @@ import { Label } from "@/components/ui/label";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "@/redux/store";
-import { setViewBatchCode } from "@/redux/features/StudentSlice";
+import { setViewBatchId } from "@/redux/features/StudentSlice";
 import { Layers, Calendar, Lock } from "lucide-react";
+import api from "@/lib/axiosInstance";
+import Cookies from "js-cookie";
+interface Batch {
+  id: number;
+  batchCode: string;
+  courseId: number;
+}
 
 export function Batch() {
   const dispatch = useDispatch();
-  const [batch, setBatch] = useState("");
+  const [batches, setBatches] = useState<Batch[]>([]);
   const student = useSelector((state: RootState) => state.student);
+  const courseId = student.viewStudent.student.courseId || "";
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [batch, setBatch] = useState("");
+
+  const getBatches = async () => {
+    try {
+      if (courseId) {
+        const response = await api.get(`/batch/Search?courseId=${courseId}`, {
+          headers: {
+            Authorization: `Bearer ${Cookies.get("adminjwt")}`,
+          },
+        });
+        if (response.data.isSuccessful) {
+          setBatches(response.data.listContent);
+        } else {
+          setBatches([]);
+        }
+      } 
+      else {
+        setBatches([]);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
   useEffect(() => {
-    setBatch(student.viewStudent.batchCode || "spring2024");
-  }, [student.viewStudent.batchCode]);
+    getBatches();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [courseId]);
+
+  useEffect(() => {
+    setBatch(String(student.viewStudent.student.batchId) || "");
+  }, [student.viewStudent.student.batchId]);
 
   const handleChange = (value: string) => {
     setBatch(value);
-    dispatch(setViewBatchCode(value));
-  };
-
-  const getBatchIcon = (batchName: string) => {
-    switch (batchName) {
-      case "spring2024":
-        return <Calendar className="h-4 w-4 text-green-500 mr-2" />;
-      case "fall2024":
-        return <Calendar className="h-4 w-4 text-amber-500 mr-2" />;
-      default:
-        return null;
-    }
+    dispatch(setViewBatchId(Number(value)));
   };
 
   return (
@@ -49,14 +75,14 @@ export function Batch() {
         Batch
         <span className="text-red-500 ml-1">*</span>
       </Label>
-      
+
       <div className="relative">
-        <Select 
-          value={batch} 
-          onValueChange={(value) => handleChange(value)} 
-          disabled={student.editBlocked}
+        <Select
+          value={String(student.viewStudent.student.batchId) || ""}
+          onValueChange={(value) => handleChange(value)}
+          disabled={student.editBlocked || batches.length === 0}
         >
-          <SelectTrigger 
+          <SelectTrigger
             className={`
               w-full pl-3 pr-10 py-2
               border border-slate-200 rounded-md shadow-sm
@@ -71,40 +97,23 @@ export function Batch() {
           <SelectContent className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-md shadow-md">
             <SelectGroup>
               <SelectLabel className="px-2 py-1.5 text-sm text-slate-500 dark:text-slate-400">Select a Batch</SelectLabel>
-              <SelectItem value="spring2024" className="flex items-center py-2 cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-700">
-                <div className="flex items-center">
-                  <Calendar className="h-4 w-4 text-green-500 mr-2" />
-                  Spring 2024
-                </div>
-              </SelectItem>
-              <SelectItem value="fall2024" className="flex items-center py-2 cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-700">
-                <div className="flex items-center">
-                  <Calendar className="h-4 w-4 text-amber-500 mr-2" />
-                  Fall 2024
-                </div>
-              </SelectItem>
+              {batches.map((batch) => (
+                <SelectItem key={batch.id} value={batch.id.toString()} className="flex items-center py-2 cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-700">
+                   <Calendar className="h-4 w-4 text-amber-500 mr-2" />
+                  {batch.batchCode}
+                </SelectItem>
+              ))}
             </SelectGroup>
           </SelectContent>
         </Select>
-        
+
         {student.editBlocked && (
           <div className="absolute right-10 top-1/2 transform -translate-y-1/2">
             <Lock className="h-4 w-4 text-slate-400" />
           </div>
         )}
       </div>
-      
-      {batch && !student.editBlocked && (
-        <div className="flex items-center mt-1 text-xs text-slate-600 dark:text-slate-300">
-          {getBatchIcon(batch)}
-          {batch === "spring2024" ? (
-            "Spring semester batch (January - May 2024)"
-          ) : batch === "fall2024" ? (
-            "Fall semester batch (August - December 2024)"
-          ) : ""}
-        </div>
-      )}
-      
+
       {student.editBlocked && (
         <p className="text-xs text-slate-500 mt-1 flex items-center">
           <Lock className="h-3 w-3 mr-1" />

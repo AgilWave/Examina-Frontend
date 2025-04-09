@@ -2,7 +2,11 @@ export type User = {
     id: number;
     name: string;
     email: string;
-    batchCode: string;
+    student: {
+        batch: {
+            batchCode: string;
+        };
+    };
     isBlacklisted: boolean;
   };
   

@@ -14,34 +14,51 @@ import { Label } from "@/components/ui/label";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "@/redux/store";
-import { setViewFaculty } from "@/redux/features/StudentSlice";
+import { setViewFacultyId } from "@/redux/features/StudentSlice";
 import { Users, User, Lock } from "lucide-react";
+import api from "@/lib/axiosInstance";
+import Cookies from "js-cookie";
+
+interface Faculty {
+  id: number;
+  name: string;
+}
 
 export function Faculty() {
   const dispatch = useDispatch();
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [faculty, setFaculty] = useState("");
   const student = useSelector((state: RootState) => state.student);
+  const [faculties, setFaculties] = useState<Faculty[]>([]);
+
+  const getFaculties = async () => {
+    try {
+      const response = await api.get("/faculty/Search", {
+        headers: {
+          Authorization: `Bearer ${Cookies.get("adminjwt")}`,
+        },
+      });
+      if (response.data.isSuccessful) {
+        setFaculties(response.data.listContent);
+      } else {
+        setFaculties([]);
+      }
+    } catch (error) {
+      console.error("Error fetching faculties:", error);  
+    }
+  };
 
   useEffect(() => {
-    setFaculty(student.viewStudent.faculty || "cs-faculty");
-  }, [student.viewStudent.faculty]);
+    getFaculties();
+  }, []);
+
+  useEffect(() => {
+    setFaculty(String(student.viewStudent.student.facultyId) || "");
+  }, [student.viewStudent.student.facultyId]);
 
   const handleChange = (value: string) => {
     setFaculty(value);
-    dispatch(setViewFaculty(value));
-  };
-
-  const getFacultyIcon = (facultyId: string) => {
-    switch (facultyId) {
-      case "cs-faculty":
-        return <User className="h-4 w-4 text-indigo-500 mr-2" />;
-      case "math-faculty":
-        return <User className="h-4 w-4 text-emerald-500 mr-2" />;
-      case "eng-faculty":
-        return <User className="h-4 w-4 text-orange-500 mr-2" />;
-      default:
-        return null;
-    }
+    dispatch(setViewFacultyId(value));
   };
 
   return (
@@ -54,9 +71,9 @@ export function Faculty() {
       
       <div className="relative">
         <Select 
-          value={faculty} 
+          value={String(student.viewStudent.student.facultyId) || ""}
           onValueChange={(value) => handleChange(value)} 
-          disabled={student.editBlocked}
+          disabled={student.editBlocked || faculties.length === 0}
         >
           <SelectTrigger 
             className={`
@@ -73,24 +90,14 @@ export function Faculty() {
           <SelectContent className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-md shadow-md">
             <SelectGroup>
               <SelectLabel className="px-2 py-1.5 text-sm text-slate-500 dark:text-slate-400">Select a Faculty</SelectLabel>
-              <SelectItem value="cs-faculty" className="flex items-center py-2 cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-700">
-                <div className="flex items-center">
-                  <User className="h-4 w-4 text-indigo-500 mr-2" />
-                  Computer Science Faculty
-                </div>
-              </SelectItem>
-              <SelectItem value="math-faculty" className="flex items-center py-2 cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-700">
-                <div className="flex items-center">
+              {faculties.map((faculty) => (
+                <SelectItem key={faculty.id} value={faculty.id.toString()} className="flex items-center py-2 cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-700">
+                  <div className="flex items-center">
                   <User className="h-4 w-4 text-emerald-500 mr-2" />
-                  Mathematics Faculty
-                </div>
-              </SelectItem>
-              <SelectItem value="eng-faculty" className="flex items-center py-2 cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-700">
-                <div className="flex items-center">
-                  <User className="h-4 w-4 text-orange-500 mr-2" />
-                  Engineering Faculty
-                </div>
-              </SelectItem>
+                  {faculty.name}
+                  </div>
+                </SelectItem>
+              ))}
             </SelectGroup>
           </SelectContent>
         </Select>
@@ -101,19 +108,7 @@ export function Faculty() {
           </div>
         )}
       </div>
-      
-      {faculty && !student.editBlocked && (
-        <div className="flex items-center mt-1 text-xs text-slate-600 dark:text-slate-300">
-          {getFacultyIcon(faculty)}
-          {faculty === "cs-faculty" ? (
-            "Faculty of Computer Science & Information Technology"
-          ) : faculty === "math-faculty" ? (
-            "Faculty of Mathematical Sciences"
-          ) : faculty === "eng-faculty" ? (
-            "Faculty of Engineering & Applied Sciences"
-          ) : ""}
-        </div>
-      )}
+
       
       {student.editBlocked && (
         <p className="text-xs text-slate-500 mt-1 flex items-center">

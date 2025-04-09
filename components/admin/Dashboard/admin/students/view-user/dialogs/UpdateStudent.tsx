@@ -15,10 +15,9 @@ import { Button } from "@/components/ui/button";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "@/redux/store";
 import { toast } from "sonner";
-import axios from "axios";
 import Cookies from "js-cookie";
 import {setEditBlocked, setviewStudentDefault } from "@/redux/features/StudentSlice";
-import { BACKEND_URL } from "@/Constants/backend";
+import api from "@/lib/axiosInstance";
 
 function UpdateStudent() {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -29,7 +28,9 @@ function UpdateStudent() {
   const handleSubmit = async (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
     const body = {
-      batch: student.viewStudent.batchCode,
+      facultyId: Number(student.viewStudent.student.facultyId),
+      courseId: Number(student.viewStudent.student.courseId),
+      batchId: Number(student.viewStudent.student.batchId),
     };
     const id = dialog.viewDialogId;
     const token = Cookies.get("adminjwt");
@@ -38,11 +39,7 @@ function UpdateStudent() {
         "Content-Type": "application/json",
         Authorization: `Bearer ${token}`,
       };
-      const response = await axios.patch(
-        `${BACKEND_URL}/users/Interact/Update/${id}`,
-        body,
-        { headers }
-      );
+      const response = await api.patch(`/users/Interact/Update/${id}`, body, { headers });
       if (response.data.isSuccessful) {
         toast.success(response.data.message);
         dispatch(setviewStudentDefault());
@@ -51,14 +48,22 @@ function UpdateStudent() {
         toast.error(response.data.message);
       }
     } catch (error) {
-      console.error("Error creating student:", error);
-      toast.error("An error occurred while creating the student.");
+      console.error("Error Updating student:", error);
+      toast.error("An error occurred while Updating the student.");
     }
   };
 
   const validateForm = () => {
-    if (!student.viewStudent.batchCode) {
+    if (!student.viewStudent.student.batchId) {
       toast.error("Please select a batch.");
+      return false;
+    }
+    if (!student.viewStudent.student.courseId) {
+      toast.error("Please select a course.");
+      return false;
+    }
+    if (!student.viewStudent.student.facultyId) {
+      toast.error("Please select a faculty.");
       return false;
     }
     return true;

@@ -8,15 +8,17 @@ const initialState: StudentInteract = {
         id: -1,
         email: "",
         name: "",
-        batchCode: "",
-        course: "",
-        faculty: "",
         createdAt: "",
         updatedAt: "",
         isBlacklisted: false,
         createdBy: "",
         updatedBy: "",
         blackelistedReason: "",
+        student: {
+            facultyId: -1,
+            courseId: -1,
+            batchId: -1,
+        },
     },
     editBlocked: true,
 };
@@ -37,16 +39,17 @@ export const studentSlice = createSlice({
             state.viewStudent = initialState.viewStudent;
         },
 
-        setViewBatchCode: (state, action) => {
-            state.viewStudent.batchCode = action.payload;
+        setViewBatchId: (state, action) => {
+            state.viewStudent.student.batchId = action.payload;
         },
-
-        setViewCourse: (state, action) => {
-            state.viewStudent.course = action.payload;
+        setViewCourseId: (state, action) => {
+            state.viewStudent.student.courseId = action.payload;
         },
-        setViewFaculty: (state, action) => {
-            state.viewStudent.faculty = action.payload;
-        }
+        setViewFacultyId: (state, action) => {
+            state.viewStudent.student.facultyId = action.payload;
+        },
+        
+           
     },
 });
 
@@ -54,9 +57,9 @@ export const {
     // View Student
     setEditBlocked,
     setviewStudent,
-    setViewBatchCode,
-    setViewCourse,
-    setViewFaculty,
+    setViewBatchId,
+    setViewCourseId,
+    setViewFacultyId,
     setviewStudentDefault
 } = studentSlice.actions;
 export default studentSlice.reducer;

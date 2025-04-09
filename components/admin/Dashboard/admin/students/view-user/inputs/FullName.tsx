@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useSelector } from "react-redux";
 import { RootState } from "@/redux/store";
-import { Lock, CheckCircle,  User2 } from "lucide-react";
+import { Lock, User2 } from "lucide-react";
 
 export function FullName() {
   const [fullName, setFullName] = useState("");
@@ -16,11 +16,11 @@ export function FullName() {
     setFullName(student.viewStudent.name || "");
   }, [student.viewStudent.name]);
 
-  
+
   return (
     <div className="flex flex-col w-full font-poppins grow gap-2 mb-4">
-      <Label 
-        htmlFor="fullName-input" 
+      <Label
+        htmlFor="fullName-input"
         className="flex items-center text-sm font-medium text-slate-700 dark:text-slate-200"
       >
         <User2 className="mr-2 h-4 w-4 text-slate-500" />
@@ -43,19 +43,20 @@ export function FullName() {
           `}
           disabled
         />
-        
+
         {fullName && (
           <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
-              <CheckCircle className="h-4 w-4 text-green-500" />
+            <Lock className="h-4 w-4 text-red-400" />
+
           </div>
         )}
       </div>
-      
-      
-        <p className="text-xs text-slate-500 mt-1 flex items-center">
-          <Lock className="h-3 w-3 mr-1" />
-          You cannot edit this field
-        </p>
+
+
+      <p className="text-xs text-slate-500 mt-1 flex items-center">
+        <Lock className="h-3 w-3 mr-1" />
+        You cannot edit this field
+      </p>
     </div>
   );
 }
