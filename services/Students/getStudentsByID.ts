@@ -2,12 +2,12 @@
 "use client";
 
 import { LogoutAction } from "@/services/actions/auth";
-import { setviewUser } from "@/redux/features/UserSlice";
+import { setviewStudent } from "@/redux/features/StudentSlice";
 import axios from "axios";
 import Cookies from "js-cookie";
 import { BACKEND_URL } from "@/Constants/backend";
 
-export async function getAdminByID( dispatch: any, id: any) {
+export async function getStudentByID( dispatch: any, id: any) {
   const jwt = Cookies.get("adminjwt");
   const headers = {
     Accept: "text/plain",
@@ -16,12 +16,11 @@ export async function getAdminByID( dispatch: any, id: any) {
   try {
     const response = await axios.get(
       `${BACKEND_URL}/users/${id}`,
-
       { headers }
     );
     if (response.data.isSuccessful) {
       if (dispatch !== null) {
-        dispatch(setviewUser(response.data.content));
+        dispatch(setviewStudent(response.data.content));
       } else {
         return response.data.content;
       }

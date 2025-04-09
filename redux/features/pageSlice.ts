@@ -10,6 +10,12 @@ const initialState: PageState = {
         nextPage: -1,
         prevPage: -1,
     },
+    students: {
+        totalPages: 0,
+        page: 1,
+        nextPage: -1,
+        prevPage: -1,
+    },
 };
 
 export const PageSlice = createSlice({
@@ -40,6 +46,33 @@ export const PageSlice = createSlice({
                 sessionStorage.setItem("userPrevPage", JSON.stringify(action.payload));
             }
         },
+
+        //students
+        setStudentPage: (state, action) => {
+            state.students.page = action.payload;
+            if (typeof window !== "undefined") {
+                sessionStorage.setItem("studentPage", JSON.stringify(action.payload));
+            }
+        },
+        setStudentTotalPages: (state, action) => {
+            state.students.totalPages = action.payload;
+            if (typeof window !== "undefined") {
+                sessionStorage.setItem("studentTotalPages", JSON.stringify(action.payload));
+            }
+        },
+        setStudentNextPage: (state, action) => {
+            state.students.nextPage = action.payload;
+            if (typeof window !== "undefined") {
+                sessionStorage.setItem("studentNextPage", JSON.stringify(action.payload));
+            }
+        },
+        setStudentPrevPage: (state, action) => {
+            state.students.prevPage = action.payload;
+            if (typeof window !== "undefined") {
+                sessionStorage.setItem("studentPrevPage", JSON.stringify(action.payload));
+            }
+        },
+
         
     },
 });
@@ -49,6 +82,15 @@ export const {
     setUserTotalPages,
     setUserNextPage,
     setUserPrevPage,
+
+    //students
+    setStudentPage,
+    setStudentTotalPages,
+    setStudentNextPage,
+    setStudentPrevPage,
+    
 } = PageSlice.actions;
+
+
 
 export default PageSlice.reducer;
