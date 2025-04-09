@@ -9,6 +9,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import { BACKEND_URL } from "@/Constants/backend";
 
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
@@ -40,7 +41,7 @@ function UpdateUser() {
         Authorization: `Bearer ${token}`,
       };
       const response = await axios.patch(
-        `${process.env.NEXT_PUBLIC_BACKEND_URL}/users/Interact/Update/${id}`,
+        `${BACKEND_URL}/users/Interact/Update/${id}`,
         body,
         { headers }
       );
