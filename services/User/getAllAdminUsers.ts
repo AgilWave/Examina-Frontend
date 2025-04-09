@@ -27,6 +27,7 @@ export async function getAllAdminUsers(
     };
     try {
         let url = `${BACKEND_URL}/users/Search?page=${page}&pageSize=${pageSize}&role=admin`;
+
         if (filterApplied) {
             url += `&isBlacklisted=${isBlacklisted}`;
         }
