@@ -28,7 +28,7 @@ const StyledDatePicker = styled(MuiDatePicker)({
       color: "white",
     },
     "& .MuiSvgIcon-root": {
-      color: "rgb(156, 163, 175)",
+      color: "rgb(156, 163, 176)",
     },
   },
 });
