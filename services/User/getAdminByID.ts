@@ -16,6 +16,7 @@ export async function getAdminByID( dispatch: any, id: any) {
   try {
     const response = await axios.get(
       `${BACKEND_URL}/users/${id}`,
+
       { headers }
     );
     if (response.data.isSuccessful) {
