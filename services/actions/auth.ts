@@ -2,12 +2,13 @@
 import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 import { encrypt } from "@/lib/encryption";
+import { BACKEND_URL } from "@/Constants/backend";
 
 export async function loginActionMS({ idToken }: { idToken: string }) {
   const cookieStore = await cookies();
 
   try {
-    const res = await fetch(`${process.env.AUTH_BACKEND_URL}/auth/microsoft`, {
+    const res = await fetch(`${BACKEND_URL}/auth/microsoft`, {
       method: "POST",
       body: JSON.stringify({
         token: idToken,
@@ -59,7 +60,7 @@ export async function loginActionMS({ idToken }: { idToken: string }) {
 export async function LogoutAction() {
   const cookieStore = await cookies();
   try {
-    const res = await fetch(`${process.env.AUTH_BACKEND_URL}/auth/logout`, {
+    const res = await fetch(`${BACKEND_URL}/auth/logout`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -93,7 +94,7 @@ export async function LoginAdmin({
   const cookieStore = await cookies();
   try {
     const res = await fetch(
-      `${process.env.AUTH_BACKEND_URL}/auth/admin-login`,
+      `${BACKEND_URL}/auth/admin-login`,
       {
         method: "POST",
         body: JSON.stringify({
