@@ -5,12 +5,11 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "@/redux/store";
-import { Mail, Lock, CheckCircle, AlertCircle } from "lucide-react";
+import { Mail, Lock, CheckCircle } from "lucide-react";
 
 export function Email() {
   const [email, setEmail] = useState("");
-  const [isValid, setIsValid] = useState(true);
-  const dispatch = useDispatch();
+  const [isValid] = useState(true);
   const student = useSelector((state: RootState) => state.student);
 
   useEffect(() => {

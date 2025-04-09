@@ -23,8 +23,11 @@ const Filters = () => {
   );
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [isBlacklisted, setIsBlacklisted] = useQueryState("isBlacklisted");
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [batchName, setbatchName] = useQueryState("batchName");
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [courseName, setcourseName] = useQueryState("courseName");
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [facultyName, setfacultyName] = useQueryState("facultyName");
 
   const handleReset = () => {
