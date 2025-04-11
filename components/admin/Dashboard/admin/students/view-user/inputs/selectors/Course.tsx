@@ -27,6 +27,7 @@ interface Course {
 
 export function Course() {
   const dispatch = useDispatch();
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [course, setCourse] = useState("");
   const student = useSelector((state: RootState) => state.student);
   const facultyId = student.viewStudent.student.faculty?.id || "";
