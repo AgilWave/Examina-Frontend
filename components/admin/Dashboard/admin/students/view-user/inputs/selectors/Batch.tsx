@@ -26,42 +26,40 @@ interface Batch {
 
 export function Batch() {
   const dispatch = useDispatch();
-  const [batches, setBatches] = useState<Batch[]>([]);
+  const [allBatches, setAllBatches] = useState<Batch[]>([]);
   const student = useSelector((state: RootState) => state.student);
-  const courseId = student.viewStudent.student.courseId || "";
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [batch, setBatch] = useState("");
 
   const getBatches = async () => {
     try {
-      if (courseId) {
-        const response = await api.get(`/batch/Search?courseId=${courseId}`, {
+        const response = await api.get(`/batch/Search`, {
           headers: {
             Authorization: `Bearer ${Cookies.get("adminjwt")}`,
           },
         });
         if (response.data.isSuccessful) {
-          setBatches(response.data.listContent);
+          setAllBatches(response.data.listContent);
         } else {
-          setBatches([]);
+          setAllBatches([]);
         }
-      } 
-      else {
-        setBatches([]);
-      }
     } catch (error) {
       console.log(error);
     }
   };
 
   useEffect(() => {
-    getBatches();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [courseId]);
+    if (allBatches.length === 0) {
+      getBatches();
+    }
+    setBatch("");
+  }, [student.viewStudent.student.course.id, student.viewStudent.student.faculty.id]);
+
+  const filteredBatches = allBatches.filter(batch => batch.courseId === Number(student.viewStudent.student.course.id));
 
   useEffect(() => {
-    setBatch(String(student.viewStudent.student.batchId) || "");
-  }, [student.viewStudent.student.batchId]);
+    setBatch(String(student.viewStudent.student.batch.id) || "");
+  }, [student.viewStudent.student.batch.id]);
 
   const handleChange = (value: string) => {
     setBatch(value);
@@ -78,9 +76,9 @@ export function Batch() {
 
       <div className="relative">
         <Select
-          value={String(student.viewStudent.student.batchId) || ""}
+          value={String(student.viewStudent.student.batch.id) || ""}
           onValueChange={(value) => handleChange(value)}
-          disabled={student.editBlocked || batches.length === 0}
+          disabled={student.editBlocked || filteredBatches.length === 0}
         >
           <SelectTrigger
             className={`
@@ -97,7 +95,7 @@ export function Batch() {
           <SelectContent className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-md shadow-md">
             <SelectGroup>
               <SelectLabel className="px-2 py-1.5 text-sm text-slate-500 dark:text-slate-400">Select a Batch</SelectLabel>
-              {batches.map((batch) => (
+              {filteredBatches.map((batch) => (
                 <SelectItem key={batch.id} value={batch.id.toString()} className="flex items-center py-2 cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-700">
                    <Calendar className="h-4 w-4 text-amber-500 mr-2" />
                   {batch.batchCode}

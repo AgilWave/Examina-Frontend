@@ -28,9 +28,9 @@ function UpdateStudent() {
   const handleSubmit = async (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
     const body = {
-      facultyId: Number(student.viewStudent.student.facultyId),
-      courseId: Number(student.viewStudent.student.courseId),
-      batchId: Number(student.viewStudent.student.batchId),
+      facultyId: Number(student.viewStudent.student.faculty.id),
+      courseId: Number(student.viewStudent.student.course.id),
+      batchId: Number(student.viewStudent.student.batch.id),
     };
     const id = dialog.viewDialogId;
     const token = Cookies.get("adminjwt");
@@ -54,15 +54,15 @@ function UpdateStudent() {
   };
 
   const validateForm = () => {
-    if (!student.viewStudent.student.batchId) {
+    if (!student.viewStudent.student.batch.id) {
       toast.error("Please select a batch.");
       return false;
     }
-    if (!student.viewStudent.student.courseId) {
+    if (!student.viewStudent.student.course.id) {
       toast.error("Please select a course.");
       return false;
     }
-    if (!student.viewStudent.student.facultyId) {
+    if (!student.viewStudent.student.faculty.id) {
       toast.error("Please select a faculty.");
       return false;
     }

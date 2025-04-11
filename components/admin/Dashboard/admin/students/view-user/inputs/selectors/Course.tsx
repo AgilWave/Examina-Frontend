@@ -27,27 +27,22 @@ interface Course {
 
 export function Course() {
   const dispatch = useDispatch();
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [course, setCourse] = useState("");
   const student = useSelector((state: RootState) => state.student);
-  const [courses, setCourses] = useState<Course[]>([]);
-  const facultyId = student.viewStudent.student.facultyId || "";
+  const facultyId = student.viewStudent.student.faculty.id || "";
+  const [allCourses, setAllCourses] = useState<Course[]>([]);
 
   const getCourses = async () => {
     try {
-      if (facultyId) {  
-        const response = await api.get(`/course/Search?facultyId=${facultyId}`, {
-          headers: {
-            Authorization: `Bearer ${Cookies.get("adminjwt")}`,
-          },
-        });
-        if (response.data.isSuccessful) {
-          setCourses(response.data.listContent);
-        } else {
-          setCourses([]);
-        }
+      const response = await api.get(`/course/Search`, {
+        headers: {
+          Authorization: `Bearer ${Cookies.get("adminjwt")}`,
+        },
+      });
+      if (response.data.isSuccessful) {
+        setAllCourses(response.data.listContent);
       } else {
-        setCourses([]);
+        setAllCourses([]);
       }
     } catch (error) {
       console.error("Error fetching courses:", error);
@@ -55,13 +50,12 @@ export function Course() {
   };
 
   useEffect(() => {
-    getCourses();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    if (allCourses.length === 0) {
+      getCourses();
+    }
   }, [facultyId]);
 
-  useEffect(() => {
-    setCourse(String(student.viewStudent.student.courseId) || "");
-  }, [student.viewStudent.student.courseId]);
+  const filteredCourses = allCourses.filter(course => course.facultyId === Number(facultyId));
 
   const handleChange = (value: string) => {
     setCourse(value);
@@ -75,14 +69,14 @@ export function Course() {
         Course
         <span className="text-red-500 ml-1">*</span>
       </Label>
-      
+
       <div className="relative">
-        <Select 
-          value={String(student.viewStudent.student.courseId) || ""}
-          onValueChange={(value) => handleChange(value)} 
-          disabled={student.editBlocked || courses.length === 0}
+        <Select
+          value={course}
+          onValueChange={(value) => handleChange(value)}
+          disabled={student.editBlocked || filteredCourses.length === 0}
         >
-          <SelectTrigger 
+          <SelectTrigger
             className={`
               w-full pl-3 pr-10 py-2
               border border-slate-200 rounded-md shadow-sm
@@ -97,7 +91,7 @@ export function Course() {
           <SelectContent className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-md shadow-md">
             <SelectGroup>
               <SelectLabel className="px-2 py-1.5 text-sm text-slate-500 dark:text-slate-400">Select a Course</SelectLabel>
-              {courses.map((course) => (
+              {filteredCourses.map((course) => (
                 <SelectItem key={course.id} value={course.id.toString()} className="flex items-center py-2 cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-700">
                   <GraduationCap className="h-4 w-4 text-blue-500 mr-2" />
                   {course.name}
@@ -106,15 +100,15 @@ export function Course() {
             </SelectGroup>
           </SelectContent>
         </Select>
-        
+
         {student.editBlocked && (
           <div className="absolute right-10 top-1/2 transform -translate-y-1/2">
             <Lock className="h-4 w-4 text-slate-400" />
           </div>
         )}
       </div>
-      
-      
+
+
       {student.editBlocked && (
         <p className="text-xs text-slate-500 mt-1 flex items-center">
           <Lock className="h-3 w-3 mr-1" />

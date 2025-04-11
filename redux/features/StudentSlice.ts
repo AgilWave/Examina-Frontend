@@ -15,9 +15,18 @@ const initialState: StudentInteract = {
         updatedBy: "",
         blackelistedReason: "",
         student: {
-            facultyId: -1,
-            courseId: -1,
-            batchId: -1,
+            faculty: {
+                id: -1,
+                name: "",
+            },
+            course: {
+                id: -1,
+                name: "",
+            },
+            batch: {
+                id: -1,
+                name: "",
+            },
         },
     },
     editBlocked: true,
@@ -40,13 +49,22 @@ export const studentSlice = createSlice({
         },
 
         setViewBatchId: (state, action) => {
-            state.viewStudent.student.batchId = action.payload;
+            state.viewStudent.student.batch.id = action.payload;
         },
         setViewCourseId: (state, action) => {
-            state.viewStudent.student.courseId = action.payload;
+            state.viewStudent.student.course.id = action.payload;
         },
         setViewFacultyId: (state, action) => {
-            state.viewStudent.student.facultyId = action.payload;
+            state.viewStudent.student.faculty.id = action.payload;
+        },
+        setViewCourseName: (state, action) => {
+            state.viewStudent.student.course.name = action.payload;
+        },
+        setViewBatchName: (state, action) => {
+            state.viewStudent.student.batch.name = action.payload;
+        },
+        setViewFacultyName: (state, action) => {
+            state.viewStudent.student.faculty.name = action.payload;
         },
         
            
@@ -60,6 +78,9 @@ export const {
     setViewBatchId,
     setViewCourseId,
     setViewFacultyId,
-    setviewStudentDefault
+    setviewStudentDefault,
+    setViewCourseName,
+    setViewBatchName,
+    setViewFacultyName,
 } = studentSlice.actions;
 export default studentSlice.reducer;

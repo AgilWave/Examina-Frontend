@@ -49,12 +49,14 @@ export function Faculty() {
   };
 
   useEffect(() => {
-    getFaculties();
-  }, []);
+    if (faculties.length === 0) {
+      getFaculties();
+    }
+  }, [faculties.length]);
 
   useEffect(() => {
-    setFaculty(String(student.viewStudent.student.facultyId) || "");
-  }, [student.viewStudent.student.facultyId]);
+    setFaculty(String(student.viewStudent.student.faculty.id) || "");
+  }, [student.viewStudent.student.faculty.id]);
 
   const handleChange = (value: string) => {
     setFaculty(value);
@@ -71,7 +73,7 @@ export function Faculty() {
       
       <div className="relative">
         <Select 
-          value={String(student.viewStudent.student.facultyId) || ""}
+          value={String(student.viewStudent.student.faculty.id) || ""}
           onValueChange={(value) => handleChange(value)} 
           disabled={student.editBlocked || faculties.length === 0}
         >

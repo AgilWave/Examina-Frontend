@@ -4,9 +4,18 @@ export interface StudentInteract {
       email: string;
       name: string;
       student: {
-        facultyId: number;
-        courseId: number;
-        batchId: number;
+        faculty: {
+            id: number;
+            name: string;
+        },
+        course: {
+            id: number;
+            name: string;
+        },
+        batch: {
+            id: number;
+            name: string;
+        },
       };
       createdAt: string;
       updatedAt: string;
