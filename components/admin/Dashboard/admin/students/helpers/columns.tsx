@@ -45,7 +45,7 @@ export const columns: ColumnDef<User>[] = [
       </div>
     ),
     cell: ({ row }) => {
-      const batch = row.original.student.batch.batchCode as string;
+      const batch = row.original.student.batch?.batchCode as string || "-";
       return (
         <div className="capitalize max-w-[100px] font-poppins 2xl:text-[14px] text-[11px]">
           {batch}

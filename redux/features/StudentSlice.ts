@@ -49,14 +49,24 @@ export const studentSlice = createSlice({
         },
 
         setViewBatchId: (state, action) => {
+            if (!state.viewStudent.student.batch) {
+                state.viewStudent.student.batch = { id: -1, name: "" };
+            }
             state.viewStudent.student.batch.id = action.payload;
         },
         setViewCourseId: (state, action) => {
+            if (!state.viewStudent.student.course) {
+                state.viewStudent.student.course = { id: -1, name: "" };
+            }
             state.viewStudent.student.course.id = action.payload;
         },
         setViewFacultyId: (state, action) => {
+            if (!state.viewStudent.student.faculty) {
+                state.viewStudent.student.faculty = { id: -1, name: "" };
+            }
             state.viewStudent.student.faculty.id = action.payload;
         },
+        
         setViewCourseName: (state, action) => {
             state.viewStudent.student.course.name = action.payload;
         },
