@@ -1,5 +1,6 @@
 export interface StudentInteract {
     viewStudent: {
+      batchCode: any;
       id: number;
       email: string;
       name: string;

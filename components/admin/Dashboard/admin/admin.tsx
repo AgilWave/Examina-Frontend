@@ -27,6 +27,11 @@ const AdminContent: FC = () => {
       title: "Students",
       link: "/admin/dashboard/admin-config/students",
     },
+    {
+      icon: <UserRoundCog size={30} color="#FFFFFF" />,
+      title: "Lectures",
+      link: "/admin/dashboard/admin-config/lectures",
+    },
   ];
 
   return (
