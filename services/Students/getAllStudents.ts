@@ -13,14 +13,7 @@ import Cookies from "js-cookie";
 import { BACKEND_URL } from "@/Constants/backend";
 
 export async function getAllStudents(
-    dispatch: any | null,
-    page: number,
-    pageSize: number,
-    filterApplied: boolean | null,
-    name: string | null,
-    isBlacklisted: string | null,
-    batchCode: string | null
-) {
+dispatch: any | null, page: number, pageSize: number, filterApplied: boolean | null, name: string | null, isBlacklisted: string | null, batchCode: string | null) {
     const jwt = Cookies.get("adminjwt");
     const headers = {
         Accept: "text/plain",
@@ -28,9 +21,6 @@ export async function getAllStudents(
     };
     try {
         let url = `${BACKEND_URL}/users/Search?page=${page}&pageSize=${pageSize}&role=student`;
-        if (filterApplied) {
-            url += `&isBlacklisted=${isBlacklisted}`;
-        }
         if (name) {
             url += `&name=${name}`;
         }
