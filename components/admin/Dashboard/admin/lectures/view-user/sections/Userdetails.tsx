@@ -1,7 +1,6 @@
 import React from "react";
 import { FullName } from "../inputs/FullName";
 import { Email } from "../inputs/Email";
-import BlackListSwitch from "../inputs/switches/BlackListSwitch";
 
 function UserDetails() {
   return (

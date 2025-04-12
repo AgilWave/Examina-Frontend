@@ -4,7 +4,7 @@ import { useState } from "react";
 import { DropdownSelectorGroup } from "@/components/admin/Dashboard/admin/lectures/view-user/sections/selectors/DropdownSelectorGroup";
 import { FacultyTable } from "@/components/admin/Dashboard/admin/lectures/view-user/sections/table/Table";
 
-export default function FacultyBatchModuleManager(data: any) {
+export default function FacultyBatchModuleManager() {
     const [records, setRecords] = useState<
       { faculty: string; batch: string; module: string }[]
     >([]);

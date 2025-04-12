@@ -54,6 +54,7 @@ export function Course() {
     if (allCourses.length === 0) {
       getCourses();
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [facultyId]);
 
   const filteredCourses = allCourses.filter(course => course.facultyId === Number(facultyId));

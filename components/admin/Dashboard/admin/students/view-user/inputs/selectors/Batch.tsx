@@ -53,6 +53,7 @@ export function Batch() {
       getBatches();
     }
     setBatch("");
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [student.viewStudent.student.course?.id, student.viewStudent.student.faculty?.id]);
 
   const filteredBatches = allBatches.filter(batch => batch.courseId === Number(student.viewStudent.student.course?.id));
