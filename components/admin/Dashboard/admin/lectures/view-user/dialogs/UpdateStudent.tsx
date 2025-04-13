@@ -29,7 +29,7 @@ function UpdateStudent() {
   const handleSubmit = async (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
     const body = {
-      batch: student.viewStudent.batchCode,
+      batch: student.viewStudent.student.batch.id,
     };
     const id = dialog.viewDialogId;
     const token = Cookies.get("adminjwt");
@@ -57,7 +57,7 @@ function UpdateStudent() {
   };
 
   const validateForm = () => {
-    if (!student.viewStudent.batchCode) {
+    if (!student.viewStudent.student.batch.id) {
       toast.error("Please select a batch.");
       return false;
     }
