@@ -32,7 +32,7 @@ function Content() {
             <UserDetails />
           </TabsContent>
           <TabsContent value="additional">
-            <AdditonalDetails data={[]} />
+            <AdditonalDetails />
           </TabsContent>
           <TabsContent value="settings" >
               <SystemDetails/>
