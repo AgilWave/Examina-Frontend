@@ -34,6 +34,7 @@ function ViewUserDialog() {
   const dialog = useSelector((state: RootState) => state.dialog);
   const user = useSelector((state: RootState) => state.user);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [loaderOpen, setLoaderOpen] = useState(false);
   const [open, setOpen] = useState(false);
   const isDesktopMediaQuery = useMediaQuery("(min-width: 768px)");

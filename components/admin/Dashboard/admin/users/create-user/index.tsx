@@ -6,7 +6,6 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-  DialogFooter,
 } from "@/components/ui/dialog";
 import {
   Drawer,
@@ -33,6 +32,7 @@ function CreateUserDialog() {
   const isDesktopMediaQuery = useMediaQuery("(min-width: 768px)");
 
   useEffect(() => {
+    
     isDesktopMediaQuery ? setOpen(dialog.createDialog) : setOpen(false);
   }, [dialog.createDialog, isDesktopMediaQuery]);
 
