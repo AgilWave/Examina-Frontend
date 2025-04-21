@@ -47,6 +47,7 @@ jobs:
     permissions:
       id-token: write 
       contents: read 
+      actions: write
 
     steps:
       - name: Download artifact from build job
@@ -71,3 +72,24 @@ jobs:
           app-name: 'examinafrontend'
           slot-name: 'Production'
           package: .
+      
+      - name: Delete deployment artifact
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const artifacts = await github.rest.actions.listArtifactsForRepo({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              per_page: 100,
+            });
+
+            for (const artifact of artifacts.data.artifacts) {
+              if (artifact.name === "nextjs-app") {
+                await github.rest.actions.deleteArtifact({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  artifact_id: artifact.id,
+                });
+                console.log(`✅ Deleted artifact: ${artifact.name}`);
+              }
+            }
