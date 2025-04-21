@@ -34,7 +34,8 @@ function Table({
     >
       <table
         data-slot="table"
-        className={cn("w-full caption-bottom text-sm", className)}
+        className={cn("w-full min-w-full caption-bottom text-sm", className)}
+        style={{ tableLayout: "fixed" }}
         {...props}
       >
         {isLoading ? (
@@ -120,6 +121,7 @@ function TableHead({ className, ...props }: React.ComponentProps<"th">) {
       data-slot="table-head"
       className={cn(
         "text-gray-700 text-sm dark:text-white h-10 px-2 text-left align-middle font-bold whitespace-nowrap [&:has([role=checkbox])]:pr-0 [&>[role=checkbox]]:translate-y-[2px]",
+        "overflow-hidden text-ellipsis",
         className
       )}
       {...props}
@@ -133,6 +135,7 @@ function TableCell({ className, ...props }: React.ComponentProps<"td">) {
       data-slot="table-cell"
       className={cn(
         "p-2 align-middle text-gray-800 dark:text-white/80 whitespace-nowrap [&:has([role=checkbox])]:pr-0 [&>[role=checkbox]]:translate-y-[2px]",
+        "overflow-hidden text-ellipsis",
         className
       )}
       {...props}
