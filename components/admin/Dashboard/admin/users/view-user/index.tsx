@@ -63,6 +63,7 @@ function ViewUserDialog() {
   }, [user.editBlocked]);
 
   useEffect(() => {
+    // eslint-disable-next-line @typescript-eslint/no-unused-expressions
     isDesktopMediaQuery ? setOpen(dialog.viewDialog) : setOpen(false);
   }, [dialog.viewDialog, isDesktopMediaQuery]);
 

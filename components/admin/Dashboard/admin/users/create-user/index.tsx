@@ -32,7 +32,7 @@ function CreateUserDialog() {
   const isDesktopMediaQuery = useMediaQuery("(min-width: 768px)");
 
   useEffect(() => {
-    
+    // eslint-disable-next-line @typescript-eslint/no-unused-expressions
     isDesktopMediaQuery ? setOpen(dialog.createDialog) : setOpen(false);
   }, [dialog.createDialog, isDesktopMediaQuery]);
 
