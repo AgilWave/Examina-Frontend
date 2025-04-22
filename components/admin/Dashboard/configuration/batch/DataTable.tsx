@@ -165,17 +165,17 @@ export function DataTable() {
     dispatch(
       setViewDialogId(JSON.parse(sessionStorage.getItem("viewDialogId") || "0"))
     );
-    const page = JSON.parse(sessionStorage.getItem("userPage") || "1");
+    const page = JSON.parse(sessionStorage.getItem("batchPage") || "1");
     fetchData(page);
   }, []);
 
   useEffect(() => {
-    const page = JSON.parse(sessionStorage.getItem("userPage") || "1");
+    const page = JSON.parse(sessionStorage.getItem("batchPage") || "1");
     fetchData(page);
   }, [pageSize]);
 
   useEffect(() => {
-    const page = JSON.parse(sessionStorage.getItem("userPage") || "1");
+    const page = JSON.parse(sessionStorage.getItem("batchPage") || "1");
     fetchData(page);
   }, [searchQuery]);
 

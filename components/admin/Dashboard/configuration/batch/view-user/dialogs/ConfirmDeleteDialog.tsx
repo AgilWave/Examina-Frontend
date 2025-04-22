@@ -40,7 +40,7 @@ export function ConfirmDeleteDialog() {
     setLoaderOpen(true);
     e.preventDefault();
     if (userId !== batch.viewBatch?.id.toString()) {
-      toast.error("Ids does not match");
+      toast.error("IDs does not match");
       return;
     }
     const jwt = Cookies.get("adminjwt");
