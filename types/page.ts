@@ -17,4 +17,10 @@ export interface PageState {
     nextPage: number;
     prevPage: number;
   };
+  batch: {
+    totalPages: number;
+    page: number;
+    nextPage: number;
+    prevPage: number;
+  };
 }
