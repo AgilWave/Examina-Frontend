@@ -1,8 +1,7 @@
-
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Dialog,
   DialogContent,
@@ -21,20 +20,19 @@ import { setEditClose, setViewDialog } from "@/redux/features/dialogState";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "@/redux/store";
 import Content from "./Content";
-import { setEditBlocked } from "@/redux/features/StudentSlice";
+import { setEditBlocked } from "@/redux/features/BatchSlice";
+import { ConfirmDeleteDialog } from "./dialogs/ConfirmDeleteDialog";
 import { GotoEditDialog } from "./dialogs/GotoEditDialog";
-import { useState } from "react";
-import { getStudentByID } from "@/services/Students/getStudentsByID";
-import UpdateStudent from "./dialogs/UpdateStudent";
+import { getBatchByID } from "@/services/Batch/getBatchByID";
+import CreateUser from "./dialogs/UpdateBatch";
 import { Button } from "@/components/ui/button";
 import { useMediaQuery } from "@/hooks/use-media-query";
 
 function ViewUserDialog() {
   const dispatch = useDispatch();
   const dialog = useSelector((state: RootState) => state.dialog);
-  const student = useSelector((state: RootState) => state.student);
+  const batch = useSelector((state: RootState) => state.batch);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [loaderOpen, setLoaderOpen] = useState(false);
   const [open, setOpen] = useState(false);
   const isDesktopMediaQuery = useMediaQuery("(min-width: 768px)");
@@ -43,8 +41,7 @@ function ViewUserDialog() {
     if (dialog.viewDialogId !== undefined) {
       try {
         setLoaderOpen(true);
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        const response = await getStudentByID(dispatch, dialog.viewDialogId);
+        await getBatchByID(dispatch, dialog.viewDialogId);
         setLoaderOpen(false);
       } catch (err: any) {
         console.log(err);
@@ -57,13 +54,12 @@ function ViewUserDialog() {
   }, [dialog.viewDialogId, dialog.viewDialog]);
 
   useEffect(() => {
-    if (student.editBlocked) {
+    if (batch.editBlocked) {
       fetchUser();
     }
-  }, [student.editBlocked]);
+  }, [batch.editBlocked]);
 
   useEffect(() => {
-    // eslint-disable-next-line @typescript-eslint/no-unused-expressions
     isDesktopMediaQuery ? setOpen(dialog.viewDialog) : setOpen(false);
   }, [dialog.viewDialog, isDesktopMediaQuery]);
 
@@ -72,13 +68,13 @@ function ViewUserDialog() {
   }, [dialog.viewDialog]);
 
   const handleBackgroundClick = (e: any) => {
-    if (!student.editBlocked) {
+    if (!batch.editBlocked) {
       e.preventDefault();
     }
   };
 
   const handleClose = (val: boolean) => {
-    if (!student.editBlocked) {
+    if (!batch.editBlocked) {
       dispatch(setEditClose(true));
       setIsDialogOpen(true);
     } else {
@@ -97,12 +93,10 @@ function ViewUserDialog() {
 
   const headerContent = (
     <div className="flex items-center justify-between w-full">
-      <div className="w-full md:w-auto">Student Details #{student.viewStudent?.id}</div>
+      <div className="w-full md:w-auto">Batch Details #{batch.viewBatch?.id}</div>
       <div className="flex items-center gap-2 sm:gap-3 pr-5 sm:pr-0 sm:w-auto">
-        <GotoEditDialog
-          isDialogOpen={isDialogOpen}
-          setIsDialogOpen={setIsDialogOpen}
-        />
+        <ConfirmDeleteDialog />
+        <GotoEditDialog isDialogOpen={isDialogOpen} setIsDialogOpen={setIsDialogOpen} />
       </div>
     </div>
   );
@@ -113,7 +107,7 @@ function ViewUserDialog() {
     </div>
   );
 
-  const footerContent = !student.editBlocked && (
+  const footerContent = !batch.editBlocked && (
     <>
       <Button
         variant="outline"
@@ -126,7 +120,7 @@ function ViewUserDialog() {
       >
         Cancel
       </Button>
-      <UpdateStudent />
+      <CreateUser />
     </>
   );
 
@@ -164,9 +158,9 @@ function ViewUserDialog() {
             {headerContent}
           </DrawerTitle>
         </DrawerHeader>
-        
+
         <div className="px-4 h-0 flex-1 overflow-y-auto">
-          <Content />
+          {mainContent}
         </div>
 
         {footerContent && (

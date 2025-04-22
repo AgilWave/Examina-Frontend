@@ -22,6 +22,12 @@ const initialState: PageState = {
         nextPage: -1,
         prevPage: -1,
     },
+    batch: {
+        totalPages: 0,
+        page: 1,
+        nextPage: -1,
+        prevPage: -1,
+    },
 };
 
 export const PageSlice = createSlice({
@@ -105,6 +111,31 @@ export const PageSlice = createSlice({
             }
         },
 
+        //batch
+        setBatchPage: (state, action) => {
+            state.batch.page = action.payload;
+            if (typeof window !== "undefined") {
+                sessionStorage.setItem("batchPage", JSON.stringify(action.payload));
+            }
+        },
+        setBatchTotalPages: (state, action) => {
+            state.batch.totalPages = action.payload;
+            if (typeof window !== "undefined") {
+                sessionStorage.setItem("batchTotalPages", JSON.stringify(action.payload));
+            }
+        },
+        setBatchNextPage: (state, action) => {
+            state.batch.nextPage = action.payload;
+            if (typeof window !== "undefined") {
+                sessionStorage.setItem("batchNextPage", JSON.stringify(action.payload));
+            }
+        },
+        setBatchPrevPage: (state, action) => {
+            state.batch.prevPage = action.payload;
+            if (typeof window !== "undefined") {
+                sessionStorage.setItem("batchPrevPage", JSON.stringify(action.payload));
+            }
+        },
         
     },
 });
@@ -125,7 +156,13 @@ export const {
     setLecturePage,
     setLectureTotalPages,
     setLectureNextPage,
-    setLecturePrevPage,    
+    setLecturePrevPage,  
+    
+    //batch
+    setBatchPage,
+    setBatchTotalPages,
+    setBatchNextPage,
+    setBatchPrevPage,
     
 } = PageSlice.actions;
 
