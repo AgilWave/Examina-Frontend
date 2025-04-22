@@ -19,7 +19,7 @@ export function BatchName() {
   }, [batch.viewBatch.batchCode]);
 
   const validateCode = (name: string) => {
-    const regex = /^[A-Z]{4}\d{2}\.\d{1}[A-Z]$/; // Example regex for validation
+    const regex = /^[a-zA-Z0-9\s\-]+$/; // Allow letters, numbers, spaces, and hyphens,
     return regex.test(name);
   }                                                       
 

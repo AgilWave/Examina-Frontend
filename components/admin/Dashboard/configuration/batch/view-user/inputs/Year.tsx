@@ -19,7 +19,7 @@ export default function Year() {
   const [year, setYear] = useState("");
 
   useEffect(() => {
-    setYear(batch.viewBatch.year || "");
+    setYear(batch.viewBatch.year?.toString() || "");
   }, [batch.viewBatch.year]);
 
   const currentYear = new Date().getFullYear();

@@ -12,10 +12,9 @@ import {
 } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
 import { useEffect, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { RootState } from "@/redux/store";
+import { useDispatch } from "react-redux";
 import { setCreateBatchCourseId } from "@/redux/features/BatchSlice";
-import { BookOpen, GraduationCap, Lock } from "lucide-react";
+import { BookOpen, GraduationCap } from "lucide-react";
 import api from "@/lib/axiosInstance";
 import Cookies from "js-cookie";
 
@@ -26,9 +25,7 @@ interface Course {
 
 export function CourseName() {
   const dispatch = useDispatch();
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [course, setCourse] = useState("");
-  const batch = useSelector((state: RootState) => state.batch);
   const [allCourses, setAllCourses] = useState<Course[]>([]);
 
   const getCourses = async () => {
@@ -52,7 +49,7 @@ export function CourseName() {
     if (allCourses.length === 0) {
       getCourses();
     }
-  }, []);
+  }, [allCourses.length]);
 
 
   const handleChange = (value: string) => {

@@ -52,7 +52,7 @@ export function CourseName() {
     if (allCourses.length === 0) {
       getCourses();
     }
-  }, []);
+  }, [allCourses.length]);
 
 
   const handleChange = (value: string) => {

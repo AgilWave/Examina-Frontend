@@ -1,10 +1,9 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { useDispatch, useSelector } from "react-redux";
-import { RootState } from "@/redux/store";
+import { useDispatch } from "react-redux";
 import { CheckCircle, AlertCircle, GraduationCap  } from "lucide-react";
 import { setCreateBatchCode } from "@/redux/features/BatchSlice";
 
@@ -12,14 +11,10 @@ export function BatchName() {
   const [batchName, setBatchName] = useState("");
   const [isValid, setIsValid] = useState(true);
   const dispatch = useDispatch();
-  const batch = useSelector((state: RootState) => state.batch);
 
-  useEffect(() => {
-    setBatchName(batch.createBatch.batchCode || "");
-  }, [batch.createBatch.batchCode]);
 
   const validateBatchName = (name: string) => {
-    const regex = /^[a-zA-Z0-9\s\-]+$/; // Allow letters, numbers, spaces, and hyphens
+    const regex = /^[a-zA-Z0-9\s\-]+$/; // Allow letters, numbers, spaces, and hyphens,
     return regex.test(name);
   };
 
