@@ -34,6 +34,18 @@ const initialState: PageState = {
         nextPage: -1,
         prevPage: -1,
     },
+    module: {
+        totalPages: 0,
+        page: 1,
+        nextPage: -1,
+        prevPage: -1,
+    },
+    faculty: {
+        totalPages: 0,
+        page: 1,
+        nextPage: -1,
+        prevPage: -1,
+    },
 };
 
 export const PageSlice = createSlice({
@@ -167,7 +179,60 @@ export const PageSlice = createSlice({
             if (typeof window !== "undefined") {    
                 sessionStorage.setItem("coursePrevPage", JSON.stringify(action.payload));
             }
-        }
+        },
+
+        //module
+        setModulePage: (state, action) => {
+            state.module.page = action.payload;
+            if (typeof window !== "undefined") {
+                sessionStorage.setItem("modulePage", JSON.stringify(action.payload));
+            }
+        },
+        setModuleTotalPages: (state, action) => {
+            state.module.totalPages = action.payload;
+            if (typeof window !== "undefined") {
+                sessionStorage.setItem("moduleTotalPages", JSON.stringify(action.payload));
+            }
+        },
+        setModuleNextPage: (state, action) => {
+            state.module.nextPage = action.payload;
+            if (typeof window !== "undefined") {
+                sessionStorage.setItem("moduleNextPage", JSON.stringify(action.payload));
+            }
+        },
+        setModulePrevPage: (state, action) => {
+            state.module.prevPage = action.payload;
+            if (typeof window !== "undefined") {
+                sessionStorage.setItem("modulePrevPage", JSON.stringify(action.payload));
+            }
+        },
+
+        //faculty
+        setFacultyPage: (state, action) => {
+            state.faculty.page = action.payload;
+            if (typeof window !== "undefined") {
+                sessionStorage.setItem("facultyPage", JSON.stringify(action.payload));
+            }
+        },
+        setFacultyTotalPages: (state, action) => {
+            state.faculty.totalPages = action.payload;
+            if (typeof window !== "undefined") {
+                sessionStorage.setItem("facultyTotalPages", JSON.stringify(action.payload));
+            }
+        },
+        setFacultyNextPage: (state, action) => {
+            state.faculty.nextPage = action.payload;
+            if (typeof window !== "undefined") {
+                sessionStorage.setItem("facultyNextPage", JSON.stringify(action.payload));
+            }
+        },
+        setFacultyPrevPage: (state, action) => {
+            state.faculty.prevPage = action.payload;
+            if (typeof window !== "undefined") {
+                sessionStorage.setItem("facultyPrevPage", JSON.stringify(action.payload));
+            }
+        },
+
         
     },
 });
@@ -201,6 +266,18 @@ export const {
     setCourseTotalPages,
     setCourseNextPage,
     setCoursePrevPage,
+
+    //module
+    setModulePage,
+    setModuleTotalPages,
+    setModuleNextPage,
+    setModulePrevPage,
+
+    //faculty
+    setFacultyPage,
+    setFacultyTotalPages,
+    setFacultyNextPage,
+    setFacultyPrevPage,
     
 } = PageSlice.actions;
 
