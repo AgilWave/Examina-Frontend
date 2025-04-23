@@ -29,11 +29,11 @@ function UpdateCourse() {
   const course = useSelector((state: RootState) => state.course);
   const dialog = useSelector((state: RootState) => state.dialog);
 
-  const { courseName } = course.viewCourse;
+  const { name } = course.viewCourse;
   const id = dialog.viewDialogId;
 
   const validateForm = (): boolean => {
-    if (!courseName) {
+    if (!name) {
       toast.error("Please fill all the required fields.");
       return false;
     }
@@ -55,7 +55,7 @@ function UpdateCourse() {
     };
 
     const body = {
-      courseName: courseName,
+      name: name,
 
     };
 
@@ -69,7 +69,6 @@ function UpdateCourse() {
       if (response.data.isSuccessful) {
         toast.success(response.data.message);
 
-        // Reset and lock form again
         dispatch(setViewCourseDefault());
         dispatch(setEditBlocked(true));
         setIsDialogOpen(false);
