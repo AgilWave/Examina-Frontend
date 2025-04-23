@@ -1,18 +1,16 @@
-export interface CourseInteract {
+export interface FacultyInteract {
     editBlocked: boolean;
-    createCourse: {
-      courseName: string;
+    createFaculty: {
+      facultyName: string;
       status: string;
       moduleIds: number[];
-      facultyId : number;
     };
-    viewCourse: {
+    viewFaculty: {
       setIsActive: undefined;
       id: number;
       courseName: string;
-      facultyId: number;
       status: string;
-      moduleIds: number[];
+      module: any[]; // You can define a proper Module type later
       createdAt: string;
       updatedAt: string;
       createdBy: string;

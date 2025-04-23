@@ -23,4 +23,10 @@ export interface PageState {
     nextPage: number;
     prevPage: number;
   };
+  course: {
+    totalPages: number;
+    page: number;
+    nextPage: number;
+    prevPage: number;
+  };
 }

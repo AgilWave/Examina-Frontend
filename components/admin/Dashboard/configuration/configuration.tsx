@@ -1,5 +1,5 @@
 import { FC } from "react";
-import { FileDiff, Cog  } from "lucide-react";
+import { FileDiff, Cog, BookOpen, Landmark, BookText   } from "lucide-react";
 import SectionTiles from "@/components/ui/section-tiles";
 import {
   Breadcrumb,
@@ -16,6 +16,21 @@ const ConfigContent: FC = () => {
       icon: <FileDiff size={30} color="#FFFFFF" />,
       title: "Batch Management",
       link: "/admin/dashboard/configs/batches",
+    },
+    {
+      icon: <BookOpen   size={30} color="#FFFFFF" />,
+      title: "Course Managemnt",
+      link: "/admin/dashboard/configs/courses",
+    },
+    {
+      icon: <Landmark   size={30} color="#FFFFFF" />,
+      title: "Faculty Managemnt",
+      link: "/admin/dashboard/configs/faculties",
+    },
+    {
+      icon: <BookText   size={30} color="#FFFFFF" />,
+      title: "Module Managemnt",
+      link: "/admin/dashboard/configs/modules",
     },
     {
       icon: <Cog  size={30} color="#FFFFFF" />,

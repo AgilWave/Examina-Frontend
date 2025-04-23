@@ -33,7 +33,7 @@ function BreadCrumb() {
           <BreadcrumbSeparator />
           <BreadcrumbItem>
             <BreadcrumbPage className="text-muted-foreground">
-              Batch
+              Course
             </BreadcrumbPage>
           </BreadcrumbItem>
         </BreadcrumbList>
