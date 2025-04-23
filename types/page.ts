@@ -29,4 +29,16 @@ export interface PageState {
     nextPage: number;
     prevPage: number;
   };
+  module: {
+    totalPages: number;
+    page: number;
+    nextPage: number;
+    prevPage: number;
+  };
+  faculty: {
+    totalPages: number;
+    page: number;
+    nextPage: number;
+    prevPage: number;
+  };
 }
