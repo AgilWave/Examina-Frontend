@@ -2,14 +2,15 @@ export interface ModuleInteract {
     editBlocked: any;
     createModule: {
       moduleName: string;
+      facultyName: string;
       status: string;
-      courseId: number;
     };
     viewModule: {
+      setIsActive: undefined;
       id: number;
       moduleName: string;
+      facultyName: string;
       status: string;
-      courseId: number;
       createdAt: string;
       updatedAt: string;
       createdBy: string;

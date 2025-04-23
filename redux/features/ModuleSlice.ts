@@ -6,18 +6,19 @@ import { ModuleInteract } from "@/types/module";
 const initialState: ModuleInteract = {
   createModule: {
     moduleName: "",
+    facultyName: "",
     status: "active",
-    courseId: -1,
   },
     viewModule: {
-        id: -1,
-        moduleName: "",
-        status: "",
-        courseId: -1,
-        createdAt: "",
-        updatedAt: "",
-        createdBy: "",
-        updatedBy: "",
+      id: -1,
+      moduleName: "",
+      facultyName: "",
+      status: "",
+      createdAt: "",
+      updatedAt: "",
+      createdBy: "",
+      updatedBy: "",
+      setIsActive: undefined
     },
 
   // Pagination state
@@ -25,7 +26,7 @@ const initialState: ModuleInteract = {
   totalPages: 0,
   nextPage: -1,
   prevPage: -1,
-  editBlocked: undefined,
+  editBlocked: true,
 };
 
 export const moduleSlice = createSlice({
@@ -45,8 +46,8 @@ export const moduleSlice = createSlice({
     setCreateModuleStatus: (state, action) => {
         state.createModule.status = action.payload;
     },
-    setCreateModuleCourseId: (state, action) => {
-        state.createModule.courseId = action.payload;
+    setCreateModuleFacaltyName: (state, action) => {
+        state.createModule.facultyName = action.payload;
     },
 
 
@@ -63,9 +64,9 @@ export const moduleSlice = createSlice({
     setViewModuleStatus: (state, action) => {
       state.viewModule.status = action.payload;
     },
-    setViewModuleCourseId: (state, action) => {
-        state.viewModule.courseId = action.payload;
-    },
+    setViewModuleFacaltyName: (state, action) => {
+      state.viewModule.facultyName = action.payload;
+  },
     setViewModuleCreatedAt: (state, action) => {
         state.viewModule.createdAt = action.payload;
     },
@@ -104,6 +105,12 @@ export const moduleSlice = createSlice({
             sessionStorage.setItem("modulePrevPage", JSON.stringify(action.payload));
         }
     },
+    setEditBlocked: (state, action) => {
+        state.editBlocked = action.payload;
+        if (typeof window !== "undefined") {
+            sessionStorage.setItem("editBlocked", JSON.stringify(action.payload));
+        }
+    },
 
   },
 });
@@ -114,14 +121,14 @@ export const {
     setCreateModule,
     setCreateModuleName,
     setCreateModuleStatus,
-    setCreateModuleCourseId,
+    setCreateModuleFacaltyName,
 
   // View module
     setViewModule,
     setViewModuleDefault,
     setViewModuleName,
     setViewModuleStatus,
-    setViewModuleCourseId,
+    setViewModuleFacaltyName,
     setViewModuleCreatedAt,
     setViewModuleUpdatedAt,
     setViewModuleCreatedBy,
@@ -132,6 +139,7 @@ export const {
     setModuleTotalPages,
     setModuleNextPage,
     setModulePrevPage,
+    setEditBlocked,
 } = moduleSlice.actions;
 
 export default moduleSlice.reducer;
