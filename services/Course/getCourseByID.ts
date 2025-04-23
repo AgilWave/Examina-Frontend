@@ -2,7 +2,7 @@
 "use client";
 
 import { LogoutAction } from "@/services/actions/auth";
-import { setViewCourse } from "@/redux/features/CourseSlice";
+import { setViewCourse, setViewCourseModules } from "@/redux/features/CourseSlice";
 import axios from "axios";
 import Cookies from "js-cookie";
 import { BACKEND_URL } from "@/Constants/backend";
@@ -23,6 +23,7 @@ export async function getCourseByID( dispatch: any, id: any) {
       if (dispatch !== null) {
         
         dispatch(setViewCourse(response.data.content));
+        dispatch(setViewCourseModules(response.data.content.modules));
       } else {
         console.log(response.data.content);
         return response.data.content;

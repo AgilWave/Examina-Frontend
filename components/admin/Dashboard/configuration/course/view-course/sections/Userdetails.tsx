@@ -6,7 +6,7 @@ function CourseDetails() {
   return (
     <div className="w-full flex flex-col gap-6">
       <div className="w-full flex flex-col lg:flex-row gap-6 items-start">
-        <div className="w-full lg:w-3/4 bg-white dark:bg-black/30 p-3 rounded-lg border border-slate-100 dark:border-slate-700 shadow-sm">
+        <div className="w-full lg:w-3/4 md:h-[44vh]  bg-white dark:bg-black/30 p-3 rounded-lg border border-slate-100 dark:border-slate-700 shadow-sm">
           <h3 className="text-lg font-medium mb-4 text-slate-800 dark:text-slate-100 border-b border-slate-100 dark:border-slate-700 pb-2">
             Course Information
           </h3>

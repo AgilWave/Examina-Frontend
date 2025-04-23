@@ -1,8 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import { DropdownSelectorGroup } from "@/components/admin/Dashboard/admin/lectures/view-user/sections/selectors/DropdownSelectorGroup";
-import { FacultyTable } from "@/components/admin/Dashboard/admin/lectures/view-user/sections/table/Table";
+import { DropdownSelectorGroup } from "@/components/admin/Dashboard/admin/lectures/view-lecturer/sections/selectors/DropdownSelectorGroup";
+import { FacultyTable } from "@/components/admin/Dashboard/admin/lectures/view-lecturer/sections/table/Table";
 
 export default function FacultyBatchModuleManager() {
     const [records, setRecords] = useState<

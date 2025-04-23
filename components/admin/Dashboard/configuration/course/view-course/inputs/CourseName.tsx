@@ -15,8 +15,8 @@ export function CourseName() {
   const course = useSelector((state: RootState) => state.course);
 
   useEffect(() => {
-    setCourseName(course.viewCourse.courseName || "");
-  }, [course.viewCourse.courseName]);
+    setCourseName(course.viewCourse.name || "");
+  }, [course.viewCourse.name]);
 
   const validateCourseName = (name: string) => {
     const regex = /^[a-zA-Z0-9\s\-]+$/; // letters, numbers, spaces, hyphens

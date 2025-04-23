@@ -26,11 +26,13 @@ interface Faculty {
 
 export function Faculty() {
   const dispatch = useDispatch();
-  const [selectedFaculty, setSelectedFaculty] = useState("");
   const course = useSelector((state: RootState) => state.course);
   const [faculties, setFaculties] = useState<Faculty[]>([]);
-
+  const [isLoading, setIsLoading] = useState(true);
+  const [selectedValue, setSelectedValue] = useState<string | undefined>(undefined);
+  
   const getFaculties = async () => {
+    setIsLoading(true);
     try {
       const response = await api.get("/faculty/Search", {
         headers: {
@@ -44,21 +46,27 @@ export function Faculty() {
       }
     } catch (error) {
       console.error("Error fetching faculties:", error);
+    } finally {
+      setIsLoading(false);
     }
   };
 
   useEffect(() => {
-    if (faculties.length === 0) {
-      getFaculties();
-    }
-  }, [faculties.length]);
+    getFaculties();
+  }, []);
 
   useEffect(() => {
-    setSelectedFaculty(String(course.viewCourse.facultyId) || "");
+    const facultyId = course.viewCourse.facultyId;
+    
+    if (facultyId && facultyId !== -1) {
+      setSelectedValue(String(facultyId));
+    } else {
+      setSelectedValue(undefined);
+    }
   }, [course.viewCourse.facultyId]);
 
   const handleChange = (value: string) => {
-    setSelectedFaculty(value);
+    setSelectedValue(value);
     dispatch(setViewCourseFaculty(value));
   };
 
@@ -72,23 +80,24 @@ export function Faculty() {
 
       <div className="relative">
         <Select
-          value={selectedFaculty}
+          key={`faculty-select-${faculties.length > 0 ? 'loaded' : 'loading'}`}
+          value={selectedValue}
           onValueChange={handleChange}
-          disabled={course.editBlocked || faculties.length === 0}
+          disabled={course.editBlocked || isLoading}
         >
           <SelectTrigger
             className={`
               w-full pl-3 pr-10 py-2
               border rounded-md shadow-sm
               transition-all duration-200
-              ${course.editBlocked ? "bg-slate-100 text-slate-500 border-slate-200" : "bg-white text-slate-900 border-slate-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-100"}
-              dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100
+              ${course.editBlocked ? "text-slate-500 border-slate-200" : "bg-white text-slate-900 border-slate-200 focus:border-teal-500 focus:ring-2 focus:ring-blue-100"}
+              dark:border-slate-700 dark:text-slate-100
             `}
           >
             <SelectValue placeholder="Select a Faculty" />
           </SelectTrigger>
 
-          <SelectContent className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-md shadow-md">
+          <SelectContent className="border border-slate-200 dark:border-slate-700 rounded-md shadow-md">
             <SelectGroup>
               <SelectLabel className="px-2 py-1.5 text-sm text-slate-500 dark:text-slate-400">
                 Select a Faculty
@@ -97,7 +106,7 @@ export function Faculty() {
                 <SelectItem
                   key={faculty.id}
                   value={faculty.id.toString()}
-                  className="flex items-center py-2 cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-700"
+                  className="flex items-center py-2 cursor-pointer hover:bg-accent"
                 >
                   <div className="flex items-center">
                     <User className="h-4 w-4 text-emerald-500 mr-2" />
@@ -109,6 +118,12 @@ export function Faculty() {
           </SelectContent>
         </Select>
 
+        {isLoading && (
+          <div className="absolute right-10 top-1/2 transform -translate-y-1/2 pointer-events-none">
+            <div className="h-4 w-4 border-2 border-t-transparent border-slate-400 rounded-full animate-spin"></div>
+          </div>
+        )}
+        
         {course.editBlocked && (
           <div className="absolute right-3 top-1/2 transform -translate-y-1/2 pointer-events-none">
             <Lock className="h-4 w-4 text-slate-400" />

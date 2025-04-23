@@ -2,25 +2,26 @@
 
 import { createSlice } from "@reduxjs/toolkit";
 import { CourseInteract } from "@/types/course";
+import { PayloadAction } from "@reduxjs/toolkit";
+
 
 const initialState: CourseInteract = {
   createCourse: {
     courseName: "",
-    status: "active",
     facultyId: -1,
     moduleIds: [] as number[],
   },
   viewCourse: {
     id: -1,
-    courseName: "",
-    status: "",
+    name: "",
     facultyId: -1,
-    moduleIds: [] as number[],
+    modules: [],
+    moduleIds: [],
     createdAt: "",
     updatedAt: "",
     createdBy: "",
     updatedBy: "",
-    setIsActive: undefined
+    isActive: false,
   },
 
   // Pagination state
@@ -45,9 +46,6 @@ export const courseSlice = createSlice({
     setCreateCourseName: (state, action) => {
       state.createCourse.courseName = action.payload;
     },
-    setCreateCourseStatus: (state, action) => {
-      state.createCourse.status = action.payload;
-    },
     setCreateCourseModules: (state, action) => {
       state.createCourse.moduleIds = action.payload;
     },
@@ -67,16 +65,23 @@ export const courseSlice = createSlice({
       state.viewCourse = initialState.viewCourse;
     },
     setViewCourseName: (state, action) => {
-      state.viewCourse.courseName = action.payload;
-    },
-    setViewCourseStatus: (state, action) => {
-      state.viewCourse.status = action.payload;
-    },
-    setViewCourseModule: (state, action) => {
-      state.viewCourse.moduleIds = action.payload;
+      state.viewCourse.name = action.payload;
     },
     setViewCourseFaculty: (state, action) => {
       state.viewCourse.facultyId = action.payload;
+    },
+    setViewCourseModules(state, action: PayloadAction<any[]>) {
+      state.viewCourse.modules = action.payload;
+      state.viewCourse.moduleIds = action.payload.map((module) => module.id);
+    },
+    setViewCourseId: (state, action) => {
+      state.viewCourse.id = action.payload;
+    },
+    setViewCourseModuleIds: (state, action) => {
+      state.viewCourse.moduleIds = action.payload;
+    },
+    setViewCourseIsActive: (state, action) => {
+      state.viewCourse.isActive = action.payload;
     },
 
   
@@ -102,7 +107,6 @@ export const {
   setCreateCourseDefault,
   setCreateCourse,
   setCreateCourseName,
-  setCreateCourseStatus,
   setCreateCourseModules,
   setCreateCourseFaculty,
 
@@ -111,9 +115,10 @@ export const {
   setViewCourse,
   setViewCourseDefault,
   setViewCourseName,
-  setViewCourseStatus,
-  setViewCourseModule,
+  setViewCourseModules,
   setViewCourseFaculty,
+  setViewCourseId,
+  setViewCourseModuleIds,
 
   // Pagination
   setCoursePage,

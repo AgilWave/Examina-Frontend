@@ -60,7 +60,7 @@ import Filters from "./filter";
 import { parseAsBoolean, useQueryState } from "nuqs";
 import { Filter } from "lucide-react";
 import SearchField from "./helpers/Search";
-import ViewUserDialog from "./view-user";
+import ViewUserDialog from "./view-student";
 
 export function DataTable() {
   const [sorting, setSorting] = useState<SortingState>([]);

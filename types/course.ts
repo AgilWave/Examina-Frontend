@@ -1,25 +1,26 @@
+interface Module {
+  id: number;
+  name: string;
+}
 export interface CourseInteract {
     editBlocked: boolean;
     createCourse: {
       courseName: string;
-      status: string;
       moduleIds: number[];
       facultyId : number;
     };
     viewCourse: {
-      setIsActive: undefined;
       id: number;
-      courseName: string;
+      name: string;
       facultyId: number;
-      status: string;
+      modules: Module[];
       moduleIds: number[];
       createdAt: string;
       updatedAt: string;
       createdBy: string;
       updatedBy: string;
+      isActive: boolean;
     };
-  
-    // Pagination fields
     page: number;
     totalPages: number;
     nextPage: number;

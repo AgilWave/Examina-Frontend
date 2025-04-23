@@ -1,8 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import { Faculty } from "@/components/admin/Dashboard/configuration/course/view-user/sections/selectors/DropdownFaculty";
-import { ModuleSelector } from "@/components/admin/Dashboard/configuration/course/view-user/sections/table/Table";
+import { Faculty } from "@/components/admin/Dashboard/configuration/course/view-course/sections/selectors/DropdownFaculty";
+import { ModuleSelector } from "@/components/admin/Dashboard/configuration/course/view-course/sections/table/Table";
 
 export default function ModuleDetails() {
     const [records, setRecords] = useState<

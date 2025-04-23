@@ -31,14 +31,13 @@ export function GotoEditDialog({
   setIsDialogOpen,
 }: {
   isDialogOpen: boolean;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   setIsDialogOpen: any;
 }) {
   const dispatch = useDispatch();
   const dialog = useSelector((state: RootState) => state.dialog);
   const course = useSelector((state: RootState) => state.course);
 
-  const handleSubmit = async (e: React.MouseEvent<HTMLButtonElement>) => {
+  const handleSubmit = async (e: any) => {
     e.preventDefault();
 
     if (course.editBlocked === true) {
@@ -51,7 +50,7 @@ export function GotoEditDialog({
         setIsDialogOpen(false);
       } else if (dialog.editClose === true) {
         dispatch(setEditClose(false));
-        dispatch(setViewDialog(false));
+        dispatch(setViewDialog(true));
         dispatch(setEditBlocked(true));
         setIsDialogOpen(false);
       } else {
@@ -71,7 +70,7 @@ export function GotoEditDialog({
     }else{
       setIsDialogOpen(true);
     }
-  }, [dialog.editClose, setIsDialogOpen]);
+  }, [dialog.editClose]);
 
   return (
     <>

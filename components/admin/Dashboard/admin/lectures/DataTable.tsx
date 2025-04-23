@@ -58,7 +58,7 @@ import { LogoutAction } from "@/services/actions/auth";
 import { RefreshCcw } from "lucide-react";
 import { useQueryState } from "nuqs";
 import SearchField from "./helpers/Search";
-import ViewUserDialog from "./view-user";
+import ViewUserDialog from "./view-lecturer";
 
 export function DataTable() {
   const [sorting, setSorting] = useState<SortingState>([]);
