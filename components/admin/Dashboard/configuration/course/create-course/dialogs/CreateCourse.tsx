@@ -11,7 +11,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
-import axios, { Axios, AxiosError } from "axios";
+import axios, { AxiosError } from "axios";
 import Cookies from "js-cookie";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "@/redux/store";
@@ -29,46 +29,49 @@ function CreateCourse() {
   const handleSubmit = async (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
     setIsLoading(true);
-  
+
     const courseName = course.createCourse.courseName?.trim();
     const moduleIds = course.createCourse.moduleIds || [];
-  
+
     if (!courseName || !Array.isArray(moduleIds) || moduleIds.length === 0) {
-      toast.error("Please provide a course name and select at least one module.");
+      toast.error(
+        "Please provide a course name and select at least one module."
+      );
       setIsLoading(false);
       return;
     }
-  
+
     const body = {
       name: courseName,
-      moduleIds: moduleIds.map((id: number) => id), 
+      moduleIds: moduleIds.map((id: number) => id),
     };
-  
+
     const token = Cookies.get("adminjwt");
-  
+
     try {
       const headers = {
         "Content-Type": "application/json",
         Authorization: `Bearer ${token}`,
       };
-  
+
       const response = await axios.post(
         `${BACKEND_URL}/course/Interact`,
         body,
         { headers }
       );
-  
+
       if (response.data.isSuccessful) {
         toast.success(response.data.message);
       } else {
         toast.error(response.data.message || "Course creation failed.");
       }
-    } catch (error: AxiosError | any) {
-      console.error("Error creating course:", error);
-      if (error.response?.data?.message) {
-        toast.error(`Error: ${error.response.data.message}`);
+    } catch (error: unknown) {
+      if (axios.isAxiosError(error)) {
+        console.error("Axios error:", error);
+        toast.error(`Error: ${error.response?.data?.message || error.message}`);
       } else {
-        toast.error("An error occurred while creating the course.");
+        console.error("Unexpected error:", error);
+        toast.error("An unexpected error occurred while creating the course.");
       }
     } finally {
       setIsLoading(false);
