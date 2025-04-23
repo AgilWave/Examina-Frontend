@@ -34,8 +34,8 @@ function BlackListSwitch() {
   const dispatch = useDispatch();
 
   useEffect(() => {
-    if (course.viewCourse && course.viewCourse.setIsActive !== undefined) {
-      setIsActive(course.viewCourse.setIsActive);
+    if (course.viewCourse && course.viewCourse.isActive !== undefined) {
+      setIsActive(course.viewCourse.isActive);
     }
   }, [course]);
 
