@@ -11,7 +11,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
-import axios from "axios";
+import axios, { Axios, AxiosError } from "axios";
 import Cookies from "js-cookie";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "@/redux/store";
@@ -41,7 +41,7 @@ function CreateCourse() {
   
     const body = {
       name: courseName,
-      moduleIds: moduleIds.map((id: any) => parseInt(id)), // Ensure integers
+      moduleIds: moduleIds.map((id: number) => id), 
     };
   
     const token = Cookies.get("adminjwt");
@@ -63,7 +63,7 @@ function CreateCourse() {
       } else {
         toast.error(response.data.message || "Course creation failed.");
       }
-    } catch (error: any) {
+    } catch (error: AxiosError | any) {
       console.error("Error creating course:", error);
       if (error.response?.data?.message) {
         toast.error(`Error: ${error.response.data.message}`);

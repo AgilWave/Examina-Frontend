@@ -64,7 +64,8 @@ export function ModuleSelector() {
 
   useEffect(() => {
       getModules();
-  }, [allModules.length,course.createCourse.facultyId]);
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [allModules.length, course.createCourse.facultyId]);
 
   useEffect(() => {
     // Update the selected modules list when moduleIds changes

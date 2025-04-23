@@ -72,6 +72,7 @@ export function ModuleSelector() {
   useEffect(() => {
     dispatch(setViewCourseModuleIds([]));
     getModules();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [course.viewCourse.facultyId, dispatch]);
 
   useEffect(() => {

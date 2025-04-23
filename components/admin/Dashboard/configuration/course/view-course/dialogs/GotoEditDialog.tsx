@@ -31,13 +31,13 @@ export function GotoEditDialog({
   setIsDialogOpen,
 }: {
   isDialogOpen: boolean;
-  setIsDialogOpen: any;
+  setIsDialogOpen: React.Dispatch<React.SetStateAction<boolean>>;
 }) {
   const dispatch = useDispatch();
   const dialog = useSelector((state: RootState) => state.dialog);
   const course = useSelector((state: RootState) => state.course);
 
-  const handleSubmit = async (e: any) => {
+  const handleSubmit = async (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
 
     if (course.editBlocked === true) {
@@ -70,6 +70,7 @@ export function GotoEditDialog({
     }else{
       setIsDialogOpen(true);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [dialog.editClose]);
 
   return (
