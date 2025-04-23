@@ -8,7 +8,7 @@ function Content() {
   return (
     <div className="mt-5 w-full min-h-[440px] p-3 sm:p-5 flex flex-col justify-between items-center dark:bg-black/40 rounded-lg shadow-sm border border-slate-200 dark:border-slate-700">
       <div className="flex w-full flex-col gap-3 sm:gap-5">
-        <Tabs defaultValue="details" className="w-full">
+        <Tabs defaultValue="details" className="w-full ">
           <div className="border-slate-200 dark:border-slate-700 border-b-2">
             <TabsList className="bg-transparent h-10 sm:h-12 p-1 sm:p-2">
               <TabsTrigger value="details" className="text-xs sm:text-sm">

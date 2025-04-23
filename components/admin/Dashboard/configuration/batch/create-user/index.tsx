@@ -32,13 +32,12 @@ function CreateUserDialog() {
   const isDesktopMediaQuery = useMediaQuery("(min-width: 768px)");
 
   useEffect(() => {
-    // eslint-disable-next-line @typescript-eslint/no-unused-expressions
-    isDesktopMediaQuery ? setOpen(dialog.createDialog) : setOpen(false);
-  }, [dialog.createDialog, isDesktopMediaQuery]);
-
-  useEffect(() => {
+  if (isDesktopMediaQuery) {
     setOpen(dialog.createDialog);
-  }, [dialog.createDialog]);
+  } else {
+    setOpen(false);
+  }
+}, [dialog.createDialog, isDesktopMediaQuery]);
 
   const handleClear = () => {
     dispatch(setCreateUserDefault());
@@ -54,14 +53,14 @@ function CreateUserDialog() {
       variant="outline"
       className="bg-primary dark:bg-primary flex items-center justify-center hover:bg-primary/80 dark:hover:bg-primary/80 text-primary-foreground cursor-pointer w-full md:w-auto px-4 py-2"
     >
-      <Plus className="md:mr-2 h-4 w-4" /> Add User
+      <Plus className="h-4 w-4" />
     </Button>
   );
 
   const sharedContent = (
     <>
       <Content />
-      <div className="flex gap-2 justify-end mt-4">
+      <div className="flex gap-2 justify-end border-t pt-4">
         <Button variant="outline" onClick={handleClear}>
           Clear
         </Button>
@@ -74,7 +73,7 @@ function CreateUserDialog() {
     return (
       <Dialog open={open} onOpenChange={handleOpenChange}>
         <DialogTrigger asChild>{triggerButton}</DialogTrigger>
-        <DialogContent className="rounded-lg lg:w-[350%]">
+        <DialogContent className="rounded-lg ]">
           <DialogHeader>
             <DialogTitle>Add New Batch</DialogTitle>
           </DialogHeader>

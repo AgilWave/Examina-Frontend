@@ -73,9 +73,9 @@ export function CourseName() {
         >
           <SelectTrigger
             className={`
-              w-full pl-3 pr-10 py-2
+              w-full pl-3  py-2
               border border-slate-200 rounded-md shadow-sm
-              focus:border-blue-500 focus:ring-2 focus:ring-blue-100
+              focus:border-teal-500 focus:ring-2 focus:ring-blue-100
               transition-all duration-200
               bg-white text-slate-900
               dark:bg-slate-800 dark:text-slate-100 dark:border-slate-700
@@ -83,7 +83,7 @@ export function CourseName() {
           >
             <SelectValue placeholder="Select a Course" />
           </SelectTrigger>
-          <SelectContent className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-md shadow-md">
+          <SelectContent className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-md shadow-md overflow-y-auto">
             <SelectGroup>
               <SelectLabel className="px-2 py-1.5 text-sm text-slate-500 dark:text-slate-400">Select a Course</SelectLabel>
               {allCourses.map((course) => (

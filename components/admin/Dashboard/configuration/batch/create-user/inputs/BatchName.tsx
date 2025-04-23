@@ -40,10 +40,10 @@ export function BatchName() {
           id="batchName-input"
           type="text"
           value={batchName}
-          placeholder="KUDSE25.1F"
+          placeholder="KUDSE241F"
           className={`
             w-full  pl-3 pr-10 py-2 
-            border ${isValid ? "border-slate-200 focus:border-blue-500" : "border-red-300 focus:border-red-500"} 
+            border ${isValid ? "border-slate-200 focus:border-teal-500" : "border-red-300 focus:border-red-500"} 
             rounded-md shadow-sm focus:ring-2 ${isValid ? "focus:ring-blue-100" : "focus:ring-red-100"}
             transition-all duration-200
             bg-white text-slate-900

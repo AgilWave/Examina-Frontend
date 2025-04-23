@@ -27,6 +27,7 @@ import { useState } from "react";
 import { getAdminByID } from "@/services/User/getAdminByID";
 import CreateUser from "./dialogs/UpdateUser";
 import { Button } from "@/components/ui/button";
+import { Loader2 } from "lucide-react";
 import { useMediaQuery } from "@/hooks/use-media-query";
 
 function ViewUserDialog() {
@@ -35,19 +36,21 @@ function ViewUserDialog() {
   const user = useSelector((state: RootState) => state.user);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [loaderOpen, setLoaderOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const [open, setOpen] = useState(false);
   const isDesktopMediaQuery = useMediaQuery("(min-width: 768px)");
 
   const fetchUser = async () => {
     if (dialog.viewDialogId !== undefined) {
       try {
-        setLoaderOpen(true);
+        setIsLoading(true);
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
         const response = await getAdminByID(dispatch, dialog.viewDialogId);
-        setLoaderOpen(false);
       } catch (err: any) {
         console.log(err);
+      }
+      finally {
+        setIsLoading(false);
       }
     }
   };
@@ -108,9 +111,15 @@ function ViewUserDialog() {
     </div>
   );
 
+    const loadingContent = (
+      <div className="flex flex-col items-center justify-center w-full h-40">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      </div>
+    );
+
   const mainContent = (
     <div className="overflow-y-auto max-h-[60vh] md:max-h-[calc(100vh-250px)] scrollbar-custom">
-      <Content />
+        {isLoading ? loadingContent : <Content />}
     </div>
   );
 

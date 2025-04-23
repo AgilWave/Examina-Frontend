@@ -27,6 +27,7 @@ import { getBatchByID } from "@/services/Batch/getBatchByID";
 import CreateUser from "./dialogs/UpdateBatch";
 import { Button } from "@/components/ui/button";
 import { useMediaQuery } from "@/hooks/use-media-query";
+import { Loader2 } from "lucide-react";
 
 function ViewUserDialog() {
   const dispatch = useDispatch();
@@ -34,14 +35,18 @@ function ViewUserDialog() {
   const batch = useSelector((state: RootState) => state.batch);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [open, setOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const isDesktopMediaQuery = useMediaQuery("(min-width: 768px)");
 
   const fetchUser = async () => {
     if (dialog.viewDialogId !== undefined) {
       try {
+        setIsLoading(true);
         await getBatchByID(dispatch, dialog.viewDialogId);
       } catch (err: any) {
         console.log(err);
+      } finally {
+        setIsLoading(false);
       }
     }
   };
@@ -99,9 +104,16 @@ function ViewUserDialog() {
     </div>
   );
 
+  const loadingContent = (
+    <div className="flex flex-col items-center justify-center w-full h-40">
+      <Loader2 className="h-8 w-8 animate-spin text-primary" />
+    </div>
+  );
+
+  // Changed the content area's height to be consistent regardless of editBlocked status
   const mainContent = (
-    <div className="overflow-y-auto max-h-[60vh] md:max-h-[calc(100vh-250px)] scrollbar-custom">
-      <Content />
+    <div className={`overflow-y-auto ${batch.editBlocked ? 'max-h-[60vh]' : 'max-h-[60vh]'} md:max-h-[calc(100vh-250px)] scrollbar-custom flex-1`}>
+      {isLoading ? loadingContent : <Content />}
     </div>
   );
 
@@ -126,7 +138,7 @@ function ViewUserDialog() {
     return (
       <Dialog open={open} onOpenChange={handleOpenChange}>
         <DialogContent
-          className="rounded-lg w-[95vw] max-w-[95vw] sm:w-[90vw] md:min-w-[700px] lg:min-w-[900px] xl:min-w-[1000px] min-h-[80vh] md:min-h-[550px]"
+          className="rounded-lg w-[95vw] max-w-[95vw] sm:w-[90vw] md:min-w-[700px] lg:min-w-[900px] xl:min-w-[1000px] flex flex-col"
           onInteractOutside={handleBackgroundClick}
           onCloseAutoFocus={() => handleClose(false)}
         >
@@ -136,7 +148,9 @@ function ViewUserDialog() {
             </DialogTitle>
           </DialogHeader>
 
-          {mainContent}
+          <div className="flex-1 flex flex-col min-h-0 overflow-hidden">
+            {mainContent}
+          </div>
 
           {footerContent && (
             <DialogFooter className="flex flex-col sm:flex-row justify-end gap-2 mt-4">

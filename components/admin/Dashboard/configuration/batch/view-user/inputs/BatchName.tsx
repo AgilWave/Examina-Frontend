@@ -47,7 +47,7 @@ export function BatchName() {
           value={batchName}
           placeholder="KUDSE24.1F"
           className={`
-            w-full  pl-3 pr-10 py-2 
+            w-full  pl-3 py-2 
             border ${isValid ? 'border-slate-200 focus:border-blue-500' : 'border-red-300 focus:border-red-500'} 
             rounded-md shadow-sm focus:ring-2 ${isValid ? 'focus:ring-blue-100' : 'focus:ring-red-100'}
             transition-all duration-200

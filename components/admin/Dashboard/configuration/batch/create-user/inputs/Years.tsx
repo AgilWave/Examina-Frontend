@@ -29,7 +29,7 @@ export default function Years() {
 
   const handleChange = (value: string) => {
     setYear(value);
-    dispatch(setCreateBatchYear(value)); // ✅ Call the correct action
+    dispatch(setCreateBatchYear(value));
   };
 
   return (
@@ -45,8 +45,12 @@ export default function Years() {
       </Label>
 
       <Select onValueChange={handleChange} value={year}>
-        <SelectTrigger id="year-picker" className="w-full bg-white text-slate-900
-            dark:bg-slate-800 dark:text-slate-100 dark:border-slate-700">
+        <SelectTrigger id="year-picker" className="      w-full pl-3 py-2
+              border border-slate-200 rounded-md shadow-sm
+              focus:border-teal-500 focus:ring-2 focus:ring-blue-100
+              transition-all duration-200
+              bg-white text-slate-900
+              dark:bg-slate-800 dark:text-slate-100 dark:border-slate-700">
           <SelectValue placeholder="Select Year" />
         </SelectTrigger>
         <SelectContent>

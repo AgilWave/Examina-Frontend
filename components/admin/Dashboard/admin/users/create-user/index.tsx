@@ -54,10 +54,9 @@ function CreateUserDialog() {
       variant="outline"
       className="bg-primary dark:bg-primary flex items-center justify-center hover:bg-primary/80 dark:hover:bg-primary/80 text-primary-foreground cursor-pointer w-full md:w-auto px-4 py-2"
     >
-      <Plus className="md:mr-2 h-4 w-4" /> Add User
+      <Plus className="h-4 w-4" />
     </Button>
   );
-
   const sharedContent = (
     <>
       <Content />

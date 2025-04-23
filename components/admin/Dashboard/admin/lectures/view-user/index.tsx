@@ -19,24 +19,26 @@ import { useState } from "react";
 import { getStudentByID } from "@/services/Students/getStudentsByID";
 import UpdateStudent from "./dialogs/UpdateStudent";
 import { Button } from "@/components/ui/button";
+import { Loader2 } from "lucide-react";
 
 function ViewStudentDialog() {
   const dispatch = useDispatch();
   const dialog = useSelector((state: RootState) => state.dialog);
   const student = useSelector((state: RootState) => state.student);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [loaderOpen, setLoaderOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   const fetchStudent = async () => {
     if (dialog.viewDialogId !== undefined) {
       try {
-        setLoaderOpen(true);
+        setIsLoading(true);
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
         const response = await getStudentByID(dispatch, dialog.viewDialogId);
-        setLoaderOpen(false);
       } catch (err: any) {
         console.log(err);
+      }
+      finally {
+        setIsLoading(false);
       }
     }
   };
@@ -68,6 +70,13 @@ function ViewStudentDialog() {
     }
   };
 
+  
+  const loadingContent = (
+    <div className="flex flex-col items-center justify-center w-full h-40">
+      <Loader2 className="h-8 w-8 animate-spin text-primary" />
+    </div>
+  );
+
   return (
     <Dialog open={dialog.viewDialog} onOpenChange={(val) => handleClose(val)}>
       <DialogContent
@@ -88,7 +97,11 @@ function ViewStudentDialog() {
         </DialogHeader>
 
         <div className="overflow-y-auto max-h-[60vh] md:max-h-[calc(100vh-250px)] scrollbar-custom">
-          <Content />
+          {isLoading ? (
+            loadingContent
+          ) : (
+            <Content />
+          )}
         </div>
 
         {!student.editBlocked && (
