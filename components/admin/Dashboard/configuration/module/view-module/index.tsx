@@ -32,7 +32,7 @@ import { Loader2 } from "lucide-react";
 function ViewModuleDialog() {
   const dispatch = useDispatch();
   const dialog = useSelector((state: RootState) => state.dialog);
-  const module = useSelector((state: RootState) => state.module);
+  const modules = useSelector((state: RootState) => state.module);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [open, setOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -56,10 +56,10 @@ function ViewModuleDialog() {
   }, [dialog.viewDialogId, dialog.viewDialog]);
 
   useEffect(() => {
-    if (module.editBlocked) {
+    if (modules.editBlocked) {
       fetchUser();
     }
-  }, [module.editBlocked]);
+  }, [modules.editBlocked]);
 
   useEffect(() => {
     // eslint-disable-next-line @typescript-eslint/no-unused-expressions
@@ -71,13 +71,13 @@ function ViewModuleDialog() {
   }, [dialog.viewDialog]);
 
   const handleBackgroundClick = (e: any) => {
-    if (!module.editBlocked) {
+    if (!modules.editBlocked) {
       e.preventDefault();
     }
   };
 
   const handleClose = (val: boolean) => {
-    if (!module.editBlocked) {
+    if (!modules.editBlocked) {
       dispatch(setEditClose(true));
       setIsDialogOpen(true);
     } else {
@@ -96,7 +96,7 @@ function ViewModuleDialog() {
 
   const headerContent = (
     <div className="flex items-center justify-between w-full">
-      <div className="w-full md:w-auto">Module Details #{module.viewModule.id}</div>
+      <div className="w-full md:w-auto">Module Details #{modules.viewModule.id}</div>
       <div className="flex items-center gap-2 sm:gap-3 pr-5 sm:pr-0 sm:w-auto">
         <ConfirmDeleteDialog />
         <GotoEditDialog isDialogOpen={isDialogOpen} setIsDialogOpen={setIsDialogOpen} />
@@ -112,12 +112,12 @@ function ViewModuleDialog() {
 
   // Changed the content area's height to be consistent regardless of editBlocked status
   const mainContent = (
-    <div className={`overflow-y-auto ${module.editBlocked ? 'max-h-[60vh]' : 'max-h-[60vh]'} md:max-h-[calc(100vh-250px)] scrollbar-custom flex-1`}>
+    <div className={`overflow-y-auto ${modules.editBlocked ? 'max-h-[60vh]' : 'max-h-[60vh]'} md:max-h-[calc(100vh-250px)] scrollbar-custom flex-1`}>
       {isLoading ? loadingContent : <Content />}
     </div>
   );
 
-  const footerContent = !module.editBlocked && (
+  const footerContent = !modules.editBlocked && (
     <>
       <Button
         variant="outline"

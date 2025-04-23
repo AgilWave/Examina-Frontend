@@ -28,7 +28,7 @@ export function FacultyName() {
   const dispatch = useDispatch();
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [course, setCourse] = useState("");
-  const module = useSelector((state: RootState) => state.module);
+  const modules = useSelector((state: RootState) => state.module);
   const [allCourses, setAllCourses] = useState<Module[]>([]);
 
   const getCourses = async () => {
@@ -70,9 +70,9 @@ export function FacultyName() {
 
       <div className="relative">
         <Select
-          value={String(module.viewModule.facultyName) || ""}
+          value={String(modules.viewModule.facultyName) || ""}
           onValueChange={(value) => handleChange(value)}
-          disabled={module.editBlocked || allCourses.length === 0}
+          disabled={modules.editBlocked || allCourses.length === 0}
         >
           <SelectTrigger
             className={`
@@ -80,7 +80,7 @@ export function FacultyName() {
               border border-slate-200 rounded-md shadow-sm
               focus:border-teal-500 focus:ring-2 focus:ring-blue-100
               transition-all duration-200
-              ${module.editBlocked ? 'bg-slate-100 text-slate-500' : 'bg-white text-slate-900'}
+              ${modules.editBlocked ? 'bg-slate-100 text-slate-500' : 'bg-white text-slate-900'}
               dark:bg-slate-800 dark:text-slate-100 dark:border-slate-700
             `}
           >
@@ -99,7 +99,7 @@ export function FacultyName() {
           </SelectContent>
         </Select>
 
-        {module.editBlocked && (
+        {modules.editBlocked && (
           <div className="absolute right-10 top-1/2 transform -translate-y-1/2">
             <Lock className="h-4 w-4 text-slate-400" />
           </div>
@@ -107,7 +107,7 @@ export function FacultyName() {
       </div>
 
 
-      {module.editBlocked && (
+      {modules.editBlocked && (
         <p className="text-xs text-slate-500 mt-1 flex items-center">
           <Lock className="h-3 w-3 mr-1" />
           This field is currently locked for editing

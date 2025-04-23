@@ -14,7 +14,7 @@ import { Label } from "@/components/ui/label";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "@/redux/store";
-import { setCreateModuleFacultyName } from "@/redux/features/ModuleSlice";
+import { setCreateModuleFacaltyName } from "@/redux/features/ModuleSlice";
 import { Users, User } from "lucide-react";
 import api from "@/lib/axiosInstance";
 import Cookies from "js-cookie";
@@ -27,7 +27,7 @@ interface Faculty {
 export function FacultyName() {
   const dispatch = useDispatch();
   const [selectedFaculty, setSelectedFaculty] = useState("");
-  const module = useSelector((state: RootState) => state.module);
+  const modules = useSelector((state: RootState) => state.module);
   const [faculties, setFaculties] = useState<Faculty[]>([]);
 
   const getFaculties = async () => {
@@ -55,8 +55,8 @@ export function FacultyName() {
 
   useEffect(() => {
     // Initialize with current value from Redux if it exists
-    setSelectedFaculty(String(module.createModule.facultyName) || "");
-  }, [module.createModule.facultyName]);
+    setSelectedFaculty(String(modules.createModule.facultyName) || "");
+  }, [modules.createModule.facultyName]);
 
   const handleChange = (value: string) => {
     setSelectedFaculty(value);

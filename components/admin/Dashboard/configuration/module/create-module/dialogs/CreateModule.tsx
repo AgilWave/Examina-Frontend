@@ -24,15 +24,15 @@ function CreateModule() {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const dispatch = useDispatch();
-  const module = useSelector((state: RootState) => state.module);
+  const modules = useSelector((state: RootState) => state.module);
 
   const handleSubmit = async (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
     setIsLoading(true);
 
     const body = {
-      moduleName : module.createModule.moduleName,
-      facultyName: module.createModule.facultyName,
+      moduleName : modules.createModule.moduleName,
+      facultyName: modules.createModule.facultyName,
     };
 
     const token = Cookies.get("adminjwt");
@@ -65,7 +65,7 @@ function CreateModule() {
   };
 
   const validateForm = () => {
-    const { moduleName, facultyName} = module.createModule;
+    const { moduleName, facultyName} = modules.createModule;
 
     if (!moduleName || !facultyName) {
       toast.error("Please fill all the required fields.");

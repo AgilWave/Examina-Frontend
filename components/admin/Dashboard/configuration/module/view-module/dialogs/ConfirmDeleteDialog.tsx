@@ -34,12 +34,12 @@ export function ConfirmDeleteDialog() {
   const [loaderOpen, setLoaderOpen] = useState(false);
   const dispatch = useDispatch();
   const dialog = useSelector((state: RootState) => state.dialog);
-  const module = useSelector((state: RootState) => state.module);
+  const modules = useSelector((state: RootState) => state.module);
 
   const handleSubmit = async (e: React.MouseEvent<HTMLButtonElement>) => {
     setLoaderOpen(true);
     e.preventDefault();
-    if (userId !== module.viewModule?.id.toString()) {
+    if (userId !== modules.viewModule?.id.toString()) {
       toast.error("IDs does not match");
       return;
     }
@@ -84,7 +84,7 @@ export function ConfirmDeleteDialog() {
                 <div
                   onClick={handleDeleteUser}
                   className={`opacity-70 cursor-pointer ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-muted-foreground border-[1px] border-red-500 p-1 rounded-sm ${
-                    module.editBlocked ? "" : "hidden"
+                    modules.editBlocked ? "" : "hidden"
                   }`}
                 >
                   <Trash className="text-red-500 h-4 w-4" />

@@ -1,7 +1,7 @@
 "use client";
 import React from "react";
 import Header from "./Header";
-import CreateUserDialog from "./create-user";
+import CreateUserDialog from "./create-module";
 import {DataTable} from "./DataTable";
 
 function Users() {

@@ -36,12 +36,12 @@ export function GotoEditDialog({
 }) {
   const dispatch = useDispatch();
   const dialog = useSelector((state: RootState) => state.dialog);
-  const module = useSelector((state: RootState) => state.module);
+  const modules = useSelector((state: RootState) => state.module);
 
   const handleSubmit = async (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
 
-    if (module.editBlocked === true) {
+    if (modules.editBlocked === true) {
       dispatch(setEditBlocked(false));
       setIsDialogOpen(false);
     } else {
@@ -83,14 +83,14 @@ export function GotoEditDialog({
               <div 
                 onClick={handleGotoEdit}
                 className={`${
-                  module.editBlocked === false
+                  modules.editBlocked === false
                     ? "bg-primary hover:bg-primary"
                     : "bg-white dark:bg-black"
                 } opacity-70 cursor-pointer ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-muted-foreground border-[1px] border-primary p-1 rounded-sm`}
               >
                 <Pencil
                   className={`${
-                    module.editBlocked === false
+                    modules.editBlocked === false
                       ? "text-white"
                       : "text-primary"
                   } h-4 w-4`}
@@ -113,7 +113,7 @@ export function GotoEditDialog({
             </AlertDialogTitle>
             <AlertDialogDescription className="font-poppins text-[14px] font-[500]">
               {`${
-                module.editBlocked === true
+                modules.editBlocked === true
                   ? "Are you sure you want to edit this batch?"
                   : "Are you sure you want to cancel the edit?"
               }`}

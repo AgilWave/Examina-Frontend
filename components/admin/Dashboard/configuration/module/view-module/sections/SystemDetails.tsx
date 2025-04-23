@@ -6,7 +6,7 @@ import { format } from "date-fns";
 import { Clock, Edit, FilePlus, User } from "lucide-react";
 
 function SystemDetails() {
-  const module = useSelector((state: RootState) => state.module);
+  const modules = useSelector((state: RootState) => state.module);
   
   const formatDate = (dateString: string) => {
     try {
@@ -51,12 +51,12 @@ function SystemDetails() {
                 <div className="flex flex-col">
                   <div className="flex items-center gap-2">
                     <User className="w-4 h-4 text-muted-foreground" />
-                    <span>{module.viewModule.createdBy || "System"}</span>
+                    <span>{modules.viewModule.createdBy || "System"}</span>
                   </div>
                   <div className="flex items-center gap-2 mt-1">
                     <Clock className="w-4 h-4 text-muted-foreground" />
                     <span className="text-sm text-muted-foreground">
-                      {formatDate(module.viewModule.createdAt)}
+                      {formatDate(modules.viewModule.createdAt)}
                     </span>
                   </div>
                 </div>
@@ -72,12 +72,12 @@ function SystemDetails() {
                 <div className="flex flex-col">
                   <div className="flex items-center gap-2">
                     <User className="w-4 h-4 text-muted-foreground" />
-                    <span>{module.viewModule.updatedBy || "Not modified"}</span>
+                    <span>{modules.viewModule.updatedBy || "Not modified"}</span>
                   </div>
                   <div className="flex items-center gap-2 mt-1">
                     <Clock className="w-4 h-4 text-muted-foreground" />
                     <span className="text-sm text-muted-foreground">
-                      {module.viewModule.updatedAt ? formatDate(module.viewModule.updatedAt) : "Never"}
+                      {modules.viewModule.updatedAt ? formatDate(modules.viewModule.updatedAt) : "Never"}
                     </span>
                   </div>
                 </div>
