@@ -14,7 +14,7 @@ import { Label } from "@/components/ui/label";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "@/redux/store";
-import { setCreateModuleFacaltyName } from "@/redux/features/ModuleSlice";
+import { setCreateModuleFacultyName } from "@/redux/features/ModuleSlice";
 import { Users, User } from "lucide-react";
 import api from "@/lib/axiosInstance";
 import Cookies from "js-cookie";
