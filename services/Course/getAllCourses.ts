@@ -3,16 +3,16 @@
 
 import { LogoutAction } from "@/services/actions/auth";
 import {
-    setBatchPage,
-    setBatchTotalPages,
-    setBatchNextPage,
-    setBatchPrevPage,
-} from "@/redux/features/BatchSlice";
+    setCoursePage,  
+    setCourseTotalPages,
+    setCourseNextPage,
+    setCoursePrevPage,
+} from "@/redux/features/CourseSlice";
 import axios from "axios";
 import Cookies from "js-cookie";
 import { BACKEND_URL } from "@/Constants/backend";
 
-export async function getAllBatches(
+export async function getAllCourses(
     dispatch: any | null,
     page: number,
     pageSize: number,
@@ -26,7 +26,7 @@ export async function getAllBatches(
         Authorization: `Bearer ${jwt}`,
     };
     try {
-        let url = `${BACKEND_URL}/batch/Search?page=${page}&pageSize=${pageSize}`;
+        let url = `${BACKEND_URL}/course/Search?page=${page}&pageSize=${pageSize}`;
 
         if (filterApplied) {
             url += `&isActive=${isActive}`;
@@ -38,17 +38,17 @@ export async function getAllBatches(
 
         if (response.data.isSuccessful) {
             if (dispatch === null) return response.data;
-            dispatch(setBatchPage(response.data.paginationInfo.page));
-            dispatch(setBatchTotalPages(response.data.paginationInfo.totalPages));
-            dispatch(setBatchNextPage(response.data.paginationInfo.nextPage));
-            dispatch(setBatchPrevPage(response.data.paginationInfo.page - 1));
+            dispatch(setCoursePage(response.data.paginationInfo.page));
+            dispatch(setCourseTotalPages(response.data.paginationInfo.totalPages));
+            dispatch(setCourseNextPage(response.data.paginationInfo.nextPage));
+            dispatch(setCoursePrevPage(response.data.paginationInfo.page - 1));
             return response.data;
         } else {
             if (dispatch === null) return response.data;
-            dispatch(setBatchPage(1));
-            dispatch(setBatchTotalPages(0));
-            dispatch(setBatchNextPage(-1));
-            dispatch(setBatchPrevPage(-1));
+            dispatch(setCoursePage(1));
+            dispatch(setCourseTotalPages(0));
+            dispatch(setCourseNextPage(-1));
+            dispatch(setCoursePrevPage(-1));
             return response.data;
         }
     } catch (err: any) {

@@ -7,25 +7,28 @@ const initialState: CourseInteract = {
   createCourse: {
     courseName: "",
     status: "active",
+    facultyId: -1,
+    moduleIds: [] as number[],
   },
   viewCourse: {
     id: -1,
     courseName: "",
     status: "",
-    module: [],
+    facultyId: -1,
+    moduleIds: [] as number[],
     createdAt: "",
     updatedAt: "",
     createdBy: "",
     updatedBy: "",
+    setIsActive: undefined
   },
-  courseEditBlocked: true,
 
   // Pagination state
   page: 1,
   totalPages: 0,
   nextPage: -1,
   prevPage: -1,
-  editBlocked: undefined,
+  editBlocked: true,
 };
 
 export const courseSlice = createSlice({
@@ -45,10 +48,17 @@ export const courseSlice = createSlice({
     setCreateCourseStatus: (state, action) => {
       state.createCourse.status = action.payload;
     },
+    setCreateCourseModules: (state, action) => {
+      state.createCourse.moduleIds = action.payload;
+    },
+    setCreateCourseFaculty: (state, action) => {
+      state.createCourse.facultyId = action.payload;
+    },
+    
 
     // View Course
-    setCourseEditBlocked: (state, action) => {
-      state.courseEditBlocked = action.payload;
+    setEditBlocked: (state, action) => {
+      state.editBlocked = action.payload;
     },
     setViewCourse: (state, action) => {
       state.viewCourse = action.payload;
@@ -63,8 +73,13 @@ export const courseSlice = createSlice({
       state.viewCourse.status = action.payload;
     },
     setViewCourseModule: (state, action) => {
-      state.viewCourse.module = action.payload;
+      state.viewCourse.moduleIds = action.payload;
     },
+    setViewCourseFaculty: (state, action) => {
+      state.viewCourse.facultyId = action.payload;
+    },
+
+  
 
     // Pagination
     setCoursePage: (state, action) => {
@@ -88,14 +103,17 @@ export const {
   setCreateCourse,
   setCreateCourseName,
   setCreateCourseStatus,
+  setCreateCourseModules,
+  setCreateCourseFaculty,
 
   // View course
-  setCourseEditBlocked,
+  setEditBlocked,
   setViewCourse,
   setViewCourseDefault,
   setViewCourseName,
   setViewCourseStatus,
   setViewCourseModule,
+  setViewCourseFaculty,
 
   // Pagination
   setCoursePage,

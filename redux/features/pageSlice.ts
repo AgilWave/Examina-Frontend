@@ -28,6 +28,12 @@ const initialState: PageState = {
         nextPage: -1,
         prevPage: -1,
     },
+    course: {
+        totalPages: 0,
+        page: 1,
+        nextPage: -1,
+        prevPage: -1,
+    },
 };
 
 export const PageSlice = createSlice({
@@ -136,6 +142,32 @@ export const PageSlice = createSlice({
                 sessionStorage.setItem("batchPrevPage", JSON.stringify(action.payload));
             }
         },
+
+        //course
+        setCoursePage: (state, action) => {
+            state.course.page = action.payload;
+            if (typeof window !== "undefined") {
+                sessionStorage.setItem("coursePage", JSON.stringify(action.payload));
+            }
+        },
+        setCourseTotalPages: (state, action) => {
+            state.course.totalPages = action.payload;
+            if (typeof window !== "undefined") {
+                sessionStorage.setItem("courseTotalPages", JSON.stringify(action.payload));
+            }
+        },
+        setCourseNextPage: (state, action) => {
+            state.course.nextPage = action.payload;
+            if (typeof window !== "undefined") {
+                sessionStorage.setItem("courseNextPage", JSON.stringify(action.payload));
+            }
+        },
+        setCoursePrevPage: (state, action) => {
+            state.course.prevPage = action.payload;
+            if (typeof window !== "undefined") {    
+                sessionStorage.setItem("coursePrevPage", JSON.stringify(action.payload));
+            }
+        }
         
     },
 });
@@ -163,6 +195,12 @@ export const {
     setBatchTotalPages,
     setBatchNextPage,
     setBatchPrevPage,
+
+    //course
+    setCoursePage,
+    setCourseTotalPages,
+    setCourseNextPage,
+    setCoursePrevPage,
     
 } = PageSlice.actions;
 
