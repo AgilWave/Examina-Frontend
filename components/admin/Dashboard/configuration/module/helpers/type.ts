@@ -1,7 +1,9 @@
 export type Module = {
     id: number;
-    moduleName: string;
-    facultyName: string;
-    isBlacklisted: boolean;
+    name: string;
+    faculty: {
+      name: string;
+    };
+    isActive: boolean;
   };
   
