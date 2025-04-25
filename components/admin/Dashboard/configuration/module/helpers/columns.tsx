@@ -22,14 +22,14 @@ export const columns: ColumnDef<Module>[] = [
     },
   },
   {
-    accessorKey: "moduleName", 
+    accessorKey: "name", 
     header: () => (
       <div className="max-w-[100px] font-poppins 2xl:text-[14px] text-[11px]">
-        Module
+        Name
       </div>
     ),
     cell: ({ row }) => {
-      const userName = row.original.moduleName as string;
+      const userName = row.original.name as string;
       return (
         <div className="capitalize max-w-[100px] font-poppins 2xl:text-[14px] text-[11px]">
           {userName}
@@ -45,10 +45,10 @@ export const columns: ColumnDef<Module>[] = [
       </div>
     ),
     cell: ({ row }) => {
-      const userName = row.original.facultyName as string;
+      const userName = row.original.faculty?.name as string || null;
       return (
         <div className="capitalize max-w-[100px] font-poppins 2xl:text-[14px] text-[11px]">
-          {userName}
+          {userName || "-"}
         </div>
       );
     },
@@ -61,13 +61,13 @@ export const columns: ColumnDef<Module>[] = [
       </div>
     ),
     cell: ({ row }) => {
-      const isActive = row.original.isBlacklisted as boolean;
+      const isActive = row.original.isActive as boolean;
       return (
         <div className="text-center max-w-[50px] font-poppins 2xl:text-[14px] text-[11px]">
           {isActive ? (
-            <AiOutlineCloseSquare className="inline rounded-full text-red-500 text-[22px]" />
-          ) : (
             <IoIosCheckbox className="inline rounded-full text-primary text-[22px]" />
+          ) : (
+            <AiOutlineCloseSquare className="inline rounded-full text-red-500 text-[22px]" />
           )}
         </div>
       );
