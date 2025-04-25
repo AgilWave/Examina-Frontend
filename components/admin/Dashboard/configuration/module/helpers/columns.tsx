@@ -45,7 +45,7 @@ export const columns: ColumnDef<Module>[] = [
       </div>
     ),
     cell: ({ row }) => {
-      const userName = row.original.faculty.name as string || null;
+      const userName = row.original.faculty?.name as string || null;
       return (
         <div className="capitalize max-w-[100px] font-poppins 2xl:text-[14px] text-[11px]">
           {userName || "-"}
