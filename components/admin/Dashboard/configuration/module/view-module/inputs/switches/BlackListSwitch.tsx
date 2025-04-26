@@ -24,7 +24,7 @@ import { toast } from "sonner";
 import { BACKEND_URL } from "@/Constants/backend";
 
 function BlackListSwitch() {
-  const modules = useSelector((state: RootState) => state.module);
+  const module = useSelector((state: RootState) => state.module);
   const [isBlacklisted, setIsBlacklisted] = useState(false);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [nextBlacklistStatus, setNextBlacklistStatus] = useState(false);
@@ -34,10 +34,10 @@ function BlackListSwitch() {
   const dispatch = useDispatch();
 
   useEffect(() => {
-    if (modules.viewModule?.setIsActive !== undefined) {
-      setIsBlacklisted(modules.viewModule.setIsActive);
+    if (module.viewModule?.setIsActive !== undefined) {
+      setIsBlacklisted(module.viewModule.setIsActive);
     }
-  }, [modules]);
+  }, [module]);
 
   const handleSwitchToggle = (checked: boolean) => {
     setNextBlacklistStatus(checked);
@@ -116,7 +116,7 @@ function BlackListSwitch() {
               id="blacklist"
               checked={isBlacklisted}
               onCheckedChange={handleSwitchToggle}
-              disabled={modules.editBlocked}
+              disabled={module.editBlocked}
               className={isBlacklisted ? "data-[state=checked]:bg-red-500" : ""}
             />
           </div>
