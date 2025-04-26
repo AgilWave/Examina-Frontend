@@ -1,3 +1,4 @@
+"use client";
 import React, { useState, useEffect } from "react";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
@@ -13,20 +14,19 @@ import {
   AlertDialogAction,
 } from "@/components/ui/alert-dialog";
 import { RootState } from "@/redux/store";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import { BadgeX, BadgeCheck, AlertCircle } from "lucide-react";
 import { setEditBlocked } from "@/redux/features/FacultySlice";
 import axios from "axios";
 import Cookies from "js-cookie";
-import { useDispatch } from "react-redux";
 import { toast } from "sonner";
-import { BACKEND_URL } from "@/Constants/backend";  
+import { BACKEND_URL } from "@/Constants/backend";
 
 function ActiveSwitch() {
   const Faculty = useSelector((state: RootState) => state.faculty);
   const [isActive, setIsActive] = useState(false);
   const [dialogOpen, setDialogOpen] = useState(false);
-  const [nextStatus, setNextStatus] = useState(false); // store what the status will change to
+  const [nextStatus, setNextStatus] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const dialog = useSelector((state: RootState) => state.dialog);
   const dispatch = useDispatch();
@@ -38,7 +38,7 @@ function ActiveSwitch() {
   }, [Faculty]);
 
   const handleSwitchToggle = (checked: boolean) => {
-    setNextStatus(checked); // what the new status should be
+    setNextStatus(checked);
     setDialogOpen(true);
   };
 
@@ -47,14 +47,10 @@ function ActiveSwitch() {
     const jwt = Cookies.get("adminjwt");
     const id = dialog.viewDialogId;
 
-    const body = {
-      isActive: nextStatus,
-    };
-
     try {
       const response = await axios.patch(
         `${BACKEND_URL}/Faculty/Interact/Update/${id}/Status`,
-        body,
+        { isActive: nextStatus },
         {
           headers: {
             "Content-Type": "application/json",
@@ -64,9 +60,7 @@ function ActiveSwitch() {
       );
 
       if (response.data.isSuccessful) {
-        toast.success(
-          nextStatus ? "Faculty activated successfully." : "Faculty deactivated successfully."
-        );
+        toast.success(nextStatus ? "Faculty activated successfully." : "Faculty deactivated successfully.");
         dispatch(setEditBlocked(true));
         setIsActive(nextStatus);
       } else {
@@ -83,17 +77,15 @@ function ActiveSwitch() {
 
   return (
     <div className="flex h-fit flex-col items-center gap-3 justify-between p-4 bg-white dark:bg-black/40 rounded-lg shadow-sm border border-slate-200 dark:border-slate-700">
-      <div className="flex items-center flex-col space-x-3">
+      <div className="flex flex-col items-center space-x-3">
         {isActive ? (
           <BadgeCheck className="text-green-500" size={20} />
         ) : (
           <BadgeX className="text-red-500" size={20} />
         )}
-        <div>
-          <h4 className="font-medium text-slate-900 dark:text-slate-100 text-center">
-            Faculty Status
-          </h4>
-          <p className="text-sm text-slate-500 dark:text-slate-400 text-center">
+        <div className="text-center">
+          <h4 className="font-medium text-slate-900 dark:text-slate-100">Faculty Status</h4>
+          <p className="text-sm text-slate-500 dark:text-slate-400">
             {isActive ? "Faculty is currently active" : "Faculty is deactivated"}
           </p>
         </div>
@@ -114,8 +106,8 @@ function ActiveSwitch() {
               id="Active"
               checked={isActive}
               onCheckedChange={handleSwitchToggle}
-              className={!isActive ? "data-[state=checked]:bg-green-500" : ""}
               disabled={Faculty.editBlocked}
+              className={!isActive ? "data-[state=checked]:bg-green-500" : ""}
             />
           </div>
         </AlertDialogTrigger>
@@ -132,15 +124,14 @@ function ActiveSwitch() {
                 : "This action will deactivate the faculty."}
             </AlertDialogDescription>
           </AlertDialogHeader>
-
           <AlertDialogFooter className="sm:justify-between flex-col sm:flex-row gap-2">
-            <AlertDialogCancel className="sm:mt-0">Cancel</AlertDialogCancel>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
             <AlertDialogAction
+              onClick={handleConfirm}
               disabled={isLoading}
               className={`${
                 nextStatus ? "bg-green-600 hover:bg-green-700" : "bg-red-500 hover:bg-red-600"
               } text-white focus:ring-0`}
-              onClick={handleConfirm}
             >
               {isLoading ? "Processing..." : "Confirm"}
             </AlertDialogAction>
@@ -150,6 +141,5 @@ function ActiveSwitch() {
     </div>
   );
 }
-
 
 export default ActiveSwitch;
