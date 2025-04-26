@@ -37,7 +37,7 @@ function BlackListSwitch() {
     if (modules.viewModule && modules.viewModule.setIsActive !== undefined) {
       setIsActive(modules.viewModule.setIsActive);
     }
-  }, [modules.viewModule]);
+  }, [modules]);
 
   const handleSwitchToggle = (checked: boolean) => {
     setIsBlacklistAction(checked);
