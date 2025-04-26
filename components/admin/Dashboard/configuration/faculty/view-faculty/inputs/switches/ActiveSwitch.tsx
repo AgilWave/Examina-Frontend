@@ -12,7 +12,6 @@ import {
   AlertDialogTrigger,
   AlertDialogAction,
 } from "@/components/ui/alert-dialog";
-import { Textarea } from "@/components/ui/textarea";
 import { RootState } from "@/redux/store";
 import { useSelector } from "react-redux";
 import { BadgeX, BadgeCheck, AlertCircle } from "lucide-react";
@@ -28,7 +27,6 @@ function ActiveSwitch() {
   const [isActive, setIsActive] = useState(false);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [nextStatus, setNextStatus] = useState(false); // store what the status will change to
-  const [reason, setReason] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const dialog = useSelector((state: RootState) => state.dialog);
   const dispatch = useDispatch();
@@ -79,7 +77,6 @@ function ActiveSwitch() {
       toast.error("An error occurred while updating the Active status.");
     } finally {
       setIsLoading(false);
-      setReason("");
       setDialogOpen(false);
     }
   };
