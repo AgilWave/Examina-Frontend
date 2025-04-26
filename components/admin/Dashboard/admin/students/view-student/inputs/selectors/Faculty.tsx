@@ -55,8 +55,8 @@ export function Faculty() {
   }, [faculties.length]);
 
   useEffect(() => {
-    setFaculty(String(student.viewStudent.student.faculty?.id) || "");
-  }, [student.viewStudent.student.faculty?.id]);
+    setFaculty(String(student.viewStudent.student?.faculty?.id) || "");
+  }, [student.viewStudent.student?.faculty?.id]);
 
   const handleChange = (value: string) => {
     console.log(value);
@@ -74,7 +74,7 @@ export function Faculty() {
       
       <div className="relative">
         <Select 
-          value={String(student.viewStudent.student.faculty?.id) || ""}
+          value={String(student.viewStudent.student?.faculty?.id) || ""}
           onValueChange={(value) => handleChange(value)} 
           disabled={student.editBlocked || faculties.length === 0}
         >

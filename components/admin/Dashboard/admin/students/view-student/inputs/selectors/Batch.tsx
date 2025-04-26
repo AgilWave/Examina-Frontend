@@ -54,13 +54,13 @@ export function Batch() {
     }
     setBatch("");
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [student.viewStudent.student.course?.id, student.viewStudent.student.faculty?.id]);
+  }, [student.viewStudent.student?.course?.id, student.viewStudent.student?.faculty?.id]);
 
-  const filteredBatches = allBatches.filter(batch => batch.courseId === Number(student.viewStudent.student.course?.id));
+  const filteredBatches = allBatches.filter(batch => batch.courseId === Number(student.viewStudent.student?.course?.id));
 
   useEffect(() => {
-    setBatch(String(student.viewStudent.student.batch?.id) || "");
-  }, [student.viewStudent.student.batch?.id]);
+    setBatch(String(student.viewStudent.student?.batch?.id) || "");
+  }, [student.viewStudent.student?.batch?.id]);
 
   const handleChange = (value: string) => {
     setBatch(value);
@@ -77,7 +77,7 @@ export function Batch() {
 
       <div className="relative">
         <Select
-          value={String(student.viewStudent.student.batch?.id) || ""}
+          value={String(student.viewStudent.student?.batch?.id) || ""}
           onValueChange={(value) => handleChange(value)}
           disabled={student.editBlocked || filteredBatches.length === 0}
         >

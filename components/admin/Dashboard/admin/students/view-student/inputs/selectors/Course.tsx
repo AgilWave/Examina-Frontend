@@ -30,7 +30,7 @@ export function Course() {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [course, setCourse] = useState("");
   const student = useSelector((state: RootState) => state.student);
-  const facultyId = student.viewStudent.student.faculty?.id || "";
+  const facultyId = student.viewStudent.student?.faculty?.id || "";
   const [allCourses, setAllCourses] = useState<Course[]>([]);
 
   const getCourses = async () => {
@@ -74,7 +74,7 @@ export function Course() {
 
       <div className="relative">
         <Select
-          value={String(student.viewStudent.student.course?.id) || ""}
+          value={String(student.viewStudent.student?.course?.id) || ""}
           onValueChange={(value) => handleChange(value)}
           disabled={student.editBlocked || filteredCourses.length === 0}
         >
