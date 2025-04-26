@@ -10,6 +10,7 @@ import batchReducer from "./features/BatchSlice";
 import courseReducer from "./features/CourseSlice";
 import yearReducer from "./features/YearSlice"; 
 import moduleReducer from "./features/ModuleSlice";
+import facultyReducer from "./features/FacultySlice";
 
 const rootReducer = combineReducers({
   dialog: dialogReducer,
@@ -21,6 +22,7 @@ const rootReducer = combineReducers({
   course: courseReducer,
   year: yearReducer, 
   module: moduleReducer,
+  faculty: facultyReducer,
 });
 
 export const store = configureStore({
