@@ -43,6 +43,7 @@ function CreateCourse() {
 
     const body = {
       name: courseName,
+      facultyId: Number(course.createCourse.facultyId),
       moduleIds: moduleIds.map((id: number) => id),
     };
 

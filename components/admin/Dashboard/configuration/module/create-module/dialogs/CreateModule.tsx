@@ -31,8 +31,8 @@ function CreateModule() {
     setIsLoading(true);
 
     const body = {
-      moduleName : modules.createModule.moduleName,
-      facultyName: modules.createModule.facultyName,
+      name : modules.createModule.moduleName,
+      facultyId: Number(modules.createModule.facultyName) ,
     };
 
     const token = Cookies.get("adminjwt");
