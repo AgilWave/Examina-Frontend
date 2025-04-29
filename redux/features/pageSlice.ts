@@ -46,6 +46,19 @@ const initialState: PageState = {
         nextPage: -1,
         prevPage: -1,
     },
+    questionBank: {
+        totalPages: 0,
+        page: 1,
+        nextPage: -1,
+        prevPage: -1,
+    },
+    question: {
+        totalPages: 0,
+        page: 1,
+        nextPage: -1,
+        prevPage: -1,
+    },
+
 };
 
 export const PageSlice = createSlice({
@@ -233,6 +246,59 @@ export const PageSlice = createSlice({
             }
         },
 
+        //questionBank
+        setQuestionBankPage: (state, action) => {
+            state.questionBank.page = action.payload;
+            if (typeof window !== "undefined") {
+                sessionStorage.setItem("questionBankPage", JSON.stringify(action.payload));
+            }
+        },
+        setQuestionBankTotalPages: (state, action) => {
+            state.questionBank.totalPages = action.payload;
+            if (typeof window !== "undefined") {
+                sessionStorage.setItem("questionBankTotalPages", JSON.stringify(action.payload));
+            }
+        },
+        setQuestionBankNextPage: (state, action) => {
+            state.questionBank.nextPage = action.payload;
+            if (typeof window !== "undefined") {
+                sessionStorage.setItem("questionBankNextPage", JSON.stringify(action.payload));
+            }
+        },
+        setQuestionBankPrevPage: (state, action) => {
+            state.questionBank.prevPage = action.payload;
+            if (typeof window !== "undefined") {
+                sessionStorage.setItem("questionBankPrevPage", JSON.stringify(action.payload));
+            }
+        },
+
+        //question
+        setQuestionPage: (state, action) => {
+            state.question.page = action.payload;
+            if (typeof window !== "undefined") {
+                sessionStorage.setItem("questionPage", JSON.stringify(action.payload));
+            }
+        },
+        setQuestionTotalPages: (state, action) => {
+            state.question.totalPages = action.payload;
+            if (typeof window !== "undefined") {
+                sessionStorage.setItem("questionTotalPages", JSON.stringify(action.payload));
+            }
+        },
+
+        setQuestionNextPage: (state, action) => {
+            state.question.nextPage = action.payload;
+            if (typeof window !== "undefined") {
+                sessionStorage.setItem("questionNextPage", JSON.stringify(action.payload));
+            }
+        },
+        setQuestionPrevPage: (state, action) => {
+            state.question.prevPage = action.payload;
+            if (typeof window !== "undefined") {
+                sessionStorage.setItem("questionPrevPage", JSON.stringify(action.payload));
+            }
+        },
+
         
     },
 });
@@ -278,6 +344,18 @@ export const {
     setFacultyTotalPages,
     setFacultyNextPage,
     setFacultyPrevPage,
+
+    //questionBank
+    setQuestionBankPage,
+    setQuestionBankTotalPages,
+    setQuestionBankNextPage,
+    setQuestionBankPrevPage,
+
+    //question
+    setQuestionPage,
+    setQuestionTotalPages,
+    setQuestionNextPage,
+    setQuestionPrevPage,
     
 } = PageSlice.actions;
 
