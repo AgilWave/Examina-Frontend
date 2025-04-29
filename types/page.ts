@@ -41,4 +41,16 @@ export interface PageState {
     nextPage: number;
     prevPage: number;
   };
+  questionBank: {
+    totalPages: number;
+    page: number;
+    nextPage: number;
+    prevPage: number;
+  };
+  question: {
+    totalPages: number;
+    page: number;
+    nextPage: number;
+    prevPage: number;
+  };
 }
