@@ -51,7 +51,7 @@ export function CourseName() {
 
   useEffect(() => {
     if (facultyId) {
-      getCourses(facultyId); // 👉 only fetch courses when faculty is selected
+      getCourses(facultyId); 
     } else {
       setAllCourses([]);
     }
@@ -62,6 +62,7 @@ export function CourseName() {
       setCourse(courseQuery);
       dispatch(setCreateBatchCourseId(courseQuery));
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [courseQuery]);
 
   const handleChange = (value: string) => {

@@ -12,7 +12,6 @@ import {
 } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
 import { useEffect, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
 import { Users, User } from "lucide-react";
 import api from "@/lib/axiosInstance";
 import Cookies from "js-cookie";
@@ -24,10 +23,10 @@ interface Lecture {
 }
 
 export function Lecture() {
-  const dispatch = useDispatch();
   const [selectedLecture, setSelectedLecture] = useState("");
   const [lecture, setLecture] = useState<Lecture[]>([]);
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [LectureQuery, setLectureQuery] = useQueryState(
     "Lecture",
     parseAsString

@@ -12,7 +12,6 @@ import {
 } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
 import { useEffect, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
 import { Users, User } from "lucide-react";
 import api from "@/lib/axiosInstance";
 import Cookies from "js-cookie";
@@ -24,10 +23,10 @@ interface Faculty {
 }
 
 export function FacultyName() {
-  const dispatch = useDispatch();
   const [selectedFaculty, setSelectedFaculty] = useState("");
   const [faculties, setFaculties] = useState<Faculty[]>([]);
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [facultyQuery, setFacultyQuery] = useQueryState(
     "faculty",
     parseAsString

@@ -7,7 +7,6 @@ import {
   ColumnFiltersState,
   SortingState,
   VisibilityState,
-  flexRender,
   getCoreRowModel,
   getFilteredRowModel,
   getPaginationRowModel,
@@ -44,7 +43,6 @@ import { RefreshCcw } from "lucide-react";
 import {  parseAsString, useQueryState, parseAsBoolean } from "nuqs";
 import SearchField from "./helpers/Search";
 import { getAllModules } from "@/services/questionBank/getAllModules";
-import { useRouter } from "next/navigation";
 import Qcard from "./Cards";
 
 export function DataTable() {
@@ -58,19 +56,21 @@ export function DataTable() {
   const dialog = useSelector((state: RootState) => state.dialog);
   const dispatch = useDispatch();
   const [searchQuery] = useQueryState("searchQuery");
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [isLoading, setIsLoading] = useState(false);
 
   const [isFilterOpen, setIsFilterOpen] = useQueryState(
       "filterOpen",
       parseAsBoolean
     );
+
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const [filterApplied] = useQueryState("filterApplied", parseAsBoolean);
 
 
   const [LectureQuery] = useQueryState("Lecture", parseAsString);
   const [questionType] = useQueryState("questionType", parseAsString);
 
-  const router = useRouter();
 
   const fetchData = async (page: number) => {
     setIsLoading(true);
@@ -166,6 +166,7 @@ export function DataTable() {
     fetchData(page);
   }, [searchQuery]);
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const table = useReactTable({
     data,
     columns,
@@ -202,8 +203,6 @@ export function DataTable() {
       fetchData(curPage);
     }
   };
-
-  const rows = table.getRowModel().rows;
 
   return (
     <>
