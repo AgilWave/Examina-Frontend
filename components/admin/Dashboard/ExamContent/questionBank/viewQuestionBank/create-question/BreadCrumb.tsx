@@ -36,13 +36,13 @@ function BreadCrumb() {
               href="/admin/dashboard/exams/questions-bank"
               className="text-muted-foreground hover:text-foreground"
             >
-              Bank
+              Question Bank
             </BreadcrumbLink>
           </BreadcrumbItem>
           <BreadcrumbSeparator />
           <BreadcrumbItem>
           <BreadcrumbPage className="text-muted-foreground">
-            Module Name
+            Module
           </BreadcrumbPage>
         </BreadcrumbItem>
         <BreadcrumbSeparator />
