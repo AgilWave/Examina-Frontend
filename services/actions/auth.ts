@@ -41,7 +41,7 @@ export async function loginActionMS({ idToken }: { idToken: string }) {
       const encryptedUserDetails = encrypt(userDetails);
       cookieStore.set("userDetails", encryptedUserDetails);
       const origin = process.env.NEXT_PUBLIC_URL || "http://localhost:3000";
-      const redirectUrl = `${origin}/dashboard`;
+      const redirectUrl = `${origin}/dashboard/overview`;
       return {
         success: true,
         message: "Login successful",
