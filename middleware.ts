@@ -101,6 +101,12 @@ export async function middleware(req: NextRequest) {
       const newPath = url.pathname.replace("/admin", "");
       return NextResponse.redirect(new URL(newPath, req.url));
     }
+
+    if (url.pathname.startsWith("/admin/dashboard/exams/questions-bank/view-questions")) {
+      const id = url.pathname.split("/").pop();
+      const newUrl = new URL(`/admin/dashboard/exams/questions-bank/view-questions/${id}`, req.url);
+      return NextResponse.redirect(newUrl);
+    }
     
     // On admin subdomain, all paths need to be internally rewritten to /admin/* 
     // This makes requests like admin.examina.live/dashboard/... route to the files in /app/admin/dashboard/...
