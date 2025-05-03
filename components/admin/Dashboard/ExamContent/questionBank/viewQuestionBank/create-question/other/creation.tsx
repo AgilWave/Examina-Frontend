@@ -322,9 +322,9 @@ const CreationPage: React.FC<CreationPageProps> = () => {
 
       if (currentQuestion.category === "mcq") {
         if (currentQuestion.questionType === "Multiple Choice") {
-\          const correctAnswers = currentQuestion.correctAnswers.filter(answer => answer.trim());
+          const correctAnswers = currentQuestion.correctAnswers.filter(answer => answer.trim());
 
-\          answerOptions = correctAnswers.map(text => ({
+          answerOptions = correctAnswers.map(text => ({
             text,
             clarification: currentQuestion.correctAnswerClarifications?.[0] || "",
             isCorrect: true
