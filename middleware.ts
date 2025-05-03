@@ -96,6 +96,13 @@ export async function middleware(req: NextRequest) {
       }
     }
 
+    console.log('Middleware processing:', req.nextUrl.pathname);
+
+    // Add this early in your middleware to bypass checks for your specific route
+    if (req.nextUrl.pathname.startsWith('/admin/dashboard/question-bank/view/')) {
+      return NextResponse.next();
+    }
+
     return NextResponse.rewrite(new URL(`/admin${url.pathname}`, req.url));
   }
 }
