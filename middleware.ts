@@ -80,18 +80,24 @@ export async function middleware(req: NextRequest) {
     if (isStaticAsset || isImageOptimizationRequest) {
       return NextResponse.next();
     }
-  
-    if (!adminJwt && url.pathname !== "/login") {
-      return NextResponse.redirect(new URL("/login", req.url));
+
+    if (url.pathname.startsWith("/admin")) {
+      const newPath = url.pathname.replace("/admin", "");
+      return NextResponse.redirect(new URL(newPath, req.url));
     }
 
-    if (adminJwt && (url.pathname === "/" || url.pathname === "/login")) {
-      return NextResponse.redirect(new URL("/dashboard/overview", req.url));
+    if (!adminJwt) {
+      if (url.pathname !== "/login") {
+        return NextResponse.redirect(new URL("/login", req.url));
+      }
+    } else {
+      if (url.pathname === "/" || url.pathname === "/login") {
+        return NextResponse.redirect(new URL("/dashboard/overview", req.url));
+      }
     }
-  
+
     return NextResponse.rewrite(new URL(`/admin${url.pathname}`, req.url));
   }
-  
 }
 
 export const config = {
