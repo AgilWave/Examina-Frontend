@@ -28,6 +28,7 @@ export async function middleware(req: NextRequest) {
   const adminHost = process.env.NEXT_PUBLIC_HOSTNAME_ADMIN as string;
   const isLocalhost = host?.includes("localhost");
 
+  // For localhost admin routes
   if (isLocalhost && url.pathname.startsWith("/admin")) {
     if (isStaticAsset || isImageOptimizationRequest) {
       return NextResponse.next();
@@ -46,6 +47,7 @@ export async function middleware(req: NextRequest) {
     return NextResponse.next();
   }
 
+  // Handle main domain routing
   if (
     host?.includes(examinaHost) &&
     !host?.includes("admin") &&
@@ -76,16 +78,14 @@ export async function middleware(req: NextRequest) {
     }
   }
 
+  // Handle admin subdomain routing
   if (host?.includes(adminHost)) {
+    // Allow static assets to pass through
     if (isStaticAsset || isImageOptimizationRequest) {
       return NextResponse.next();
     }
 
-    if (url.pathname.startsWith("/admin")) {
-      const newPath = url.pathname.replace("/admin", "");
-      return NextResponse.redirect(new URL(newPath, req.url));
-    }
-
+    // Handle authentication for admin routes
     if (!adminJwt) {
       if (url.pathname !== "/login") {
         return NextResponse.redirect(new URL("/login", req.url));
@@ -95,15 +95,18 @@ export async function middleware(req: NextRequest) {
         return NextResponse.redirect(new URL("/dashboard/overview", req.url));
       }
     }
-
-    console.log('Middleware processing:', req.nextUrl.pathname);
-
-    // Add this early in your middleware to bypass checks for your specific route
-    if (req.nextUrl.pathname.startsWith('/admin/dashboard/question-bank/view/')) {
-      return NextResponse.next();
+    
+    // For other routes on admin subdomain, remove /admin prefix if it exists
+    if (url.pathname.startsWith("/admin")) {
+      const newPath = url.pathname.replace("/admin", "");
+      return NextResponse.redirect(new URL(newPath, req.url));
     }
-
-    return NextResponse.rewrite(new URL(`/admin${url.pathname}`, req.url));
+    
+    // On admin subdomain, all paths need to be internally rewritten to /admin/* 
+    // This makes requests like admin.examina.live/dashboard/... route to the files in /app/admin/dashboard/...
+    const targetPath = `/admin${url.pathname}`;
+    console.log(`[Middleware] Rewriting ${url.pathname} to ${targetPath} on ${host}`);
+    return NextResponse.rewrite(new URL(targetPath, req.url));
   }
 }
 
