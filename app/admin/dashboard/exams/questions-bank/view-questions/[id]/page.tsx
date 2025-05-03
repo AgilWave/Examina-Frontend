@@ -11,7 +11,7 @@ async function ViewQuestionBankPage({
   console.log(id);
   return (
     <div>
-      <QuestionBankWrapper />
+      <QuestionBankWrapper id={id} />
     </div>
   );
 }
