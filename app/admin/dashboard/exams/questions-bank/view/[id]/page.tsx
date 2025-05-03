@@ -4,13 +4,11 @@ import Link from "next/link";
 
 export const dynamic = 'force-dynamic';
 
-type ViewQuestionBankPageProps = {
-  params: {
-    id: string;
-  };
-};
-
-const ViewQuestionBankPage = async ({ params }: ViewQuestionBankPageProps) => {
+const ViewQuestionBankPage = async ({
+  params,
+}: {
+  params: { id: string };
+}) => {
   const id = parseInt(params.id, 10);
 
   if (!id || isNaN(id)) {
