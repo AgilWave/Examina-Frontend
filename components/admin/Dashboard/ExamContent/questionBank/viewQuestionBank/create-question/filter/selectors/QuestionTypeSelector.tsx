@@ -16,7 +16,7 @@ const QuestionTypeSelector: React.FC<QuestionTypeSelectorProps> = ({
   onChange,
   disabled = false,
 }) => {
-  const mcqTypes = ["Multiple Choice", "Checkbox"];
+  const mcqTypes = ["Multiple Choice", "Checkbox", "Choice"];
   const structuredTypes = ["Image Upload", "Short Text", "Long Text", "Code Snippet"];
 
   const getOptions = () => {

@@ -7,10 +7,10 @@ import QuestionTextInput from "./QuestionTextInput";
 import AnswerSection from "./AnswerSection";
 import CategorySelector from "../filter/selectors/CategorySelector";
 import QuestionTypeSelector from "../filter/selectors/QuestionTypeSelector";
-import { 
-  Plus, Save, Paperclip,  X,   
-  Pencil, FileQuestion, Eye, Trash2, 
-  FileImage,  File
+import {
+  Plus, Save, Paperclip, X,
+  Pencil, FileQuestion, Eye, Trash2,
+  FileImage, File
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -23,15 +23,19 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import Image from "next/image";
+import { useDispatch, useSelector } from "react-redux";
 
 interface QuestionData {
   id: string;
   questionText: string;
-  correctAnswer: string;
+  correctAnswers: string[];
+  correctAnswerClarifications: string[];
   wrongAnswers: string[];
+  wrongAnswerClarifications: string[];
   collapsed: boolean;
   category: string;
   questionType: string;
+
   saved: boolean;
   disabled?: boolean;
   attachment?: File | null;
@@ -45,11 +49,20 @@ interface CreationPageProps {
   onResetSelectors: () => void;
 }
 
+import { setCreateQuestionBankQuestion, setCreateQuestionModuleId, removeCreateQuestionBankQuestion, updateCreateQuestionBankQuestion } from "@/redux/features/QuestionBankSlice";
+
+import { RootState } from "@/redux/store";
+import { useParams } from "next/navigation";
+import { toast } from "sonner";
+
 const CreationPage: React.FC<CreationPageProps> = () => {
+  const params = useParams();
+  const idString = params?.id ? (Array.isArray(params.id) ? params.id[0] : params.id) : undefined;
+  const id = idString ? parseInt(idString, 10) : undefined;
   const [questions, setQuestions] = useState<QuestionData[]>([]);
   const [newQuestion, setNewQuestion] = useState<QuestionData | null>(null);
   const [currentQuestion, setCurrentQuestion] = useState<QuestionData | null>(null);
-  const [validationErrors, setValidationErrors] = useState<{[key: string]: string}>({});
+  const [validationErrors, setValidationErrors] = useState<{ [key: string]: string }>({});
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [viewDialogOpen, setViewDialogOpen] = useState(false);
@@ -59,20 +72,37 @@ const CreationPage: React.FC<CreationPageProps> = () => {
   const [questionType, setQuestionType] = useState("");
   const [currentIndex, setCurrentIndex] = useState<number>(-1);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const dispatch = useDispatch();
+  const createQuestionBank = useSelector((state: RootState) => state.questionBank.createQuestionBank);
+
+  useEffect(() => {
+    const handleReset = () => {
+      setQuestions([]);
+    };
+
+    const element = document.querySelector('.creation-page');
+    if (element) {
+      element.addEventListener('resetQuestions', handleReset);
+      return () => {
+        element.removeEventListener('resetQuestions', handleReset);
+      };
+    }
+  }, []);
 
   const handleCategoryChange = (newCategory: string) => {
     setCategory(newCategory);
     setQuestionType("");
   };
 
-  // Create new question editor when dialog opens
   useEffect(() => {
     if (dialogOpen && category && questionType) {
       setNewQuestion({
         id: generateUniqueId(),
         questionText: "",
-        correctAnswer: "",
+        correctAnswers: [""],
+        correctAnswerClarifications: [""],
         wrongAnswers: ["", ""],
+        wrongAnswerClarifications: ["", ""],
         collapsed: false,
         category,
         questionType,
@@ -86,11 +116,24 @@ const CreationPage: React.FC<CreationPageProps> = () => {
     return `question-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
   };
 
-  // eslint-disable-next-line
-  const handleQuestionFieldChange = (field: keyof QuestionData, value: any) => {
+  const handleQuestionFieldChange = (field: keyof QuestionData, value: string | string[]) => {
     if (newQuestion) {
-      setNewQuestion({ ...newQuestion, [field]: value });
-      // Clear validation error when field is changed
+      if (field === "correctAnswers") {
+        const answers = Array.isArray(value) 
+          ? value 
+          : typeof value === 'string' 
+            ? value.split("|").filter(Boolean) 
+            : [];
+            
+        setNewQuestion({ ...newQuestion, correctAnswers: answers });
+      } else if (field === "correctAnswerClarifications") {
+        // For correct answer clarifications, ensure it's an array
+        const clarifications = Array.isArray(value) ? value : [value];
+        setNewQuestion({ ...newQuestion, correctAnswerClarifications: clarifications });
+      } else {
+        setNewQuestion({ ...newQuestion, [field]: value });
+      }
+      
       if (validationErrors[field]) {
         const newErrors = { ...validationErrors };
         delete newErrors[field];
@@ -104,8 +147,7 @@ const CreationPage: React.FC<CreationPageProps> = () => {
       const updatedWrongAnswers = [...newQuestion.wrongAnswers];
       updatedWrongAnswers[index] = value;
       setNewQuestion({ ...newQuestion, wrongAnswers: updatedWrongAnswers });
-      
-      // Clear validation error for wrong answers
+
       if (validationErrors.wrongAnswers) {
         const newErrors = { ...validationErrors };
         delete newErrors.wrongAnswers;
@@ -114,53 +156,122 @@ const CreationPage: React.FC<CreationPageProps> = () => {
     }
   };
 
+  const handleWrongClarificationChange = (index: number, value: string) => {
+    if (newQuestion) {
+      const updatedClarifications = [...(newQuestion.wrongAnswerClarifications || [])];
+      while (updatedClarifications.length <= index) {
+        updatedClarifications.push("");
+      }
+      updatedClarifications[index] = value;
+      setNewQuestion({ ...newQuestion, wrongAnswerClarifications: updatedClarifications });
+    }
+  };
+
   const validateQuestion = (question: QuestionData): boolean => {
-    const errors: {[key: string]: string} = {};
-    
+    const errors: { [key: string]: string } = {};
+  
     if (!question.questionText.trim()) {
       errors.questionText = "Question text is required";
     }
-    
-    if (question.category === "mcq" && question.questionType === "Multiple Choice") {
-      if (!question.correctAnswer.trim()) {
-        errors.correctAnswer = "Correct answer is required";
-      }
+
+    console.log('question', question);
+  
+    if (question.category === "mcq" && 
+       (question.questionType === "Multiple Choice" || question.questionType === "Choice")) {
+      const correctAnswers = question.correctAnswers.filter(answer => answer.trim());
       
-      const emptyWrongAnswers = question.wrongAnswers.filter(answer => !answer.trim()).length;
-      if (emptyWrongAnswers > 0) {
-        errors.wrongAnswers = "All answer options must be filled";
+      if (correctAnswers.length === 0) {
+        errors.correctAnswer = "At least one correct answer is required";
+      }
+  
+      const validWrongAnswers = question.wrongAnswers.filter(answer => answer.trim()).length;
+      if (validWrongAnswers === 0) {
+        errors.wrongAnswers = "At least one wrong answer is required";
       }
     }
-    
+  
     setValidationErrors(errors);
     return Object.keys(errors).length === 0;
   };
 
   const handleSaveNewQuestion = () => {
     if (newQuestion && validateQuestion(newQuestion)) {
+      let answerOptions: { text: string; clarification: string; isCorrect: boolean; }[] = [];
+      
+      if (newQuestion.category === "mcq") {
+        if (newQuestion.questionType === "Multiple Choice") {
+          const correctAnswers = newQuestion.correctAnswers.filter(answer => answer.trim());
+          
+          answerOptions = correctAnswers.map((text, idx) => ({
+            text,
+            clarification: newQuestion.correctAnswerClarifications?.[idx] || 
+                          newQuestion.correctAnswerClarifications?.[0] || "",
+            isCorrect: true
+          }));
+          
+          // Add wrong answers
+          answerOptions = [
+            ...answerOptions,
+            ...newQuestion.wrongAnswers
+              .filter(answer => answer.trim())
+              .map((answer, index) => ({
+                text: answer,
+                clarification: newQuestion.wrongAnswerClarifications?.[index] || "",
+                isCorrect: false
+              }))
+          ];
+        } else {
+          answerOptions = [
+            {
+              text: newQuestion.correctAnswers[0],
+              clarification: newQuestion.correctAnswerClarifications?.[0] || "",
+              isCorrect: true
+            },
+            ...newQuestion.wrongAnswers
+              .filter(answer => answer.trim())
+              .map((answer, index) => ({
+                text: answer,
+                clarification: newQuestion.wrongAnswerClarifications?.[index] || "",
+                isCorrect: false
+              }))
+          ];
+        }
+      }
+  
+      const structuredQuestion = {
+        category: category,
+        type: questionType,
+        text: newQuestion.questionText,
+        attachment: newQuestion.attachment,
+        ...(category === "mcq" ? { answerOptions } : {})
+      };
+      
+      dispatch(setCreateQuestionModuleId(id));
       setQuestions([...questions, { ...newQuestion, saved: true, collapsed: true }]);
+      dispatch(setCreateQuestionBankQuestion(structuredQuestion));
       setSaveSuccess(true);
       setDialogOpen(false);
-      
-      // Reset for next question
+  
       setTimeout(() => {
         setSaveSuccess(false);
       }, 3000);
-      
-      // Reset selectors for next question
+  
+      console.log(createQuestionBank);
+      console.log(structuredQuestion);
       setCategory("");
       setQuestionType("");
+      toast.success("Question Added to Creation List");
     }
   };
 
   const openEditDialog = (question: QuestionData, index: number) => {
-    setCurrentQuestion({...question});
+    setCurrentQuestion({ ...question });
     setCurrentIndex(index);
     setEditDialogOpen(true);
   };
 
   const openViewDialog = (question: QuestionData) => {
-    setCurrentQuestion({...question});
+    setCurrentQuestion({ ...question });
     setViewDialogOpen(true);
   };
 
@@ -168,7 +279,6 @@ const CreationPage: React.FC<CreationPageProps> = () => {
   const handleEditQuestionChange = (field: keyof QuestionData, value: any) => {
     if (currentQuestion) {
       setCurrentQuestion({ ...currentQuestion, [field]: value });
-      // Clear validation error when field is changed
       if (validationErrors[field]) {
         const newErrors = { ...validationErrors };
         delete newErrors[field];
@@ -182,8 +292,7 @@ const CreationPage: React.FC<CreationPageProps> = () => {
       const updatedWrongAnswers = [...currentQuestion.wrongAnswers];
       updatedWrongAnswers[answerIndex] = value;
       setCurrentQuestion({ ...currentQuestion, wrongAnswers: updatedWrongAnswers });
-      
-      // Clear validation error for wrong answers
+
       if (validationErrors.wrongAnswers) {
         const newErrors = { ...validationErrors };
         delete newErrors.wrongAnswers;
@@ -192,14 +301,78 @@ const CreationPage: React.FC<CreationPageProps> = () => {
     }
   };
 
+  const handleEditWrongClarificationChange = (answerIndex: number, value: string) => {
+    if (currentQuestion) {
+      const updatedClarifications = [...(currentQuestion.wrongAnswerClarifications || [])];
+      while (updatedClarifications.length <= answerIndex) {
+        updatedClarifications.push("");
+      }
+      updatedClarifications[answerIndex] = value;
+      setCurrentQuestion({ ...currentQuestion, wrongAnswerClarifications: updatedClarifications });
+    }
+  };
+
   const saveEditedQuestion = () => {
     if (currentQuestion && validateQuestion(currentQuestion)) {
       const updatedQuestions = [...questions];
       updatedQuestions[currentIndex] = { ...currentQuestion };
       setQuestions(updatedQuestions);
-      
+
+      let answerOptions: { text: string; clarification: string; isCorrect: boolean; }[] = [];
+
+      if (currentQuestion.category === "mcq") {
+        if (currentQuestion.questionType === "Multiple Choice") {
+\          const correctAnswers = currentQuestion.correctAnswers.filter(answer => answer.trim());
+
+\          answerOptions = correctAnswers.map(text => ({
+            text,
+            clarification: currentQuestion.correctAnswerClarifications?.[0] || "",
+            isCorrect: true
+          }));
+
+          answerOptions = [
+            ...answerOptions,
+            ...currentQuestion.wrongAnswers.map((answer, index) => ({
+              text: answer,
+              clarification: currentQuestion.wrongAnswerClarifications?.[index] || "",
+              isCorrect: false
+            }))
+          ];
+        } else {
+          answerOptions = [
+            {
+              text: currentQuestion.correctAnswers[0],
+              clarification: currentQuestion.correctAnswerClarifications?.[0] || "",
+              isCorrect: true
+            },
+            ...currentQuestion.wrongAnswers.map((answer, index) => ({
+              text: answer,
+              clarification: currentQuestion.wrongAnswerClarifications?.[index] || "",
+              isCorrect: false
+            }))
+          ];
+        }
+      }
+
+      const structuredQuestion = {
+        category: currentQuestion.category,
+        type: currentQuestion.questionType,
+        text: currentQuestion.questionText,
+        attachment: currentQuestion.attachment,
+        
+        ...(currentQuestion.category === "mcq" ? { answerOptions } : {})
+      };
+
+      dispatch(updateCreateQuestionBankQuestion({
+        index: currentIndex,
+        question: structuredQuestion
+      }));
+      dispatch(setCreateQuestionModuleId(id));
+
       setEditDialogOpen(false);
       setSaveSuccess(true);
+      toast.success("Question Updated Successfully");
+
       setTimeout(() => {
         setSaveSuccess(false);
       }, 3000);
@@ -210,7 +383,8 @@ const CreationPage: React.FC<CreationPageProps> = () => {
     if (newQuestion) {
       setNewQuestion({
         ...newQuestion,
-        wrongAnswers: [...newQuestion.wrongAnswers, ""]
+        wrongAnswers: [...newQuestion.wrongAnswers, ""],
+        wrongAnswerClarifications: [...(newQuestion.wrongAnswerClarifications || []), ""]
       });
     }
   };
@@ -219,7 +393,8 @@ const CreationPage: React.FC<CreationPageProps> = () => {
     if (currentQuestion) {
       setCurrentQuestion({
         ...currentQuestion,
-        wrongAnswers: [...currentQuestion.wrongAnswers, ""]
+        wrongAnswers: [...currentQuestion.wrongAnswers, ""],
+        wrongAnswerClarifications: [...(currentQuestion.wrongAnswerClarifications || []), ""]
       });
     }
   };
@@ -228,7 +403,17 @@ const CreationPage: React.FC<CreationPageProps> = () => {
     if (newQuestion && newQuestion.wrongAnswers.length > 2) {
       const updatedWrongAnswers = [...newQuestion.wrongAnswers];
       updatedWrongAnswers.splice(answerIndex, 1);
-      setNewQuestion({ ...newQuestion, wrongAnswers: updatedWrongAnswers });
+
+      const updatedClarifications = [...(newQuestion.wrongAnswerClarifications || [])];
+      if (updatedClarifications.length > answerIndex) {
+        updatedClarifications.splice(answerIndex, 1);
+      }
+
+      setNewQuestion({
+        ...newQuestion,
+        wrongAnswers: updatedWrongAnswers,
+        wrongAnswerClarifications: updatedClarifications
+      });
     }
   };
 
@@ -236,7 +421,17 @@ const CreationPage: React.FC<CreationPageProps> = () => {
     if (currentQuestion && currentQuestion.wrongAnswers.length > 2) {
       const updatedWrongAnswers = [...currentQuestion.wrongAnswers];
       updatedWrongAnswers.splice(answerIndex, 1);
-      setCurrentQuestion({ ...currentQuestion, wrongAnswers: updatedWrongAnswers });
+
+      const updatedClarifications = [...(currentQuestion.wrongAnswerClarifications || [])];
+      if (updatedClarifications.length > answerIndex) {
+        updatedClarifications.splice(answerIndex, 1);
+      }
+
+      setCurrentQuestion({
+        ...currentQuestion,
+        wrongAnswers: updatedWrongAnswers,
+        wrongAnswerClarifications: updatedClarifications
+      });
     }
   };
 
@@ -255,7 +450,7 @@ const CreationPage: React.FC<CreationPageProps> = () => {
     if (files && files.length > 0) {
       const file = files[0];
       const previewUrl = URL.createObjectURL(file);
-      
+
       if (newQuestion) {
         setNewQuestion({
           ...newQuestion,
@@ -272,7 +467,7 @@ const CreationPage: React.FC<CreationPageProps> = () => {
     if (files && files.length > 0) {
       const file = files[0];
       const previewUrl = URL.createObjectURL(file);
-      
+
       if (currentQuestion) {
         setCurrentQuestion({
           ...currentQuestion,
@@ -288,7 +483,7 @@ const CreationPage: React.FC<CreationPageProps> = () => {
     if (newQuestion && newQuestion.attachmentPreviewUrl) {
       URL.revokeObjectURL(newQuestion.attachmentPreviewUrl);
     }
-    
+
     if (newQuestion) {
       setNewQuestion({
         ...newQuestion,
@@ -303,7 +498,7 @@ const CreationPage: React.FC<CreationPageProps> = () => {
     if (currentQuestion && currentQuestion.attachmentPreviewUrl) {
       URL.revokeObjectURL(currentQuestion.attachmentPreviewUrl);
     }
-    
+
     if (currentQuestion) {
       setCurrentQuestion({
         ...currentQuestion,
@@ -323,26 +518,26 @@ const CreationPage: React.FC<CreationPageProps> = () => {
           URL.revokeObjectURL(q.attachmentPreviewUrl);
         }
       });
-      
+
       if (newQuestion?.attachmentPreviewUrl) {
         URL.revokeObjectURL(newQuestion.attachmentPreviewUrl);
       }
-      
+
       if (currentQuestion?.attachmentPreviewUrl) {
         URL.revokeObjectURL(currentQuestion.attachmentPreviewUrl);
       }
     };
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Helper function to determine file type
   const getFileType = (fileName: string) => {
     const extension = fileName.split('.').pop()?.toLowerCase();
     if (!extension) return 'unknown';
-    
+
     const imageExtensions = ['jpg', 'jpeg', 'png', 'gif', 'bmp', 'webp', 'svg'];
     const pdfExtension = 'pdf';
-    
+
     if (imageExtensions.includes(extension)) return 'image';
     if (extension === pdfExtension) return 'pdf';
     return 'other';
@@ -350,18 +545,18 @@ const CreationPage: React.FC<CreationPageProps> = () => {
 
   const renderAttachmentPreview = (attachmentName?: string, previewUrl?: string) => {
     if (!attachmentName || !previewUrl) return null;
-    
+
     const fileType = getFileType(attachmentName);
-    
+
     switch (fileType) {
       case 'image':
         return (
           <div className="mt-2 border rounded-md overflow-hidden dark:border-gray-600">
-            <Image 
-              src={previewUrl} 
-              alt="Attachment preview" 
-              className="w-full h-[200px] object-cover" 
-              width={200} 
+            <Image
+              src={previewUrl}
+              alt="Attachment preview"
+              className="w-full h-[200px] object-cover"
+              width={200}
               height={200}
             />
           </div>
@@ -369,9 +564,9 @@ const CreationPage: React.FC<CreationPageProps> = () => {
       case 'pdf':
         return (
           <div className="mt-2 border rounded-md overflow-hidden dark:border-gray-600">
-            <iframe 
-              src={previewUrl} 
-              className="w-full h-[200px]" 
+            <iframe
+              src={previewUrl}
+              className="w-full h-[200px]"
               title="PDF preview"
             />
           </div>
@@ -386,19 +581,36 @@ const CreationPage: React.FC<CreationPageProps> = () => {
     }
   };
 
+  const handleRemoveQuestion = (idx: number) => {
+    if (idx === -1) {
+      toast.error("Please select a question to remove");
+      return;
+    }
+    if (questions.length > 1) {
+      const updatedQuestions = questions.filter((_, i) => i !== idx);
+      setQuestions(updatedQuestions);
+      dispatch(removeCreateQuestionBankQuestion(idx));
+      toast.success("Question Removed from Creation List");
+    } else {
+      setQuestions([]);
+      dispatch(removeCreateQuestionBankQuestion(idx));
+      toast.success("Question Removed from Creation List");
+    }
+  };
+
   return (
-    <div className="flex flex-col gap-6 dark:text-gray-100">
+    <div className="flex flex-col gap-6 dark:text-gray-100 creation-page">
       {/* Main Card */}
       {questions.length > 0 && (
         <div className="w-full flex justify-end items-center mb-4">
-        <Button 
-            onClick={openQuestionDialog} 
-            variant="default" 
+          <Button
+            onClick={openQuestionDialog}
+            variant="default"
             className="w-full sm:w-[40px] gap-2"
           >
             <Plus className="h-4 w-4" />
           </Button>
-    </div>
+        </div>
       )}
 
       {/* Question Creation Dialog */}
@@ -413,7 +625,7 @@ const CreationPage: React.FC<CreationPageProps> = () => {
               Fill in the details below to create your question
             </DialogDescription>
           </DialogHeader>
-          
+
           <div className="mt-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
               <div>
@@ -422,7 +634,7 @@ const CreationPage: React.FC<CreationPageProps> = () => {
                   onChange={handleCategoryChange}
                 />
               </div>
-              
+
               <div>
                 <QuestionTypeSelector
                   category={category}
@@ -431,31 +643,37 @@ const CreationPage: React.FC<CreationPageProps> = () => {
                 />
               </div>
             </div>
-            
+
             {category && questionType ? (
               <ScrollArea className="h-[50vh] pr-4">
                 <div className="space-y-6">
                   <Badge variant="outline" className="mb-4 font-normal dark:text-gray-300 dark:border-gray-600">
                     {category} - {questionType}
                   </Badge>
-                  
-                  <QuestionTextInput 
-                    value={newQuestion?.questionText || ""} 
+
+                  <QuestionTextInput
+                    value={newQuestion?.questionText || ""}
                     onChange={(val) => handleQuestionFieldChange("questionText", val)}
                     error={validationErrors.questionText}
                   />
 
-                  {category === "mcq" && questionType === "Multiple Choice" && (
+                  {/* Only show answer options for MCQ questions */}
+                  {category === "mcq" && (questionType === "Multiple Choice" || questionType === "Choice") && (
                     <div className="space-y-4">
                       <AnswerSection
-                        correctAnswer={newQuestion?.correctAnswer || ""}
+                        correctAnswers={newQuestion?.correctAnswers || []}
                         wrongAnswers={newQuestion?.wrongAnswers || []}
-                        onCorrectAnswerChange={(val) => handleQuestionFieldChange("correctAnswer", val)}
+                        correctAnswerClarifications={newQuestion?.correctAnswerClarifications || []}
+                        wrongAnswerClarifications={newQuestion?.wrongAnswerClarifications || []}
+                        onCorrectAnswerChange={(val) => handleQuestionFieldChange("correctAnswers", val)}
+                        onCorrectClarificationChange={(val) => handleQuestionFieldChange("correctAnswerClarifications", val)}
                         onWrongAnswerChange={(index, val) => handleWrongAnswerChange(index, val)}
+                        onWrongClarificationChange={(index, val) => handleWrongClarificationChange(index, val)}
                         errorCorrect={validationErrors.correctAnswer}
                         errorWrong={validationErrors.wrongAnswers}
+                        questionType={questionType}
                       />
-                      
+
                       <div className="flex items-center justify-between">
                         <Button
                           onClick={addWrongAnswer}
@@ -466,7 +684,7 @@ const CreationPage: React.FC<CreationPageProps> = () => {
                           <Plus className="h-4 w-4 mr-1" />
                           Add Another Option
                         </Button>
-                        
+
                         {newQuestion && newQuestion.wrongAnswers.length > 2 && (
                           <Button
                             onClick={() => removeWrongAnswer(newQuestion.wrongAnswers.length - 1)}
@@ -483,14 +701,14 @@ const CreationPage: React.FC<CreationPageProps> = () => {
                   )}
 
                   {/* Hidden file input */}
-                  <input 
-                    type="file" 
+                  <input
+                    type="file"
                     ref={fileInputRef}
                     onChange={handleFileChange}
                     className="hidden"
                     accept=".jpg,.jpeg,.png,.pdf,.doc,.docx"
                   />
-                  
+
                   {/* Add Attachment Button and Preview */}
                   <div className="space-y-3">
                     {newQuestion?.attachment ? (
@@ -541,8 +759,6 @@ const CreationPage: React.FC<CreationPageProps> = () => {
           </div>
 
           <DialogFooter className="mt-4">
-            
-            
             <Button
               onClick={handleSaveNewQuestion}
               variant="default"
@@ -568,7 +784,7 @@ const CreationPage: React.FC<CreationPageProps> = () => {
               Make changes to your question
             </DialogDescription>
           </DialogHeader>
-          
+
           {currentQuestion && (
             <div className="mt-4">
               <ScrollArea className="max-h-[50vh] h-[45vh] pr-4 ">
@@ -576,24 +792,29 @@ const CreationPage: React.FC<CreationPageProps> = () => {
                   <Badge variant="outline" className="mb-4 font-normal dark:text-gray-300 dark:border-gray-600">
                     {currentQuestion.category} - {currentQuestion.questionType}
                   </Badge>
-                  
-                  <QuestionTextInput 
-                    value={currentQuestion.questionText} 
+
+                  <QuestionTextInput
+                    value={currentQuestion.questionText}
                     onChange={(val) => handleEditQuestionChange("questionText", val)}
                     error={validationErrors.questionText}
                   />
 
-                  {currentQuestion.category === "mcq" && currentQuestion.questionType === "Multiple Choice" && (
+                  {currentQuestion.category === "mcq" && (currentQuestion.questionType === "Multiple Choice" || currentQuestion.questionType === "Choice") && (
                     <div className="space-y-4">
                       <AnswerSection
-                        correctAnswer={currentQuestion.correctAnswer}
+                        correctAnswers={currentQuestion.correctAnswers}
                         wrongAnswers={currentQuestion.wrongAnswers}
-                        onCorrectAnswerChange={(val) => handleEditQuestionChange("correctAnswer", val)}
+                        correctAnswerClarifications={currentQuestion.correctAnswerClarifications}
+                        wrongAnswerClarifications={currentQuestion.wrongAnswerClarifications}
+                        onCorrectAnswerChange={(val) => handleEditQuestionChange("correctAnswers", val)}
+                        onCorrectClarificationChange={(val) => handleEditQuestionChange("correctAnswerClarifications", val)}
                         onWrongAnswerChange={(answerIndex, val) => handleEditWrongAnswerChange(answerIndex, val)}
+                        onWrongClarificationChange={(answerIndex, val) => handleEditWrongClarificationChange(answerIndex, val)}
                         errorCorrect={validationErrors.correctAnswer}
                         errorWrong={validationErrors.wrongAnswers}
+                        questionType={currentQuestion.questionType}
                       />
-                      
+
                       <div className="flex items-center justify-between">
                         <Button
                           onClick={addWrongAnswerToExisting}
@@ -604,7 +825,7 @@ const CreationPage: React.FC<CreationPageProps> = () => {
                           <Plus className="h-4 w-4 mr-1" />
                           Add Another Option
                         </Button>
-                        
+
                         {currentQuestion.wrongAnswers.length > 2 && (
                           <Button
                             onClick={() => removeWrongAnswerFromExisting(currentQuestion.wrongAnswers.length - 1)}
@@ -621,14 +842,14 @@ const CreationPage: React.FC<CreationPageProps> = () => {
                   )}
 
                   {/* Hidden file input for edit dialog */}
-                  <input 
-                    type="file" 
+                  <input
+                    type="file"
                     id="edit-file-input"
                     onChange={handleExistingFileChange}
                     className="hidden"
                     accept=".jpg,.jpeg,.png,.pdf,.doc,.docx"
                   />
-                  
+
                   {/* Add Attachment Button for edit dialog with preview */}
                   <div className="space-y-3">
                     {currentQuestion.attachment ? (
@@ -672,8 +893,8 @@ const CreationPage: React.FC<CreationPageProps> = () => {
             </div>
           )}
 
-          <DialogFooter className="mt-4">       
-           <Button
+          <DialogFooter className="mt-4">
+            <Button
               onClick={saveEditedQuestion}
               variant="default"
               className="gap-2"
@@ -697,14 +918,14 @@ const CreationPage: React.FC<CreationPageProps> = () => {
               Reviewing question details
             </DialogDescription>
           </DialogHeader>
-          
+
           {currentQuestion && (
             <ScrollArea className="max-h-[50vh] pr-4">
               <div className="space-y-6">
                 <Badge variant="outline" className="mb-4 font-normal dark:text-gray-300 dark:border-gray-600">
                   {currentQuestion.category} - {currentQuestion.questionType}
                 </Badge>
-                
+
                 <div className="pb-3">
                   <div className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">Question Text:</div>
                   <div className="text-gray-800 dark:text-gray-200 p-3 bg-gray-50 dark:bg-gray-900 rounded-md border ">
@@ -712,28 +933,58 @@ const CreationPage: React.FC<CreationPageProps> = () => {
                   </div>
                 </div>
 
-                {currentQuestion.category === "mcq" && currentQuestion.questionType === "Multiple Choice" && (
+                {currentQuestion.category === "mcq" && (
                   <div className="space-y-3">
                     <div>
-                      <div className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">Correct Answer:</div>
-                      <div className="bg-green-50 dark:bg-green-900/20 border border-green-100 dark:border-green-800 text-gray-800 dark:text-green-200 p-3 rounded-md">
-                        {currentQuestion.correctAnswer}
+                      <div className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">
+                        {currentQuestion.questionType === "Multiple Choice"
+                          ? "Correct Answers:"
+                          : "Correct Answer:"}
+                      </div>
+                      <div className="space-y-2">
+                        {currentQuestion.questionType === "Multiple Choice"
+                          ? currentQuestion.correctAnswers.map((answer, idx) => (
+                            <div key={idx} className="bg-green-50 dark:bg-green-900/20 border border-green-100 dark:border-green-800 text-gray-800 dark:text-green-200 p-3 rounded-md">
+                              {answer}
+                              {currentQuestion.correctAnswerClarifications?.[idx] && (
+                                <div className="text-xs mt-1 italic text-gray-600 dark:text-gray-400">
+                                  Clarification: {currentQuestion.correctAnswerClarifications?.[idx]}
+                                </div>
+                              )}
+                            </div>
+                          ))
+                          : (
+                            <div className="bg-green-50 dark:bg-green-900/20 border border-green-100 dark:border-green-800 text-gray-800 dark:text-green-200 p-3 rounded-md">
+                              {currentQuestion.correctAnswers[0]}
+                              {currentQuestion.correctAnswerClarifications?.[0] && (
+                                <div className="text-xs mt-1 italic text-gray-600 dark:text-gray-400">
+                                  Clarification: {currentQuestion.correctAnswerClarifications?.[0]}
+                                </div>
+                              )}
+                            </div>
+                          )
+                        }
                       </div>
                     </div>
-                    
+
                     <div>
                       <div className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">Other Options:</div>
                       <div className="space-y-2">
                         {currentQuestion.wrongAnswers.map((answer, ansIdx) => (
-                          <div key={ansIdx} className=" bg-card border border-gray-500  text-gray-800 dark:text-gray-300 p-3 rounded-md">
+                          <div key={ansIdx} className="bg-card border border-gray-500 text-gray-800 dark:text-gray-300 p-3 rounded-md">
                             {answer}
+                            {currentQuestion.wrongAnswerClarifications?.[ansIdx] && (
+                              <div className="text-xs mt-1 italic text-gray-600 dark:text-gray-400">
+                                Clarification: {currentQuestion.wrongAnswerClarifications?.[ansIdx]}
+                              </div>
+                            )}
                           </div>
                         ))}
                       </div>
                     </div>
                   </div>
                 )}
-                
+
                 {currentQuestion.attachment && (
                   <div>
                     <div className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">Attachment:</div>
@@ -757,13 +1008,13 @@ const CreationPage: React.FC<CreationPageProps> = () => {
               </div>
             </ScrollArea>
           )}
-          
+
         </DialogContent>
       </Dialog>
-      
+
       {/* Saved Questions Grid View */}
       {questions.length > 0 && (
-        <Card className="bg-card h-[60vh] overflow-auto scrollbar-custom">
+        <Card className="bg-card h-[58vh] overflow-auto scrollbar-custom">
           <CardHeader className="pb-3">
             <CardTitle className="flex justify-between items-center dark:text-gray-100">
               <span>Saved Questions ({questions.length})</span>
@@ -783,8 +1034,7 @@ const CreationPage: React.FC<CreationPageProps> = () => {
                       </div>
                       <Button
                         onClick={() => {
-                          const updatedQuestions = questions.filter((_, i) => i !== idx);
-                          setQuestions(updatedQuestions);
+                          handleRemoveQuestion(idx);
                         }}
                         variant="ghost"
                         size="sm"
@@ -797,12 +1047,14 @@ const CreationPage: React.FC<CreationPageProps> = () => {
                     <div className="mt-3 line-clamp-3 text-sm text-gray-700 dark:text-gray-300 flex-grow">
                       {q.questionText || "Empty question"}
                     </div>
-                    
+
                     <div className="mt-3 pt-3 border-t ">
                       <div className="flex justify-between items-center">
                         <span className="text-xs text-gray-500 dark:text-gray-400">
                           {q.category === "mcq" && (
-                            `${q.wrongAnswers.length + 1} options`
+                            q.questionType === "Multiple Choice" 
+                              ? `${q.correctAnswers.filter(a => a.trim()).length + q.wrongAnswers.filter(a => a.trim()).length} total options`
+                              : `${q.wrongAnswers.length + 1} options`
                           )}
                         </span>
                         <div className="flex gap-2">
@@ -830,7 +1082,7 @@ const CreationPage: React.FC<CreationPageProps> = () => {
                   </div>
                 </Card>
               ))}
-              
+
             </div>
           </CardContent>
         </Card>
@@ -843,9 +1095,9 @@ const CreationPage: React.FC<CreationPageProps> = () => {
             <p className="text-sm text-gray-500 dark:text-gray-400 max-w-md mb-4">
               Create a new question by clicking the plus button above to get started with your question bank
             </p>
-            <Button 
-              onClick={openQuestionDialog} 
-              variant="default" 
+            <Button
+              onClick={openQuestionDialog}
+              variant="default"
               className="gap-2"
             >
               <Plus className="h-4 w-4" />

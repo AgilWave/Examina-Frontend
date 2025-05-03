@@ -19,7 +19,8 @@ const initialState: QuestionBankInteract = {
     editBlocked: true,
 
     createQuestionBank: {
-        name: ""
+        moduleId: -1,
+        questions: []
     }
 };
 
@@ -66,6 +67,28 @@ export const QuestionBankSlice = createSlice({
         setQuestionBankPrevPage: (state, action) => {
             state.prevPage = action.payload;
         },
+
+        setCreateListQuestions: (state, action) => {
+            state.createQuestionBank.questions = action.payload;
+        },
+        setCreateQuestionModuleId: (state, action) => {
+            state.createQuestionBank.moduleId = action.payload;
+        },
+        setCreateQuestionBankQuestion: (state, action) => {
+            state.createQuestionBank.questions.push(action.payload);
+        },
+        // remove question from createQuestionBank
+        removeCreateQuestionBankQuestion: (state, action) => {
+            state.createQuestionBank.questions = state.createQuestionBank.questions.filter((question, index) => index !== action.payload);
+        },
+        // update question from createQuestionBank
+        updateCreateQuestionBankQuestion: (state, action) => {
+            state.createQuestionBank.questions[action.payload.index] = action.payload.question;
+        },
+        // reset createQuestionBank
+        resetCreateQuestionBank: (state) => {
+            state.createQuestionBank = initialState.createQuestionBank;
+        },
     },
 });
 
@@ -86,6 +109,14 @@ export const {
     setQuestionBankNextPage,
     setQuestionBankPrevPage,
     setEditBlocked,
+
+    // Create question bank
+    setCreateListQuestions,
+    setCreateQuestionModuleId,
+    setCreateQuestionBankQuestion,
+    removeCreateQuestionBankQuestion,
+    updateCreateQuestionBankQuestion,
+    resetCreateQuestionBank,
 } = QuestionBankSlice.actions;
 
 export default QuestionBankSlice.reducer;
