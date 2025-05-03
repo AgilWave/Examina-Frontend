@@ -294,7 +294,7 @@ export function DataTable() {
                     <TableRow
                       key={row.id}
                       onClick={() => {
-                        router.push(`/admin/dashboard/exams/questions-bank/view/${row.original.id}`);
+                        router.push(`/admin/dashboard/exams/questions-bank/view-questions/${row.original.id}`);
                       }}
                     >
                       {row.getVisibleCells().map((cell) => {
