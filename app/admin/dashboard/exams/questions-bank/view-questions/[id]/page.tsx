@@ -1,19 +1,9 @@
-import QuestionBankWrapper from "@/components/wrapper/QuestionBankWrapper";
+import React from 'react'
 
-export const dynamic = 'force-dynamic';
-
-async function ViewQuestionBankPage({
-  params,
-}: {
-  params: Promise<{ id: string }>;
-}) {
-  const { id } = await params;
-  console.log(id);
+function page() {
   return (
-    <div>
-      <QuestionBankWrapper id={id} />
-    </div>
-  );
+    <div>page</div>
+  )
 }
 
-export default ViewQuestionBankPage;
+export default page
