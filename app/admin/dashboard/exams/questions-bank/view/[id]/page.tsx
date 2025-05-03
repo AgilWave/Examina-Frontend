@@ -1,11 +1,16 @@
-// ✅ DO NOT add "use client" here
 import QuestionBank from "@/components/admin/Dashboard/ExamContent/questionBank/viewQuestionBank/index";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 
 export const dynamic = 'force-dynamic';
 
-const ViewQuestionBankPage = async ({ params }: { params: { id: string } }) => {
+type ViewQuestionBankPageProps = {
+  params: {
+    id: string;
+  };
+};
+
+const ViewQuestionBankPage = async ({ params }: ViewQuestionBankPageProps) => {
   const id = parseInt(params.id, 10);
 
   if (!id || isNaN(id)) {
