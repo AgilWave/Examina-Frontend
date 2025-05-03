@@ -47,7 +47,6 @@ export async function middleware(req: NextRequest) {
     return NextResponse.next();
   }
 
-  // Handle main domain routing
   if (
     host?.includes(examinaHost) &&
     !host?.includes("admin") &&
@@ -85,7 +84,6 @@ export async function middleware(req: NextRequest) {
       return NextResponse.next();
     }
 
-    // Handle authentication for admin routes
     if (!adminJwt) {
       if (url.pathname !== "/login") {
         return NextResponse.redirect(new URL("/login", req.url));
@@ -95,11 +93,12 @@ export async function middleware(req: NextRequest) {
         return NextResponse.redirect(new URL("/dashboard/overview", req.url));
       }
     }
-    
-    // For other routes on admin subdomain, remove /admin prefix if it exists
+
     if (url.pathname.startsWith("/admin")) {
       const newPath = url.pathname.replace("/admin", "");
-      return NextResponse.redirect(new URL(newPath, req.url));
+      const newUrl = new URL(newPath, req.url);
+      newUrl.search = url.search;
+      return NextResponse.redirect(newUrl);
     }
 
     if (url.pathname.startsWith("/admin/dashboard/exams/questions-bank/view-questions")) {
@@ -107,11 +106,8 @@ export async function middleware(req: NextRequest) {
       const newUrl = new URL(`/admin/dashboard/exams/questions-bank/view-questions/${id}`, req.url);
       return NextResponse.redirect(newUrl);
     }
-    
-    // On admin subdomain, all paths need to be internally rewritten to /admin/* 
-    // This makes requests like admin.examina.live/dashboard/... route to the files in /app/admin/dashboard/...
+
     const targetPath = `/admin${url.pathname}`;
-    console.log(`[Middleware] Rewriting ${url.pathname} to ${targetPath} on ${host}`);
     return NextResponse.rewrite(new URL(targetPath, req.url));
   }
 }
