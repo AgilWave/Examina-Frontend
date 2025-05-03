@@ -52,12 +52,12 @@ interface CreationPageProps {
 import { setCreateQuestionBankQuestion, setCreateQuestionModuleId, removeCreateQuestionBankQuestion, updateCreateQuestionBankQuestion } from "@/redux/features/QuestionBankSlice";
 
 import { RootState } from "@/redux/store";
-import { useParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import { toast } from "sonner";
 
 const CreationPage: React.FC<CreationPageProps> = () => {
-  const params = useParams();
-  const idString = params?.id ? (Array.isArray(params.id) ? params.id[0] : params.id) : undefined;
+  const searchParams = useSearchParams();
+  const idString = searchParams?.get('id');
   const id = idString ? parseInt(idString, 10) : undefined;
   const [questions, setQuestions] = useState<QuestionData[]>([]);
   const [newQuestion, setNewQuestion] = useState<QuestionData | null>(null);
@@ -119,12 +119,12 @@ const CreationPage: React.FC<CreationPageProps> = () => {
   const handleQuestionFieldChange = (field: keyof QuestionData, value: string | string[]) => {
     if (newQuestion) {
       if (field === "correctAnswers") {
-        const answers = Array.isArray(value) 
-          ? value 
-          : typeof value === 'string' 
-            ? value.split("|").filter(Boolean) 
+        const answers = Array.isArray(value)
+          ? value
+          : typeof value === 'string'
+            ? value.split("|").filter(Boolean)
             : [];
-            
+
         setNewQuestion({ ...newQuestion, correctAnswers: answers });
       } else if (field === "correctAnswerClarifications") {
         // For correct answer clarifications, ensure it's an array
@@ -133,7 +133,7 @@ const CreationPage: React.FC<CreationPageProps> = () => {
       } else {
         setNewQuestion({ ...newQuestion, [field]: value });
       }
-      
+
       if (validationErrors[field]) {
         const newErrors = { ...validationErrors };
         delete newErrors[field];
@@ -169,27 +169,27 @@ const CreationPage: React.FC<CreationPageProps> = () => {
 
   const validateQuestion = (question: QuestionData): boolean => {
     const errors: { [key: string]: string } = {};
-  
+
     if (!question.questionText.trim()) {
       errors.questionText = "Question text is required";
     }
 
     console.log('question', question);
-  
-    if (question.category === "mcq" && 
-       (question.questionType === "Multiple Choice" || question.questionType === "Choice")) {
+
+    if (question.category === "mcq" &&
+      (question.questionType === "Multiple Choice" || question.questionType === "Choice")) {
       const correctAnswers = question.correctAnswers.filter(answer => answer.trim());
-      
+
       if (correctAnswers.length === 0) {
         errors.correctAnswer = "At least one correct answer is required";
       }
-  
+
       const validWrongAnswers = question.wrongAnswers.filter(answer => answer.trim()).length;
       if (validWrongAnswers === 0) {
         errors.wrongAnswers = "At least one wrong answer is required";
       }
     }
-  
+
     setValidationErrors(errors);
     return Object.keys(errors).length === 0;
   };
@@ -197,18 +197,18 @@ const CreationPage: React.FC<CreationPageProps> = () => {
   const handleSaveNewQuestion = () => {
     if (newQuestion && validateQuestion(newQuestion)) {
       let answerOptions: { text: string; clarification: string; isCorrect: boolean; }[] = [];
-      
+
       if (newQuestion.category === "mcq") {
         if (newQuestion.questionType === "Multiple Choice") {
           const correctAnswers = newQuestion.correctAnswers.filter(answer => answer.trim());
-          
+
           answerOptions = correctAnswers.map((text, idx) => ({
             text,
-            clarification: newQuestion.correctAnswerClarifications?.[idx] || 
-                          newQuestion.correctAnswerClarifications?.[0] || "",
+            clarification: newQuestion.correctAnswerClarifications?.[idx] ||
+              newQuestion.correctAnswerClarifications?.[0] || "",
             isCorrect: true
           }));
-          
+
           // Add wrong answers
           answerOptions = [
             ...answerOptions,
@@ -237,7 +237,7 @@ const CreationPage: React.FC<CreationPageProps> = () => {
           ];
         }
       }
-  
+
       const structuredQuestion = {
         category: category,
         type: questionType,
@@ -245,17 +245,17 @@ const CreationPage: React.FC<CreationPageProps> = () => {
         attachment: newQuestion.attachment,
         ...(category === "mcq" ? { answerOptions } : {})
       };
-      
+
       dispatch(setCreateQuestionModuleId(id));
       setQuestions([...questions, { ...newQuestion, saved: true, collapsed: true }]);
       dispatch(setCreateQuestionBankQuestion(structuredQuestion));
       setSaveSuccess(true);
       setDialogOpen(false);
-  
+
       setTimeout(() => {
         setSaveSuccess(false);
       }, 3000);
-  
+
       console.log(createQuestionBank);
       console.log(structuredQuestion);
       setCategory("");
@@ -359,7 +359,7 @@ const CreationPage: React.FC<CreationPageProps> = () => {
         type: currentQuestion.questionType,
         text: currentQuestion.questionText,
         attachment: currentQuestion.attachment,
-        
+
         ...(currentQuestion.category === "mcq" ? { answerOptions } : {})
       };
 
@@ -1052,7 +1052,7 @@ const CreationPage: React.FC<CreationPageProps> = () => {
                       <div className="flex justify-between items-center">
                         <span className="text-xs text-gray-500 dark:text-gray-400">
                           {q.category === "mcq" && (
-                            q.questionType === "Multiple Choice" 
+                            q.questionType === "Multiple Choice"
                               ? `${q.correctAnswers.filter(a => a.trim()).length + q.wrongAnswers.filter(a => a.trim()).length} total options`
                               : `${q.wrongAnswers.length + 1} options`
                           )}

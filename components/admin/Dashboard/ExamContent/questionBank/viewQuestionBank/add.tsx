@@ -3,18 +3,16 @@
 import React from "react";
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
-import { useRouter, useParams } from "next/navigation";
+import {  useRouter, useSearchParams } from "next/navigation";
 
 function CreateCourseDialog() {
   const router = useRouter();
-  const params = useParams();
-
-  // Extract the id from the params
-  const idString = params?.id ? (Array.isArray(params.id) ? params.id[0] : params.id) : undefined;
-
+  const searchParams = useSearchParams();
+  const idString = searchParams?.get('id');
+  
   const handleNavigate = () => {
     if (idString) {
-      router.push(`/admin/dashboard/exams/questions-bank/view/${idString}/create`);
+      router.push(`/admin/dashboard/exams/questions-bank/view-questions/create?id=${idString}`);
     } else {
       console.error("No valid ID found in URL.");
     }
