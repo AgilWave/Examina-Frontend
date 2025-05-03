@@ -47,7 +47,7 @@ export function DataTable() {
       Authorization: `Bearer ${token}`,
     };
     console.log(body);
-    const response = await axios.post(`${BACKEND_URL}/question-bank/question/create`, body, { headers });
+    const response = await axios.post(`${BACKEND_URL}/question-bank/question/Interact`, body, { headers });
     if (response.data.isSuccessful) {
       toast.success(response.data.message);
       setShowConfirmDialog(false);
