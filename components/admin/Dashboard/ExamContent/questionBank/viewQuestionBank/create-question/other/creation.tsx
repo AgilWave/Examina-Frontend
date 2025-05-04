@@ -8,7 +8,7 @@ import AnswerSection from "./AnswerSection";
 import CategorySelector from "../filter/selectors/CategorySelector";
 import QuestionTypeSelector from "../filter/selectors/QuestionTypeSelector";
 import {
-  Plus, Save, Paperclip, X,
+  Plus, Save, Paperclip,
   Pencil, FileQuestion, Eye, Trash2,
   FileImage, File
 } from "lucide-react";
@@ -24,6 +24,7 @@ import {
 } from "@/components/ui/dialog";
 import Image from "next/image";
 import { useDispatch, useSelector } from "react-redux";
+import { Label } from "@/components/ui/label";
 
 interface QuestionData {
   id: string;
@@ -153,6 +154,30 @@ const CreationPage: React.FC<CreationPageProps> = () => {
         delete newErrors.wrongAnswers;
         setValidationErrors(newErrors);
       }
+    }
+  };
+
+  const handleRemoveWrongAnswer = (index: number) => {
+    if (newQuestion) {
+      const updatedWrongAnswers = newQuestion.wrongAnswers.filter((_, i) => i !== index);
+      const updatedWrongClarifications = newQuestion.wrongAnswerClarifications.filter((_, i) => i !== index);
+      setNewQuestion({
+        ...newQuestion,
+        wrongAnswers: updatedWrongAnswers,
+        wrongAnswerClarifications: updatedWrongClarifications
+      });
+    }
+  };
+
+  const handleRemoveCorrectAnswer = (index: number) => {
+    if (newQuestion) {
+      const updatedCorrectAnswers = newQuestion.correctAnswers.filter((_, i) => i !== index);
+      const updatedCorrectClarifications = newQuestion.correctAnswerClarifications.filter((_, i) => i !== index);
+      setNewQuestion({
+        ...newQuestion,
+        correctAnswers: updatedCorrectAnswers,
+        correctAnswerClarifications: updatedCorrectClarifications
+      });
     }
   };
 
@@ -379,62 +404,6 @@ const CreationPage: React.FC<CreationPageProps> = () => {
     }
   };
 
-  const addWrongAnswer = () => {
-    if (newQuestion) {
-      setNewQuestion({
-        ...newQuestion,
-        wrongAnswers: [...newQuestion.wrongAnswers, ""],
-        wrongAnswerClarifications: [...(newQuestion.wrongAnswerClarifications || []), ""]
-      });
-    }
-  };
-
-  const addWrongAnswerToExisting = () => {
-    if (currentQuestion) {
-      setCurrentQuestion({
-        ...currentQuestion,
-        wrongAnswers: [...currentQuestion.wrongAnswers, ""],
-        wrongAnswerClarifications: [...(currentQuestion.wrongAnswerClarifications || []), ""]
-      });
-    }
-  };
-
-  const removeWrongAnswer = (answerIndex: number) => {
-    if (newQuestion && newQuestion.wrongAnswers.length > 2) {
-      const updatedWrongAnswers = [...newQuestion.wrongAnswers];
-      updatedWrongAnswers.splice(answerIndex, 1);
-
-      const updatedClarifications = [...(newQuestion.wrongAnswerClarifications || [])];
-      if (updatedClarifications.length > answerIndex) {
-        updatedClarifications.splice(answerIndex, 1);
-      }
-
-      setNewQuestion({
-        ...newQuestion,
-        wrongAnswers: updatedWrongAnswers,
-        wrongAnswerClarifications: updatedClarifications
-      });
-    }
-  };
-
-  const removeWrongAnswerFromExisting = (answerIndex: number) => {
-    if (currentQuestion && currentQuestion.wrongAnswers.length > 2) {
-      const updatedWrongAnswers = [...currentQuestion.wrongAnswers];
-      updatedWrongAnswers.splice(answerIndex, 1);
-
-      const updatedClarifications = [...(currentQuestion.wrongAnswerClarifications || [])];
-      if (updatedClarifications.length > answerIndex) {
-        updatedClarifications.splice(answerIndex, 1);
-      }
-
-      setCurrentQuestion({
-        ...currentQuestion,
-        wrongAnswers: updatedWrongAnswers,
-        wrongAnswerClarifications: updatedClarifications
-      });
-    }
-  };
-
   const openQuestionDialog = () => {
     setDialogOpen(true);
   };
@@ -606,7 +575,7 @@ const CreationPage: React.FC<CreationPageProps> = () => {
           <Button
             onClick={openQuestionDialog}
             variant="default"
-            className="w-full sm:w-[40px] gap-2"
+            className="w-full sm:w-[40px] gap-2 bg-primary text-primary-foreground"
           >
             <Plus className="h-4 w-4" />
           </Button>
@@ -618,7 +587,7 @@ const CreationPage: React.FC<CreationPageProps> = () => {
         <DialogContent className="min-w-5xl w-[90vw] max-h-[90vh] overflow-hidden dark:bg-card">
           <DialogHeader>
             <DialogTitle className="text-xl flex items-center gap-2 dark:text-gray-100">
-              <FileQuestion className="h-5 w-5" />
+              <FileQuestion className="h-5 w-5 text-teal-500" />
               Create New Question
             </DialogTitle>
             <DialogDescription className="dark:text-gray-400">
@@ -647,7 +616,7 @@ const CreationPage: React.FC<CreationPageProps> = () => {
             {category && questionType ? (
               <ScrollArea className="h-[50vh] pr-4">
                 <div className="space-y-6">
-                  <Badge variant="outline" className="mb-4 font-normal dark:text-gray-300 dark:border-gray-600">
+                  <Badge variant="outline" className="mb-4 font-normal dark:text-gray-300 dark:border-gray-600 bg-teal-50 dark:bg-teal-900/20 text-teal-700 dark:text-teal-400">
                     {category} - {questionType}
                   </Badge>
 
@@ -669,34 +638,12 @@ const CreationPage: React.FC<CreationPageProps> = () => {
                         onCorrectClarificationChange={(val) => handleQuestionFieldChange("correctAnswerClarifications", val)}
                         onWrongAnswerChange={(index, val) => handleWrongAnswerChange(index, val)}
                         onWrongClarificationChange={(index, val) => handleWrongClarificationChange(index, val)}
+                        onRemoveWrongAnswer={handleRemoveWrongAnswer}
+                        onRemoveCorrectAnswer={handleRemoveCorrectAnswer}
                         errorCorrect={validationErrors.correctAnswer}
                         errorWrong={validationErrors.wrongAnswers}
                         questionType={questionType}
                       />
-
-                      <div className="flex items-center justify-between">
-                        <Button
-                          onClick={addWrongAnswer}
-                          variant="ghost"
-                          size="sm"
-                          className="text-teal-600 dark:text-teal-400 hover:text-teal-800 hover:bg-teal-50 dark:hover:bg-teal-900/20"
-                        >
-                          <Plus className="h-4 w-4 mr-1" />
-                          Add Another Option
-                        </Button>
-
-                        {newQuestion && newQuestion.wrongAnswers.length > 2 && (
-                          <Button
-                            onClick={() => removeWrongAnswer(newQuestion.wrongAnswers.length - 1)}
-                            variant="ghost"
-                            size="sm"
-                            className="text-red-500 dark:text-red-400 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-900/20"
-                          >
-                            <X className="h-4 w-4 mr-1" />
-                            Remove Last Option
-                          </Button>
-                        )}
-                      </div>
                     </div>
                   )}
 
@@ -713,7 +660,7 @@ const CreationPage: React.FC<CreationPageProps> = () => {
                   <div className="space-y-3">
                     {newQuestion?.attachment ? (
                       <div className="space-y-2">
-                        <div className="flex items-center gap-2 p-2 border rounded-md dark:border-gray-600">
+                        <div className="flex items-center gap-2 p-2 border rounded-md dark:border-gray-600 bg-gray-50 dark:bg-gray-800">
                           {getFileType(newQuestion.attachmentName || '') === 'image' ? (
                             <FileImage className="h-4 w-4 text-teal-500 dark:text-teal-400" />
                           ) : getFileType(newQuestion.attachmentName || '') === 'pdf' ? (
@@ -739,7 +686,7 @@ const CreationPage: React.FC<CreationPageProps> = () => {
                       <Button
                         variant="outline"
                         size="sm"
-                        className="gap-2 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-700"
+                        className="gap-2 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-700 w-full"
                         onClick={handleAttachmentClick}
                       >
                         <Paperclip className="h-4 w-4" />
@@ -762,7 +709,7 @@ const CreationPage: React.FC<CreationPageProps> = () => {
             <Button
               onClick={handleSaveNewQuestion}
               variant="default"
-              className="gap-2"
+              className="gap-2 bg-primary text-primary-foreground"
               disabled={!category || !questionType}
             >
               <Save className="h-4 w-4" />
@@ -774,10 +721,10 @@ const CreationPage: React.FC<CreationPageProps> = () => {
 
       {/* Edit Question Dialog */}
       <Dialog open={editDialogOpen} onOpenChange={setEditDialogOpen}>
-        <DialogContent className="min-w-5xl w-[90vw] max-h-[90vh] overflow-hidden bg-card ">
+        <DialogContent className="min-w-5xl w-[90vw] max-h-[90vh] overflow-hidden bg-card">
           <DialogHeader>
             <DialogTitle className="text-xl flex items-center gap-2 dark:text-gray-100">
-              <Pencil className="h-5 w-5" />
+              <Pencil className="h-5 w-5 text-teal-500" />
               Edit Question
             </DialogTitle>
             <DialogDescription className="dark:text-gray-400">
@@ -787,9 +734,9 @@ const CreationPage: React.FC<CreationPageProps> = () => {
 
           {currentQuestion && (
             <div className="mt-4">
-              <ScrollArea className="max-h-[50vh] h-[45vh] pr-4 ">
+              <ScrollArea className="max-h-[50vh] h-[45vh] pr-4">
                 <div className="space-y-6">
-                  <Badge variant="outline" className="mb-4 font-normal dark:text-gray-300 dark:border-gray-600">
+                  <Badge variant="outline" className="mb-4 font-normal dark:text-gray-300 dark:border-gray-600 bg-teal-50 dark:bg-teal-900/20 text-teal-700 dark:text-teal-400">
                     {currentQuestion.category} - {currentQuestion.questionType}
                   </Badge>
 
@@ -810,34 +757,12 @@ const CreationPage: React.FC<CreationPageProps> = () => {
                         onCorrectClarificationChange={(val) => handleEditQuestionChange("correctAnswerClarifications", val)}
                         onWrongAnswerChange={(answerIndex, val) => handleEditWrongAnswerChange(answerIndex, val)}
                         onWrongClarificationChange={(answerIndex, val) => handleEditWrongClarificationChange(answerIndex, val)}
+                        onRemoveWrongAnswer={handleRemoveWrongAnswer}
+                        onRemoveCorrectAnswer={handleRemoveCorrectAnswer}
                         errorCorrect={validationErrors.correctAnswer}
                         errorWrong={validationErrors.wrongAnswers}
                         questionType={currentQuestion.questionType}
                       />
-
-                      <div className="flex items-center justify-between">
-                        <Button
-                          onClick={addWrongAnswerToExisting}
-                          variant="ghost"
-                          size="sm"
-                          className="text-teal-600 dark:text-teal-400 hover:text-teal-800 hover:bg-teal-50 dark:hover:bg-teal-900/20"
-                        >
-                          <Plus className="h-4 w-4 mr-1" />
-                          Add Another Option
-                        </Button>
-
-                        {currentQuestion.wrongAnswers.length > 2 && (
-                          <Button
-                            onClick={() => removeWrongAnswerFromExisting(currentQuestion.wrongAnswers.length - 1)}
-                            variant="ghost"
-                            size="sm"
-                            className="text-red-500 dark:text-red-400 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-900/20"
-                          >
-                            <X className="h-4 w-4 mr-1" />
-                            Remove Last Option
-                          </Button>
-                        )}
-                      </div>
                     </div>
                   )}
 
@@ -854,7 +779,7 @@ const CreationPage: React.FC<CreationPageProps> = () => {
                   <div className="space-y-3">
                     {currentQuestion.attachment ? (
                       <div className="space-y-2">
-                        <div className="flex items-center gap-2 p-2 border rounded-md dark:border-gray-600">
+                        <div className="flex items-center gap-2 p-2 border rounded-md dark:border-gray-600 bg-gray-50 dark:bg-gray-800">
                           {getFileType(currentQuestion.attachmentName || '') === 'image' ? (
                             <FileImage className="h-4 w-4 text-teal-500 dark:text-teal-400" />
                           ) : getFileType(currentQuestion.attachmentName || '') === 'pdf' ? (
@@ -880,7 +805,7 @@ const CreationPage: React.FC<CreationPageProps> = () => {
                       <Button
                         variant="outline"
                         size="sm"
-                        className="gap-2"
+                        className="gap-2 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-700 w-full"
                         onClick={() => document.getElementById('edit-file-input')?.click()}
                       >
                         <Paperclip className="h-4 w-4" />
@@ -897,7 +822,7 @@ const CreationPage: React.FC<CreationPageProps> = () => {
             <Button
               onClick={saveEditedQuestion}
               variant="default"
-              className="gap-2"
+              className="gap-2 bg-primary text-primary-foreground"
             >
               <Save className="h-4 w-4" />
               Save Changes
@@ -908,10 +833,10 @@ const CreationPage: React.FC<CreationPageProps> = () => {
 
       {/* View Question Dialog */}
       <Dialog open={viewDialogOpen} onOpenChange={setViewDialogOpen}>
-        <DialogContent className="min-w-5xl w-[90vw] max-h-[90vh] overflow-hidden bg-card ">
+        <DialogContent className="min-w-5xl w-[90vw] max-h-[90vh] overflow-hidden bg-card">
           <DialogHeader>
             <DialogTitle className="text-xl flex items-center gap-2 dark:text-gray-100">
-              <Eye className="h-5 w-5" />
+              <Eye className="h-5 w-5 text-teal-500" />
               View Question
             </DialogTitle>
             <DialogDescription className="dark:text-gray-400">
@@ -922,98 +847,115 @@ const CreationPage: React.FC<CreationPageProps> = () => {
           {currentQuestion && (
             <ScrollArea className="max-h-[50vh] pr-4">
               <div className="space-y-6">
-                <Badge variant="outline" className="mb-4 font-normal dark:text-gray-300 dark:border-gray-600">
+                <Badge variant="outline" className="mb-4 font-normal dark:text-gray-300 dark:border-gray-600 bg-teal-50 dark:bg-teal-900/20 text-teal-700 dark:text-teal-400">
                   {currentQuestion.category} - {currentQuestion.questionType}
                 </Badge>
 
-                <div className="pb-3">
-                  <div className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">Question Text:</div>
-                  <div className="text-gray-800 dark:text-gray-200 p-3 bg-gray-50 dark:bg-gray-900 rounded-md border ">
-                    {currentQuestion.questionText}
-                  </div>
-                </div>
-
-                {currentQuestion.category === "mcq" && (
-                  <div className="space-y-3">
-                    <div>
-                      <div className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">
-                        {currentQuestion.questionType === "Multiple Choice"
-                          ? "Correct Answers:"
-                          : "Correct Answer:"}
+                <Card className="bg-gray-50 dark:bg-gray-900">
+                  <CardContent className="pt-6">
+                    <div className="space-y-4">
+                      <div>
+                        <Label className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">Question Text:</Label>
+                        <div className="text-gray-800 dark:text-gray-200 p-3 bg-white dark:bg-gray-800 rounded-md border dark:border-gray-700">
+                          {currentQuestion.questionText}
+                        </div>
                       </div>
-                      <div className="space-y-2">
-                        {currentQuestion.questionType === "Multiple Choice"
-                          ? currentQuestion.correctAnswers.map((answer, idx) => (
-                            <div key={idx} className="bg-green-50 dark:bg-green-900/20 border border-green-100 dark:border-green-800 text-gray-800 dark:text-green-200 p-3 rounded-md">
-                              {answer}
-                              {currentQuestion.correctAnswerClarifications?.[idx] && (
-                                <div className="text-xs mt-1 italic text-gray-600 dark:text-gray-400">
-                                  Clarification: {currentQuestion.correctAnswerClarifications?.[idx]}
-                                </div>
-                              )}
-                            </div>
-                          ))
-                          : (
-                            <div className="bg-green-50 dark:bg-green-900/20 border border-green-100 dark:border-green-800 text-gray-800 dark:text-green-200 p-3 rounded-md">
-                              {currentQuestion.correctAnswers[0]}
-                              {currentQuestion.correctAnswerClarifications?.[0] && (
-                                <div className="text-xs mt-1 italic text-gray-600 dark:text-gray-400">
-                                  Clarification: {currentQuestion.correctAnswerClarifications?.[0]}
-                                </div>
-                              )}
-                            </div>
-                          )
-                        }
-                      </div>
-                    </div>
 
-                    <div>
-                      <div className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">Other Options:</div>
-                      <div className="space-y-2">
-                        {currentQuestion.wrongAnswers.map((answer, ansIdx) => (
-                          <div key={ansIdx} className="bg-card border border-gray-500 text-gray-800 dark:text-gray-300 p-3 rounded-md">
-                            {answer}
-                            {currentQuestion.wrongAnswerClarifications?.[ansIdx] && (
-                              <div className="text-xs mt-1 italic text-gray-600 dark:text-gray-400">
-                                Clarification: {currentQuestion.wrongAnswerClarifications?.[ansIdx]}
-                              </div>
-                            )}
+                      {currentQuestion.category === "mcq" && (
+                        <div className="space-y-4">
+                          <div>
+                            <Label className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">
+                              {currentQuestion.questionType === "Multiple Choice"
+                                ? "Correct Answers:"
+                                : "Correct Answer:"}
+                            </Label>
+                            <div className="space-y-2">
+                              {currentQuestion.questionType === "Multiple Choice"
+                                ? currentQuestion.correctAnswers.map((answer, idx) => (
+                                  <Card key={idx} className="bg-green-50 dark:bg-green-900/20 border-green-100 dark:border-green-800">
+                                    <CardContent className="p-3">
+                                      <div className="text-gray-800 dark:text-green-200">
+                                        {answer}
+                                        {currentQuestion.correctAnswerClarifications?.[idx] && (
+                                          <div className="text-xs mt-1 italic text-gray-600 dark:text-gray-400">
+                                            Clarification: {currentQuestion.correctAnswerClarifications?.[idx]}
+                                          </div>
+                                        )}
+                                      </div>
+                                    </CardContent>
+                                  </Card>
+                                ))
+                                : (
+                                  <Card className="bg-green-50 dark:bg-green-900/20 border-green-100 dark:border-green-800">
+                                    <CardContent className="p-3">
+                                      <div className="text-gray-800 dark:text-green-200">
+                                        {currentQuestion.correctAnswers[0]}
+                                        {currentQuestion.correctAnswerClarifications?.[0] && (
+                                          <div className="text-xs mt-1 italic text-gray-600 dark:text-gray-400">
+                                            Clarification: {currentQuestion.correctAnswerClarifications?.[0]}
+                                          </div>
+                                        )}
+                                      </div>
+                                    </CardContent>
+                                  </Card>
+                                )
+                              }
+                            </div>
                           </div>
-                        ))}
-                      </div>
-                    </div>
-                  </div>
-                )}
 
-                {currentQuestion.attachment && (
-                  <div>
-                    <div className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">Attachment:</div>
-                    <div className="space-y-2">
-                      <div className="flex items-center gap-2 p-2 border rounded-md dark:border-gray-600">
-                        {getFileType(currentQuestion.attachmentName || '') === 'image' ? (
-                          <FileImage className="h-4 w-4 text-teal-500 dark:text-teal-400" />
-                        ) : getFileType(currentQuestion.attachmentName || '') === 'pdf' ? (
-                          <File className="h-4 w-4 text-red-500 dark:text-red-400" />
-                        ) : (
-                          <Paperclip className="h-4 w-4 text-gray-500 dark:text-gray-400" />
-                        )}
-                        <span className="text-sm dark:text-gray-300">
-                          {currentQuestion.attachmentName}
-                        </span>
-                      </div>
-                      {renderAttachmentPreview(currentQuestion.attachmentName, currentQuestion.attachmentPreviewUrl)}
+                          <div>
+                            <Label className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">Other Options:</Label>
+                            <div className="space-y-2">
+                              {currentQuestion.wrongAnswers.map((answer, ansIdx) => (
+                                <Card key={ansIdx} className="bg-card border border-gray-200 dark:border-gray-700">
+                                  <CardContent className="p-3">
+                                    <div className="text-gray-800 dark:text-gray-300">
+                                      {answer}
+                                      {currentQuestion.wrongAnswerClarifications?.[ansIdx] && (
+                                        <div className="text-xs mt-1 italic text-gray-600 dark:text-gray-400">
+                                          Clarification: {currentQuestion.wrongAnswerClarifications?.[ansIdx]}
+                                        </div>
+                                      )}
+                                    </div>
+                                  </CardContent>
+                                </Card>
+                              ))}
+                            </div>
+                          </div>
+                        </div>
+                      )}
+
+                      {currentQuestion.attachment && (
+                        <div>
+                          <Label className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">Attachment:</Label>
+                          <div className="space-y-2">
+                            <div className="flex items-center gap-2 p-2 border rounded-md dark:border-gray-600 bg-gray-50 dark:bg-gray-800">
+                              {getFileType(currentQuestion.attachmentName || '') === 'image' ? (
+                                <FileImage className="h-4 w-4 text-teal-500 dark:text-teal-400" />
+                              ) : getFileType(currentQuestion.attachmentName || '') === 'pdf' ? (
+                                <File className="h-4 w-4 text-red-500 dark:text-red-400" />
+                              ) : (
+                                <Paperclip className="h-4 w-4 text-gray-500 dark:text-gray-400" />
+                              )}
+                              <span className="text-sm dark:text-gray-300">
+                                {currentQuestion.attachmentName}
+                              </span>
+                            </div>
+                            {renderAttachmentPreview(currentQuestion.attachmentName, currentQuestion.attachmentPreviewUrl)}
+                          </div>
+                        </div>
+                      )}
                     </div>
-                  </div>
-                )}
+                  </CardContent>
+                </Card>
               </div>
             </ScrollArea>
           )}
-
         </DialogContent>
       </Dialog>
 
       {/* Saved Questions Grid View */}
-      {questions.length > 0 && (
+      {questions.length > 0 ? (
         <Card className="bg-card h-[58vh] overflow-auto scrollbar-custom">
           <CardHeader className="pb-3">
             <CardTitle className="flex justify-between items-center dark:text-gray-100">
@@ -1023,7 +965,7 @@ const CreationPage: React.FC<CreationPageProps> = () => {
           <CardContent>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {questions.map((q, idx) => (
-                <Card key={q.id} className="h-full flex flex-col dark:bg-black/50 ">
+                <Card key={q.id} className="h-full flex flex-col dark:bg-black/50 hover:shadow-lg transition-shadow duration-200">
                   <div className="p-4 flex flex-col h-full">
                     <div className="flex justify-between items-center">
                       <div className="flex items-center gap-2">
@@ -1048,7 +990,7 @@ const CreationPage: React.FC<CreationPageProps> = () => {
                       {q.questionText || "Empty question"}
                     </div>
 
-                    <div className="mt-3 pt-3 border-t ">
+                    <div className="mt-3 pt-3 border-t dark:border-gray-700">
                       <div className="flex justify-between items-center">
                         <span className="text-xs text-gray-500 dark:text-gray-400">
                           {q.category === "mcq" && (
@@ -1082,13 +1024,11 @@ const CreationPage: React.FC<CreationPageProps> = () => {
                   </div>
                 </Card>
               ))}
-
             </div>
           </CardContent>
         </Card>
-      )}
-      {questions.length === 0 && (
-        <Card className="bg-card ">
+      ) : (
+        <Card className="bg-card">
           <CardContent className="flex flex-col items-center justify-center py-10 text-center">
             <FileQuestion className="h-12 w-12 text-gray-300 dark:text-gray-600 mb-3" />
             <h3 className="text-lg font-medium text-gray-700 dark:text-gray-300 mb-2">No questions saved yet</h3>
@@ -1098,7 +1038,7 @@ const CreationPage: React.FC<CreationPageProps> = () => {
             <Button
               onClick={openQuestionDialog}
               variant="default"
-              className="gap-2"
+              className="gap-2 bg-primary text-primary-foreground"
             >
               <Plus className="h-4 w-4" />
               Create Question

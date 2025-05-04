@@ -12,12 +12,14 @@ import Cookies from "js-cookie";
 import { BACKEND_URL } from "@/Constants/backend";
 import { resetCreateQuestionBank } from "@/redux/features/QuestionBankSlice";
 import { AlertDialog, AlertDialogContent, AlertDialogHeader, AlertDialogTitle, AlertDialogDescription, AlertDialogFooter } from "@/components/ui/alert-dialog";
-
+import { setCreateQuestionDefault } from "@/redux/features/QuestionSlice";
+import { Loader2 } from "lucide-react";
 export function DataTable() {
   const [category, setCategory] = useState("");
   const [questionType, setQuestionType] = useState("");
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
   const [showResetDialog, setShowResetDialog] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const createQuestionBank = useSelector((state: RootState) => state.questionBank.createQuestionBank);
   const dispatch = useDispatch();
   const resetSelectors = () => {
@@ -37,6 +39,7 @@ export function DataTable() {
   };
 
   const onSubmit = async () => {
+    setIsLoading(true);
     const token = Cookies.get("adminjwt");
     const body = {
       questions: createQuestionBank.questions,
@@ -51,9 +54,12 @@ export function DataTable() {
     if (response.data.isSuccessful) {
       toast.success(response.data.message);
       setShowConfirmDialog(false);
+      dispatch(setCreateQuestionDefault());
+      window.location.reload();
     } else {
       toast.error(response.data.message);
     }
+    setIsLoading(false);
   };
 
   return (
@@ -104,7 +110,7 @@ export function DataTable() {
               Cancel
             </Button>
             <Button variant="default" onClick={onSubmit}>
-              Confirm
+              {isLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : "Confirm"}
             </Button>
           </AlertDialogFooter>
         </AlertDialogContent>

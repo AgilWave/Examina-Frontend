@@ -7,8 +7,12 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
+import { useSearchParams } from "next/navigation";
 
 function BreadCrumb() {
+  const searchParams = useSearchParams();
+  const moduleName = searchParams.get("module");
+  console.log(moduleName);
   return (
     <>
       <Breadcrumb>
@@ -36,13 +40,13 @@ function BreadCrumb() {
               href="/admin/dashboard/exams/questions-bank"
               className="text-muted-foreground hover:text-foreground"
             >
-              Bank
+              Questions Bank
             </BreadcrumbLink>
           </BreadcrumbItem>
           <BreadcrumbSeparator />
           <BreadcrumbItem>
           <BreadcrumbPage className="text-muted-foreground">
-            Module Name
+            {moduleName}
           </BreadcrumbPage>
         </BreadcrumbItem>
         </BreadcrumbList> 

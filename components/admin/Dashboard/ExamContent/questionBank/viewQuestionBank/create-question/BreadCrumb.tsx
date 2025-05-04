@@ -7,8 +7,12 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
+import { useSearchParams } from "next/navigation";
 
 function BreadCrumb() {
+  const searchParams = useSearchParams();
+  const moduleName = searchParams.get("module");
+  const id = searchParams.get("id");
   return (
     <>
       <Breadcrumb>
@@ -41,17 +45,20 @@ function BreadCrumb() {
           </BreadcrumbItem>
           <BreadcrumbSeparator />
           <BreadcrumbItem>
-          <BreadcrumbPage className="text-muted-foreground">
-            Module
-          </BreadcrumbPage>
-        </BreadcrumbItem>
-        <BreadcrumbSeparator />
+            <BreadcrumbLink className="text-muted-foreground hover:text-foreground"
+              href={`/admin/dashboard/exams/questions-bank/view-questions?id=${id}&module=${moduleName}`}
+            >
+
+              {moduleName}
+            </BreadcrumbLink>
+          </BreadcrumbItem>
+          <BreadcrumbSeparator />
           <BreadcrumbItem>
-          <BreadcrumbPage className="text-muted-foreground">
-            Create
-          </BreadcrumbPage>
-        </BreadcrumbItem>
-        </BreadcrumbList> 
+            <BreadcrumbPage className="text-muted-foreground">
+              Create Questions
+            </BreadcrumbPage>
+          </BreadcrumbItem>
+        </BreadcrumbList>
       </Breadcrumb>
     </>
   );

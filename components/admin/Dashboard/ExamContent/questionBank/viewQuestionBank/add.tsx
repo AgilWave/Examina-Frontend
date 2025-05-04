@@ -9,10 +9,11 @@ function CreateCourseDialog() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const idString = searchParams?.get('id');
-  
+  const moduleName = searchParams?.get('module');
+
   const handleNavigate = () => {
     if (idString) {
-      router.push(`/admin/dashboard/exams/questions-bank/view-questions/create?id=${idString}`);
+      router.push(`/admin/dashboard/exams/questions-bank/view-questions/create?id=${idString}&module=${moduleName}`);
     } else {
       console.error("No valid ID found in URL.");
     }

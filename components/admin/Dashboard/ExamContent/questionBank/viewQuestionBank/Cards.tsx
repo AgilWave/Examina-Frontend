@@ -1,9 +1,10 @@
-import { useState } from "react";
 import {
-  MousePointer,
   ListChecks,
   TextCursorInput,
   UserRound,
+  CheckCircle,
+  Eye,
+  Trash2,
 } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -13,71 +14,47 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Eye, Pencil, Trash2 } from "lucide-react";
+import { useState } from "react";
+import axios from "axios";
+import Cookies from "js-cookie";
+import { BACKEND_URL } from "@/Constants/backend";
+import { toast } from "sonner";
+import { AlertDialog, AlertDialogContent, AlertDialogHeader, AlertDialogTitle, AlertDialogDescription, AlertDialogFooter } from "@/components/ui/alert-dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
+import { Badge } from "@/components/ui/badge";
+import { CardContent } from "@/components/ui/card";
 
 interface Question {
   id: number;
   text: string;
-  type: "input" | "selector" | "multi-selector";
+  type: "Long Text" | "Short Text" | "Multiple Choice" | "Choice" | "Short Answer";
   createdBy: string;
+  answerOptions?: {
+    text: string;
+    clarification: string;
+    isCorrect: boolean;
+  }[];
 }
 
-export default function QuestionBank() {
-  const [questions] = useState<Question[]>([
-    {
-      id: 1,
-      text: "Formula for calculating percentage change in price?",
-      type: "input",
-      createdBy: "Shehal H.",
-    },
-    {
-      id: 2,
-      text: "Revenue: $10,000; expenses: $7,500. What is profit?",
-      type: "selector",
-      createdBy: "Shehal H.",
-    },
-    {
-      id: 3,
-      text: "Inflation rate: 3%; original price: $100. New price after one year?",
-      type: "input",
-      createdBy: "Shehal H.",
-    },
-    {
-      id: 4,
-      text: "Demand function: Q = 100 - 2P. Equilibrium price and quantity?",
-      type: "multi-selector",
-      createdBy: "Shehal H.",
-    },
-    {
-      id: 5,
-      text: "Car purchased for $20,000, depreciates by 10% annually. Value after 5 years?",
-      type: "selector",
-      createdBy: "Shehal H.",
-    },
-    {
-      id: 6,
-      text: "Price elasticity: -2; price increase: 10%. Percentage change in quantity demanded?",
-      type: "input",
-      createdBy: "Shehal H.",
-    },
-    {
-      id: 7,
-      text: "Nominal interest rate: 6%; inflation rate: 2%. Real interest rate?",
-      type: "input",
-      createdBy: "Shehal H.",
-    },
-  ]);
+interface QuestionBankProps {
+  questions: Question[];
+  onDelete: () => void;
+}
+
+export default function QuestionBank({ questions, onDelete }: QuestionBankProps) {
+  const [isDeletingDialogOpen, setIsDeletingDialogOpen] = useState(false);
+  const [questionToDelete, setQuestionToDelete] = useState<Question | null>(null);
+  const [viewDialogOpen, setViewDialogOpen] = useState(false);
+  const [selectedQuestion, setSelectedQuestion] = useState<Question | null>(null);
 
   const renderTypeIcon = (type: Question["type"]) => {
-    switch (type) {
-      case "input":
-        return <TextCursorInput className="h-5 w-4 text-teal-500" />;
-      case "selector":
-        return <MousePointer className="h-5 w-4 text-emerald-500" />;
-      case "multi-selector":
-        return <ListChecks className="h-4 w-4 text-emerald-500" />;
-      default:
-        return null;
+    if (type === "Long Text" || type === "Short Text" || type === "Short Answer") {
+      return <TextCursorInput className="h-5 w-4 text-teal-500" />;
+    } else if (type === "Multiple Choice") {
+      return <ListChecks className="h-4 w-4 text-emerald-500" />;
+    } else if (type === "Choice") {
+      return <CheckCircle className="h-4 w-4 text-emerald-500" />;
     }
   };
 
@@ -86,23 +63,155 @@ export default function QuestionBank() {
     return text.slice(0, maxLength) + "...";
   };
 
+  const handleDeleteQuestion = async (questionId: number) => {
+    const jwt = Cookies.get("adminjwt");
+    const headers = {
+      Accept: "text/plain",
+      Authorization: `Bearer ${jwt}`,
+    };
+    try {
+      const response = await axios.delete(`${BACKEND_URL}/question-bank/question/Interact/${questionId}`, { headers });
+      if (response.data.isSuccessful) {
+        toast.success("Question deleted successfully");
+        onDelete();
+      }
+    } catch (error) {
+      toast.error("Error deleting question");
+      console.error("Error deleting question:", error);
+    }
+  };
+
+  const handleCloseViewDialog = (value: boolean) => {
+    setViewDialogOpen(value);
+    if (value === false) {
+      setTimeout(() => {
+        setSelectedQuestion(null);
+      }, 0);
+    }
+  };
+
+  const openViewDialog = (question: Question) => {
+    setSelectedQuestion(question);
+    setTimeout(() => {
+      setViewDialogOpen(true);
+    }, 0);
+  };
   return (
     <div className="flex flex-col rounded-2xl transition-colors duration-200 h-full">
+      {/* View Question Dialog */}
+      <Dialog
+        open={viewDialogOpen}
+        onOpenChange={handleCloseViewDialog}
+      >
+        <DialogContent className="min-w-5xl w-[90vw] max-h-[90vh] overflow-hidden bg-card">
+          <DialogHeader>
+            <DialogTitle className="text-xl flex items-center gap-2 dark:text-gray-100">
+              <Eye className="h-5 w-5 text-teal-500" />
+              View Question
+            </DialogTitle>
+            <DialogDescription className="dark:text-gray-400">
+              Reviewing question details
+            </DialogDescription>
+          </DialogHeader>
+
+          {selectedQuestion && (
+            <div className="mt-4">
+              <div className="space-y-6">
+                <Badge variant="outline" className="mb-4 font-normal  dark:border-gray-600 bg-teal-50 dark:bg-teal-900/20 text-teal-700 dark:text-teal-400">
+                  {selectedQuestion.type}
+                </Badge>
+
+                <Card className="bg-gray-50 dark:bg-gray-900">
+                  <CardContent className="pt-6">
+                    <div className="space-y-4">
+                      <div>
+                        <Label className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">Question Text:</Label>
+                        <div className="text-gray-800 dark:text-gray-200 p-3 bg-white dark:bg-gray-800 rounded-md border dark:border-gray-700">
+                          {selectedQuestion.text}
+                        </div>
+                      </div>
+
+                      {selectedQuestion.answerOptions && selectedQuestion.answerOptions.length > 0 && (
+                        <div className="space-y-4 h-[400px] overflow-y-auto scrollbar-custom">
+                          {/* Correct Answers Section */}
+                          <div>
+                            <Label className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">Correct Answers:</Label>
+                            <div className="space-y-2">
+                              {selectedQuestion.answerOptions
+                                .filter(option => option.isCorrect)
+                                .map((option, idx) => (
+                                  <Card
+                                    key={`correct-${idx}`}
+                                    className="bg-green-50 dark:bg-green-900/20 border-green-100 dark:border-green-800"
+                                  >
+                                    <CardContent className="p-3">
+                                      <div className="text-gray-800 dark:text-green-200">
+                                        {option.text}
+                                        {option.clarification && (
+                                          <div className="text-xs mt-1 italic text-gray-600 dark:text-gray-400">
+                                            Clarification: {option.clarification}
+                                          </div>
+                                        )}
+                                      </div>
+                                    </CardContent>
+                                  </Card>
+                                ))}
+                            </div>
+                          </div>
+
+                          {/* Wrong Answers Section */}
+                          <div>
+                            <Label className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">Other Options:</Label>
+                            <div className="space-y-2">
+                              {selectedQuestion.answerOptions
+                                .filter(option => !option.isCorrect)
+                                .map((option, idx) => (
+                                  <Card
+                                    key={`wrong-${idx}`}
+                                    className="bg-card border border-gray-200 dark:border-gray-700"
+                                  >
+                                    <CardContent className="p-3">
+                                      <div className="text-gray-800 dark:text-gray-300">
+                                        {option.text}
+                                        {option.clarification && (
+                                          <div className="text-xs mt-1 italic text-gray-600 dark:text-gray-400">
+                                            Clarification: {option.clarification}
+                                          </div>
+                                        )}
+                                      </div>
+                                    </CardContent>
+                                  </Card>
+                                ))}
+                            </div>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
+
       {/* Scrollable card section */}
       <div className="h-[431px] overflow-y-auto rounded-2xl p-2 bg-white dark:bg-[#000000a9] border-gray-200 dark:border-black border shadow-sm w-full scrollbar-custom">
         <div className="space-y-1 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-          {questions.map((question) => (
+          {questions.length > 0 ? questions.map((question) => (
             <Card
               key={question.id}
               className="transition-all hover:shadow-md bg-[#fdfdfd] dark:bg-[#0A0A0A] border border-gray-200 dark:border-teal-900 rounded-xl shadow-sm cursor-pointer p-3 flex flex-col justify-start h-full"
             >
-              {/* Top Line */}
               <div className="flex items-center justify-between">
                 <div className="flex items-center space-x-2">
                   <div className="bg-teal-100 dark:bg-teal-900 text-teal-700 dark:text-teal-300 text-xs font-medium rounded-full px-3 py-1.5 flex items-center space-x-1">
                     {renderTypeIcon(question.type)}
                     <span className="capitalize">
                       {question.type.replace("-", " ")}
+                      {(question.type === "Multiple Choice" || question.type === "Choice") && question.answerOptions && (
+                        <span className="ml-1">({question.answerOptions.length} options)</span>
+                      )}
                     </span>
                   </div>
                   <div className="bg-gray-100 dark:bg-gray-900 border border-teal-800 flex items-center gap-3 text-gray-700 dark:text-gray-300 text-xs font-medium rounded-full px-2 py-1.5">
@@ -137,27 +246,17 @@ export default function QuestionBank() {
 
                   <DropdownMenuContent align="end" className="w-40">
                     <DropdownMenuItem
-                      onClick={() =>
-                        console.log(`Viewing question ${question.id}`)
-                      }
+                      onClick={() => openViewDialog(question)}
                       className="flex items-center gap-2"
                     >
                       <Eye className="w-4 h-4" />
                       View
                     </DropdownMenuItem>
                     <DropdownMenuItem
-                      onClick={() =>
-                        console.log(`Editing question ${question.id}`)
-                      }
-                      className="flex items-center gap-2"
-                    >
-                      <Pencil className="w-4 h-4" />
-                      Edit
-                    </DropdownMenuItem>
-                    <DropdownMenuItem
-                      onClick={() =>
-                        console.log(`Deleting question ${question.id}`)
-                      }
+                      onClick={() => {
+                        setQuestionToDelete(question);
+                        setIsDeletingDialogOpen(true);
+                      }}
                       className="flex items-center gap-2 text-red-500 hover:bg-red-700 dark:hover:bg-red-900/50"
                     >
                       <Trash2 className="w-4 h-4 text-red-500" />
@@ -166,6 +265,29 @@ export default function QuestionBank() {
                   </DropdownMenuContent>
                 </DropdownMenu>
               </div>
+
+              <AlertDialog open={isDeletingDialogOpen} onOpenChange={(open) => {
+                setIsDeletingDialogOpen(open);
+                if (!open) setQuestionToDelete(null);
+              }}>
+                <AlertDialogContent>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+                    <AlertDialogDescription>
+                      This will delete the question &quot;{questionToDelete?.text}&quot; from the question bank.
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter>
+                    <Button variant="outline" onClick={() => setIsDeletingDialogOpen(false)}>Cancel</Button>
+                    <Button variant="destructive" onClick={() => {
+                      if (questionToDelete) {
+                        handleDeleteQuestion(questionToDelete.id);
+                        setIsDeletingDialogOpen(false);
+                      }
+                    }}>Delete</Button>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
 
               {/* Main Content */}
               <div className="flex items-start">
@@ -176,7 +298,13 @@ export default function QuestionBank() {
                 </div>
               </div>
             </Card>
-          ))}
+          )) :
+            <div className="w-full h-full flex items-center justify-center">
+              <p className="text-gray-800 dark:text-gray-200 text-m font-regular leading-relaxed">
+                No questions found
+              </p>
+            </div>
+          }
         </div>
       </div>
     </div>

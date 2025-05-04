@@ -23,27 +23,22 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Loader2 } from "lucide-react";
 
 import { columns } from "./helpers/columns";
 import { RootState } from "@/redux/store";
 
-import {
-  setQuestionBankPage,
-  setQuestionBankTotalPages,
-  setQuestionBankNextPage,
-  setQuestionBankPrevPage,
-} from "@/redux/features/QuestionBankSlice";
 import { setViewDialog, setViewDialogId } from "@/redux/features/dialogState";
 import { useDispatch, useSelector } from "react-redux";
 import { toast } from "sonner";
-import { Filter } from "lucide-react";
-import Filters from "./filter";
 import { LogoutAction } from "@/services/actions/auth";
 import { RefreshCcw } from "lucide-react";
-import {  parseAsString, useQueryState, parseAsBoolean } from "nuqs";
+import { useQueryState } from "nuqs";
 import SearchField from "./helpers/Search";
-import { getAllModules } from "@/services/questionBank/getAllModules";
 import Qcard from "./Cards";
+import { useSearchParams } from "next/navigation";
+import { getAllQuestionsByModuleId } from "@/services/questionBank/getAllQuestionsByModuleId";
+import { setQuestionPage, setQuestionTotalPages, setQuestionNextPage, setQuestionPrevPage } from "@/redux/features/pageSlice";
 
 export function DataTable() {
   const [sorting, setSorting] = useState<SortingState>([]);
@@ -56,31 +51,19 @@ export function DataTable() {
   const dialog = useSelector((state: RootState) => state.dialog);
   const dispatch = useDispatch();
   const [searchQuery] = useQueryState("searchQuery");
+  const moduleId = useSearchParams().get("id");
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [isLoading, setIsLoading] = useState(false);
-
-  const [isFilterOpen, setIsFilterOpen] = useQueryState(
-      "filterOpen",
-      parseAsBoolean
-    );
-
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const [filterApplied] = useQueryState("filterApplied", parseAsBoolean);
-
-
-  const [LectureQuery] = useQueryState("Lecture", parseAsString);
-  const [questionType] = useQueryState("questionType", parseAsString);
 
 
   const fetchData = async (page: number) => {
     setIsLoading(true);
     try {
-      const response = await getAllModules(
+      const response = await getAllQuestionsByModuleId(
         dispatch,
         page,
         pageSize,
-        LectureQuery,
-        questionType,
+        moduleId,
         searchQuery,
       );
       if (response.isSuccessful) {
@@ -90,17 +73,17 @@ export function DataTable() {
           return;
         }
         setData(response.listContent);
-        dispatch(setQuestionBankPage(response.paginationInfo.page));
-        dispatch(setQuestionBankTotalPages(response.paginationInfo.totalPages));
-        dispatch(setQuestionBankNextPage(response.paginationInfo.nextPage));
-        dispatch(setQuestionBankPrevPage(response.paginationInfo.page - 1));
+        dispatch(setQuestionPage(response.paginationInfo.page));
+        dispatch(setQuestionTotalPages(response.paginationInfo.totalPages));
+        dispatch(setQuestionNextPage(response.paginationInfo.nextPage));
+        dispatch(setQuestionPrevPage(response.paginationInfo.page - 1));
       } else {
         setData([]);
         toast.error(response.message);
-        dispatch(setQuestionBankPage(1));
-        dispatch(setQuestionBankTotalPages(0));
-        dispatch(setQuestionBankNextPage(-1));
-        dispatch(setQuestionBankPrevPage(-1));
+        dispatch(setQuestionPage(1));
+        dispatch(setQuestionTotalPages(0));
+        dispatch(setQuestionNextPage(-1));
+        dispatch(setQuestionPrevPage(-1));
       }
     } catch (error: any) {
       if (error.response) {
@@ -127,23 +110,23 @@ export function DataTable() {
 
   useEffect(() => {
     dispatch(
-      setQuestionBankPage(
-        JSON.parse(sessionStorage.getItem("QuestionBankPage") || "1")
+      setQuestionPage(
+        JSON.parse(sessionStorage.getItem("QuestionPage") || "1")
       )
     );
     dispatch(
-      setQuestionBankTotalPages(
-        JSON.parse(sessionStorage.getItem("totalBatchPages") || "0")
+      setQuestionTotalPages(
+        JSON.parse(sessionStorage.getItem("QuestionTotalPages") || "0")
       )
     );
     dispatch(
-      setQuestionBankNextPage(
-        JSON.parse(sessionStorage.getItem("nextBatchPage") || "-1")
+      setQuestionNextPage(
+        JSON.parse(sessionStorage.getItem("QuestionNextPage") || "-1")
       )
     );
     dispatch(
-      setQuestionBankPrevPage(
-        JSON.parse(sessionStorage.getItem("prevBatchPage") || "-1")
+      setQuestionPrevPage(
+        JSON.parse(sessionStorage.getItem("QuestionPrevPage") || "-1")
       )
     );
     dispatch(
@@ -152,17 +135,17 @@ export function DataTable() {
     dispatch(
       setViewDialogId(JSON.parse(sessionStorage.getItem("viewDialogId") || "0"))
     );
-    const page = JSON.parse(sessionStorage.getItem("QuestionBankPage") || "1");
+    const page = JSON.parse(sessionStorage.getItem("QuestionPage") || "1");
     fetchData(page);
   }, []);
 
   useEffect(() => {
-    const page = JSON.parse(sessionStorage.getItem("QuestionBankPage") || "1");
+    const page = JSON.parse(sessionStorage.getItem("QuestionPage") || "1");
     fetchData(page);
   }, [pageSize]);
 
   useEffect(() => {
-    const page = JSON.parse(sessionStorage.getItem("QuestionBankPage") || "1");
+    const page = JSON.parse(sessionStorage.getItem("QuestionPage") || "1");
     fetchData(page);
   }, [searchQuery]);
 
@@ -191,19 +174,22 @@ export function DataTable() {
   });
 
   const handleNext = async () => {
-    if (page.course.nextPage > page.course.page) {
-      const curPage = page.course.nextPage;
+    if (page.question.nextPage > page.question.page) {
+      const curPage = page.question.nextPage;
       fetchData(curPage);
     }
   };
 
   const handlePrev = async () => {
-    if (page.course.prevPage >= 0) {
-      const curPage = page.course.prevPage;
+    if (page.question.prevPage >= 0) {
+      const curPage = page.question.prevPage;
       fetchData(curPage);
     }
   };
 
+  const handleDeleteQuestion = () => {
+    fetchData(page.question.page);
+  };
   return (
     <>
       <div className="flex flex-col gap-4 w-full">
@@ -211,17 +197,6 @@ export function DataTable() {
           <div className="flex flex-col md:flex-row gap-4 justify-between items-start md:items-center">
             <div className="flex flex-col md:flex-row gap-4 items-start md:items-center w-full md:w-3/4">
               <SearchField />
-              <Button
-                variant="outline"
-                size={"lg"}
-                onClick={() => {
-                  setIsFilterOpen(!isFilterOpen);
-                }}
-                className="shrink-0 cursor-pointer px-4 py-2 md:w-auto w-full"
-              >
-                <Filter className="h-4 w-4 mr-2" />
-                Filter
-              </Button>
             </div>
             <div className="relative flex gap-2 ">
               <div className="flex relative md:w-auto w-full  gap-4 py-2 flex-row justify-between items-center">
@@ -256,37 +231,43 @@ export function DataTable() {
                 </div>
               </div>
             </div>
-          </div> 
+          </div>
         </div>
-        <div className="flex w-full justify-end">
-          <Filters />
-        </div>
-        <div className="rounded-2xl border shadow-sm overflow-hidden w-full">
-          <Qcard />
-        </div>
-        <div className="flex items-center justify-center gap-4 mt-4">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={handlePrev}
-            disabled={page.course.prevPage <= 0}
-          >1
-            Previous
-          </Button>
-          <span className="text-sm font-medium text-gray-700 dark:text-gray-200">
-            Page {page.course.page} of {page.course.totalPages}
-          </span>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={handleNext}
-            disabled={
-              page.course.nextPage === -1 || page.course.nextPage === null
-            }
-          >
-            Next
-          </Button>
-        </div>
+
+        {isLoading ? (
+          <div className="flex flex-col items-center justify-center w-full h-40">
+            <Loader2 className="h-8 w-8 animate-spin text-primary" />
+          </div>
+        ) : (
+          <>
+            <div className="rounded-2xl border shadow-sm overflow-hidden w-full">
+              <Qcard questions={data} onDelete={handleDeleteQuestion} />
+            </div>
+            <div className="flex items-center justify-center gap-4 mt-4">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handlePrev}
+                disabled={page.question.prevPage <= 0}
+              >
+                Previous
+              </Button>
+              <span className="text-sm font-medium text-gray-700 dark:text-gray-200">
+                Page {page.question.page} of {page.question.totalPages}
+              </span>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handleNext}
+                disabled={
+                  page.question.nextPage === -1 || page.question.nextPage === null
+                }
+              >
+                Next
+              </Button>
+            </div>
+          </>
+        )}
       </div>
     </>
   );
