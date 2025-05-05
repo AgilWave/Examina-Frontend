@@ -12,7 +12,6 @@ import { useSearchParams } from "next/navigation";
 function BreadCrumb() {
   const searchParams = useSearchParams();
   const moduleName = searchParams.get("module");
-  console.log(moduleName);
   return (
     <>
       <Breadcrumb>
