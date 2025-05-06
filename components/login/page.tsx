@@ -58,8 +58,7 @@ function LoginPageContent() {
 
     try {
       const response = await signIn("microsoft-entra-id" , {
-        redirect: true,
-        callbackUrl: "https://lecturer.examina.live/login",
+        redirectTo: `https://lecturer.examina.live/login`,
       });
       console.log("SignIn Response:", response); 
     } catch (error) {

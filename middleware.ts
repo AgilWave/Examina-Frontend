@@ -139,6 +139,13 @@ export async function middleware(req: NextRequest) {
       return NextResponse.next();
     }
 
+    if (url.pathname.startsWith("/api")) {
+      console.log("API request detected, allowing through middleware.");
+      console.log("Request URL:", req.url);
+      console.log("Request Pathname:", url.pathname);
+      return NextResponse.next();
+    }
+
     if (url.pathname.startsWith("/lecturer/api")) {
       const newPath = url.pathname.replace("/lecturer/api", "/api");
       const newUrl = new URL(newPath, req.url);
