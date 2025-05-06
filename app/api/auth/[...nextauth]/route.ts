@@ -27,7 +27,7 @@ function handler(req: NextRequest) {
                     params: {
                         prompt: "login",
                         scope: "openid profile email offline_access",
-                        redirect_uri: `${baseUrl}/api/auth/callback/microsoftentra`,
+                        redirect_uri: `${baseUrl}/api/auth/callback/microsoft-entra-id`,
                     },
                 },
             }),
