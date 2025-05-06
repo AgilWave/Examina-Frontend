@@ -31,6 +31,18 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
       },
     })
   ],
+  cookies: {
+    sessionToken: {
+      name: `__Secure-next-auth.session-token`,
+      options: {
+        domain: ".examina.live",
+        path: "/",
+        secure: true,
+        httpOnly: true,
+        sameSite: 'lax',
+      },
+    },
+  },
   callbacks: {
     async jwt({ token, account }) {
       if (account) {
