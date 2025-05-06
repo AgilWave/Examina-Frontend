@@ -35,7 +35,7 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
     sessionToken: {
       name: `__Secure-next-auth.session-token`,
       options: {
-        domain: ".examina.live",
+        domain: "lecturer.examina.live",
         path: "/",
         secure: true,
         httpOnly: true,
@@ -45,7 +45,7 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
     csrfToken: {
       name: `__Secure-next-auth.csrf-token`,
       options: {
-        domain: ".examina.live",
+        domain: "lecturer.examina.live",
         path: "/",
         secure: true,
         httpOnly: true,
@@ -55,7 +55,7 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
     callbackUrl: {
       name: `__Secure-next-auth.callback-url`,
       options: {
-        domain: ".examina.live",
+        domain: "lecturer.examina.live",
         path: "/",
         secure: true,
         httpOnly: true,
