@@ -1,4 +1,5 @@
-import { NextAuthConfig } from 'next-auth'
+import NextAuth from 'next-auth'
+import MicrosoftEntraID from 'next-auth/providers/microsoft-entra-id';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { JWT } from 'next-auth/jwt';
 
@@ -16,9 +17,32 @@ declare module 'next-auth/jwt' {
   }
 }
 
-
-
-export const authConfig: NextAuthConfig = {
+export const { auth, handlers, signIn, signOut } = NextAuth({
+  providers: [
+    MicrosoftEntraID({
+      clientId: process.env.AUTH_MICROSOFT_ENTRA_ID_ID,
+      clientSecret: process.env.AUTH_MICROSOFT_ENTRA_ID_SECRET,
+      issuer: `https://login.microsoftonline.com/${process.env.AUTH_MICROSOFT_ENTRA_TENANT_ID}/v2.0`,
+      authorization: {
+        params: {
+          prompt: 'login',
+          scope: 'openid profile email offline_access',
+        },
+      },
+    })
+  ],
+  cookies: {
+    sessionToken: {
+      name: `__Secure-authjs.session-token`,
+      options: {
+        domain: ".examina.live",
+        path: "/",
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'lax',
+      },
+    },
+  },
   callbacks: {
     async jwt({ token, account }) {
       if (account) {
@@ -37,18 +61,6 @@ export const authConfig: NextAuthConfig = {
       return session;
     },
   },
-  cookies: {
-    sessionToken: {
-      name: `__Secure-authjs.session-token`,
-      options: {
-        domain: ".examina.live",
-        path: "/",
-        httpOnly: true,
-        secure: process.env.NODE_ENV === 'production',
-        sameSite: 'lax',
-      },
-    },
-  },
   trustHost: true,
-  providers: []
-};
+  
+});
