@@ -6,6 +6,11 @@ import { BACKEND_URL } from "@/Constants/backend";
 export async function loginActionMS({ idToken }: { idToken: string }) {
   const cookieStore = await cookies();
 
+  const LectuerEmailArray = [
+    "lishanichamathka@outlook.com",
+  ];
+
+
   try {
     const res = await fetch(`${BACKEND_URL}/auth/microsoft`, {
       method: "POST",
@@ -34,14 +39,21 @@ export async function loginActionMS({ idToken }: { idToken: string }) {
         status: res.status,
       };
     }
-
     if (responseBody.content.jwt) {
-      cookieStore.set("jwt", responseBody.content.jwt);
+      let origin = process.env.NEXT_PUBLIC_URL || "http://localhost:3000";
+      let redirectUrl = `${origin}/dashboard/overview`;
+
+      if (LectuerEmailArray.includes(responseBody.content.user.email)) {
+        cookieStore.set("lecturerjwt", responseBody.content.jwt);
+        origin = process.env.NEXT_LECTURER_PUBLIC_URL || "http://localhost:3000";
+        redirectUrl = `${origin}/lecturer/dashboard/overview`;
+      } else {
+        cookieStore.set("jwt", responseBody.content.jwt);
+      }
       const userDetails = JSON.stringify(responseBody.content.user);
       const encryptedUserDetails = encrypt(userDetails);
       cookieStore.set("userDetails", encryptedUserDetails);
-      const origin = process.env.NEXT_PUBLIC_URL || "http://localhost:3000";
-      const redirectUrl = `${origin}/dashboard/overview`;
+   
       return {
         success: true,
         message: "Login successful",
