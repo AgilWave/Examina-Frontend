@@ -139,6 +139,15 @@ export async function middleware(req: NextRequest) {
       return NextResponse.next();
     }
 
+    if (url.pathname.startsWith("/api")) {
+      return NextResponse.next();
+    }
+
+    if (url.pathname.startsWith("/lecturer/api")) {
+      const newPath = url.pathname.replace("/lecturer/api", "/api");
+      const newUrl = new URL(newPath, req.url);
+      return NextResponse.rewrite(newUrl);
+    }
     if (!lecturerJwt) {
       if (url.pathname !== "/login") {
         return NextResponse.redirect(new URL("/login", req.url));
