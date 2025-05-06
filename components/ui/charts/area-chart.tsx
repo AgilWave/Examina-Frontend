@@ -1,7 +1,7 @@
 "use client"
 
 import * as React from "react"
-import { AreaChart as RechartsAreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts"
+import { AreaChart as RechartsAreaChart, Area, XAxis, YAxis, CartesianGrid} from "recharts"
 import { 
   ChartContainer, 
   ChartTooltip, 
@@ -11,6 +11,7 @@ import {
 } from "@/components/ui/chart"
 
 interface AreaChartProps {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   data: any[]
   categories: string[]
   index: string

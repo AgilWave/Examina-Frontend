@@ -1,7 +1,7 @@
 "use client"
 
 import * as React from "react"
-import { BarChart as RechartsBarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts"
+import { BarChart as RechartsBarChart, Bar, XAxis, YAxis, CartesianGrid} from "recharts"
 import { 
   ChartContainer, 
   ChartTooltip, 
@@ -11,6 +11,7 @@ import {
 } from "@/components/ui/chart"
 
 interface BarChartProps {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   data: any[]
   categories: string[]
   index: string

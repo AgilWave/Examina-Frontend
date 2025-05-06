@@ -1,156 +1,5 @@
-// import { useEffect, useState } from 'react';
-// import axios from 'axios';
-// import { X, Clock, Calendar, Fuel, Hash } from 'lucide-react';
-
-// // Types
-// interface ExamSession {
-//   id: string;
-//   examName: string;
-//   sessionNumber: number;
-//   fuelType: string;
-//   date: string;
-//   time: string;
-//   duration: string;
-//   examId: number;
-//   meter: number;
-//   isActive: boolean;
-//   openedBy: string;
-// }
-
-// // ExamCard Component
-// const ExamCard = ({
-//   session,
-//   onEndSession,
-// }: {
-//   session: ExamSession;
-//   onEndSession: (id: string) => void;
-// }) => {
-//   return (
-//     <div className="rounded-lg border border-gray-200 shadow-sm bg-white dark:bg-black/20 dark:border-teal-600 overflow-hidden w-full">
-//       <div className="border-b-4 border-teal-600 px-4 py-3 flex justify-between items-center">
-//         <div className="flex items-center">
-//           <div className="rounded-full bg-red-100 p-2 mr-3"></div>
-//           <div>
-//             <h3 className="font-medium text-base text-gray-900 dark:text-white">{session.examName}</h3>
-//             <p className="text-xs text-gray-600">Session #{session.sessionNumber} • Fuel: {session.fuelType}</p>
-//           </div>
-//         </div>
-//         <div>
-//           <span
-//             className={`inline-flex items-center px-2 py-1 rounded-full text-xs ${
-//               session.isActive ? 'bg-green-800/20 text-green-500' : 'bg-gray-100 text-gray-800'
-//             }`}
-//           >
-//             <span
-//               className={`w-2 h-2 rounded-full mr-1 ${
-//                 session.isActive ? 'bg-green-500' : 'bg-gray-500'
-//               }`}
-//             ></span>
-//             {session.isActive ? 'Active' : 'Upcoming'}
-//           </span>
-//         </div>
-//       </div>
-
-//       <div className="p-4 space-y-3">
-//         <div className="grid grid-cols-2 gap-4">
-//           <div className="flex items-center text-sm">
-//             <Calendar className="text-teal-600 mr-2" size={16} />
-//             <span className="text-white/60">{session.date}</span>
-//           </div>
-//           <div className="flex items-center text-sm">
-//             <Clock className="text-teal-600 mr-2" size={16} />
-//             <span className="text-white/60">Duration: {session.duration}</span>
-//           </div>
-//           <div className="flex items-center text-sm">
-//             <Fuel className="text-teal-600 mr-2" size={16} />
-//             <span className="text-white/60">Pump ID: {session.examId}</span>
-//           </div>
-//           <div className="flex items-center text-sm">
-//             <Hash className="text-teal-600 mr-2" size={16} />
-//             <span className="text-white/60">Meter: {session.meter}</span>
-//           </div>
-//         </div>
-
-//         <div className="flex justify-between items-center pt-2">
-//           <div className="text-xs text-gray-500">Opened by: {session.openedBy}</div>
-//           {session.isActive && (
-//             <button
-//               onClick={() => onEndSession(session.id)}
-//               className="flex items-center px-4 py-2 text-sm border border-red-200 rounded text-teal-600 hover:bg-red-50 transition-colors"
-//             >
-//               <X size={16} className="mr-1" />
-//               End Session
-//             </button>
-//           )}
-//         </div>
-//       </div>
-//     </div>
-//   );
-// };
-
-// // ExamGrid Component
-// const ExamGrid = ({
-//   sessions,
-//   onEndSession,
-// }: {
-//   sessions: ExamSession[];
-//   onEndSession: (id: string) => void;
-// }) => {
-//   return (
-//     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-//       {sessions.map((session) => (
-//         <ExamCard key={session.id} session={session} onEndSession={onEndSession} />
-//       ))}
-//     </div>
-//   );
-// };
-
-// // Main Component
-// const ExamDashboard = () => {
-//   const [sessions, setSessions] = useState<ExamSession[]>([]);
-//   const [loading, setLoading] = useState(true);
-
-//   useEffect(() => {
-//     const fetchSessions = async () => {
-//       try {
-//         const res = await axios.get('/api/exam-sessions'); // Update this with your real backend route
-//         setSessions(res.data);
-//       } catch (error) {
-//         console.error('Error fetching sessions:', error);
-//       } finally {
-//         setLoading(false);
-//       }
-//     };
-
-//     fetchSessions();
-//   }, []);
-
-//   const handleEndSession = async (id: string) => {
-//     try {
-//       await axios.post(`/api/end-session/${id}`); // Update endpoint as per backend logic
-//       setSessions((prev) => prev.map((s) => (s.id === id ? { ...s, isActive: false } : s)));
-//     } catch (error) {
-//       console.error('Failed to end session:', error);
-//     }
-//   };
-
-//   return (
-//     <div className="h-[500px] p-6 bg-gray-50 dark:bg-card max-h-screen overflow-auto scrollbar-custom">
-//       {loading ? (
-//         <div className="text-center text-gray-500">Loading sessions...</div>
-//       ) : (
-//         <ExamGrid sessions={sessions} onEndSession={handleEndSession} />
-//       )}
-//     </div>
-//   );
-// };
-
-// export default ExamDashboard;
-
-
-
 import { useState } from 'react';
-import { X, Clock, Calendar, MapPin, BookCheck , FileType2  } from 'lucide-react';
+import {  Clock, Calendar, BookCheck , FileType2  } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 // Types
@@ -233,6 +82,7 @@ const ExamGrid = ({ sessions }: { sessions: ExamSession[] }) => {
 
 // Main component that brings everything together
 const ExamDashboard = () => {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [activeSessions, setActiveSessions] = useState<ExamSession[]>([
     {
       id: '1',
@@ -288,6 +138,7 @@ const ExamDashboard = () => {
     },
   ]);
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [upcomingSessions, setUpcomingSessions] = useState<ExamSession[]>([
     {
       id: '5',

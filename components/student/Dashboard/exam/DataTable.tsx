@@ -57,6 +57,7 @@ export function DataTable() {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [isLoading, setIsLoading] = useState(false);
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [isFilterOpen, setIsFilterOpen] = useQueryState(
     "filterOpen",
     parseAsBoolean

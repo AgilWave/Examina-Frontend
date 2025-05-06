@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
  import { useState } from "react";
 import {
   MousePointer,
@@ -22,6 +23,7 @@ interface Question {
   createdBy: string;
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const Qcard = ({ data }: { data: any }) => {
   const [questions] = useState<Question[]>([
     {

@@ -58,7 +58,6 @@ import { LogoutAction } from "@/services/actions/auth";
 import { RefreshCcw } from "lucide-react";
 import Filters from "./filter";
 import { parseAsBoolean, useQueryState } from "nuqs";
-import { Filter } from "lucide-react";
 import SearchField from "./helpers/Search";
 import ViewUserDialog from "./view-batch";
 
@@ -74,6 +73,7 @@ export function DataTable() {
   const dispatch = useDispatch();
   const [searchQuery] = useQueryState("searchQuery");
   const [isLoading, setIsLoading] = useState(false);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [isFilterOpen, setIsFilterOpen] = useQueryState(
     "filterOpen",
     parseAsBoolean

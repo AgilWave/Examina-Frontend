@@ -1,8 +1,6 @@
 import * as React from "react";
 import { ColumnDef } from "@tanstack/react-table";
 import { Batch } from "./type";
-import { AiOutlineCloseSquare } from "react-icons/ai";
-import { IoIosCheckbox } from "react-icons/io";
 
 export const columns: ColumnDef<Batch>[] = [
   {

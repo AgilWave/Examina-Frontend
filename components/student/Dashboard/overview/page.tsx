@@ -99,6 +99,7 @@ const getStatusColor = (status: string) => {
   }
 };
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const renderIcon = (icon: string) => {
   return (
     <div className="flex items-center justify-center w-10 h-10 rounded-full bg-teal-600 text-white">
@@ -123,6 +124,7 @@ const renderIcon = (icon: string) => {
   );
 };
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const ExamHistory = ({ activities = sampleActivities }) => {
   return (
     <div className="space-y-4 max-h-[300px] overflow-y-auto scrollbar-custom pr-2 custom-scrollbar">
@@ -316,7 +318,7 @@ export default function AdminDashboard() {
               Overview
             </h1>
             <p className="text-black/80 dark:text-gray-400 text-sm">
-              Welcome back! Here's what's happening with your reports and exams.
+              Welcome back! Here&apos;s what&apos;s happening with your reports and exams.
             </p>
           </div>
         </div>
