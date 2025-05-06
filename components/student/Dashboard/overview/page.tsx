@@ -1,18 +1,8 @@
 "use client";
 
-import {
-  ResponsiveContainer,
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  Tooltip,
-  LineChart,
-  Line,
-} from "recharts";
-import Image from "next/image";
-import React from "react";
+import React, { JSX } from "react";
 import Link from "next/link";
+import { ReactNode } from "react";
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -21,168 +11,153 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
+import {
+  GraduationCap,
+  BookOpen,
+  Users,
+  Hourglass,
+  MoveUp,
+  FileText,
+  ClipboardList,
+  Database,
+  User,
+  Laptop,
+} from "lucide-react";
 
-import avatar1 from "@/public/imgs/dashboard/common/overview/avatar1.png";
-import avatar2 from "@/public/imgs/dashboard/common/overview/avatar2.png";
-import avatar3 from "@/public/imgs/dashboard/common/overview/avatar3.png";
-import avatar4 from "@/public/imgs/dashboard/common/overview/avatar4.png";
-import avatar5 from "@/public/imgs/dashboard/common/overview/avatar5.png";
-import avatar6 from "@/public/imgs/dashboard/common/overview/avatar6.png";
+// Import custom shadcn chart components
+import { BarChart } from "@/components/ui/charts/bar-chart";
+import { AreaChart } from "@/components/ui/charts/area-chart";
 
-type ActivityStatus = "Ongoing" | "Pending" | "Completed";
-
-interface Activity {
-  id: string;
-  icon: "code" | "server";
-  course: string;
-  date: string;
-  type: string;
-  status: ActivityStatus;
-}
-
-interface RecentAccess {
+interface upcomingActivity {
   id: string;
   time: string;
-  avatar: string;
 }
 
-const StatCard: React.FC<{ title: string; value: number }> = ({
+interface StatCardProps {
+  title: string;
+  value: number;
+  icon: ReactNode;
+  highlight?: boolean;
+}
+
+const StatCard: React.FC<StatCardProps> = ({
   title,
   value,
-}) => (
-  <div className="bg-[#F6F6F6] dark:bg-[#0A0A0A] p-6 rounded-2xl dark:shadow-lg hover:bg-gray-100 dark:hover:bg-black/90 transition-all duration-300 dark:border dark:border-teal-600/50 hover:border-teal-500 backdrop-blur-sm transform hover:scale-105">
-    <h3 className="text-lg font-medium text-gray-800 dark:text-gray-300 mb-2">
-      {title}
-    </h3>
-    <p className="text-4xl font-bold text-black dark:text-cyan-400 tracking-tight">
-      {value}
-    </p>
-  </div>
-);
-
-const CodeIcon = () => (
-  <svg
-    xmlns="http://www.w3.org/2000/svg"
-    width="24"
-    height="24"
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-    className="stroke-gray-700 dark:stroke-cyan-400"
-  >
-    <polyline points="16 18 22 12 16 6"></polyline>
-    <polyline points="8 6 2 12 8 18"></polyline>
-  </svg>
-);
-
-const ServerIcon = () => (
-  <svg
-    xmlns="http://www.w3.org/2000/svg"
-    width="24"
-    height="24"
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-    className="stroke-gray-700 dark:stroke-cyan-400"
-  >
-    <rect x="2" y="2" width="20" height="8" rx="2" ry="2"></rect>
-    <rect x="2" y="14" width="20" height="8" rx="2" ry="2"></rect>
-    <line x1="6" y1="6" x2="6.01" y2="6"></line>
-    <line x1="6" y1="18" x2="6.01" y2="18"></line>
-  </svg>
-);
-
-const renderStatus = (status: ActivityStatus) => {
-  const baseStyles = "px-3 py-1.5 rounded-lg text-sm font-medium";
-
-  switch (status) {
-    case "Ongoing":
-      return (
-        <span
-          className={`${baseStyles} bg-gradient-to-b from-cyan-400 to-cyan-600 dark:from-blue-500/20 dark:to-blue-400/20  text-gray-100 dark:text-blue-400 dark:border border-blue-500/10 shadow-inner dark:shadow-none`}
-        >
-          Ongoing
-        </span>
-      );
-    case "Pending":
-      return (
-        <span
-          className={`${baseStyles} bg-gradient-to-b from-yellow-200 to-yellow-400 dark:from-yellow-500/20 dark:to-yellow-500/20  dark:bg-yellow-500/20 text-gray-800 dark:text-yellow-400 dark:border border-yellow-400 dark:border-yellow-500/30 shadow-inner dark:shadow-none`}
-        >
-          Pending
-        </span>
-      );
-    case "Completed":
-      return (
-        <span
-          className={`${baseStyles} bg-gradient-to-b from-green-300 to-green-500 dark:from-green-500/20 dark:to-green-500/20 text-gray-700 dark:text-green-400 dark:border border-green-300 dark:border-green-500/30 shadow-inner dark:shadow-none`}
-        >
-          Completed
-        </span>
-      );
-    default:
-      return (
-        <span
-          className={`${baseStyles} bg-gray-500/20 text-gray-400 border border-gray-500/30`}
-        >
-          {status}
-        </span>
-      );
-  }
-};
-
-const renderIcon = (iconType: "code" | "server") => {
+  icon,
+  highlight,
+}) => {
   return (
-    <div className="w-12 h-12 rounded-full flex items-center justify-center bg-[#79CDCD] dark:bg-cyan-900/30 backdrop-blur-sm dark:border border-cyan-700/50">
-      {iconType === "code" ? (
-        <div className=" stroke-gray-700 dark:stroke-cyan-400">
-          <CodeIcon />
+    <div
+      className={`p-6 rounded-2xl transition-all duration-300 transform hover:scale-102
+        ${
+          highlight
+            ? "bg-gradient-to-l from-teal-600/60 to-teal-500/60 text-white"
+            : "bg-[#F6F6F6] text-black dark:bg-[#0A0A0A] dark:text-gray-300"
+        }
+        dark:shadow-lg  hover:bg-gray-100 dark:hover:bg-black/90 dark:border dark:border-teal-600/50 hover:border-teal-500 backdrop-blur-sm
+        flex flex-col justify-between h-48`}
+    >
+      <div className="flex justify-between items-start">
+        <h3 className="text-1.5xl font-bold">{title}</h3>
+        <div
+          className={`p-2 rounded-full ${
+            highlight
+              ? "bg-white/20 text-white dark:bg-white/10 dark:text-teal-300"
+              : "bg-black/10 text-teal-500 dark:bg-white/10 dark:text-teal-300"
+          }`}
+        >
+          {icon}
         </div>
-      ) : (
-        <div className="stroke-gray-700 dark:stroke-cyan-400">
-          <ServerIcon />
-        </div>
-      )}
+      </div>
+
+      <div className="flex justify-center items-center flex-grow">
+        <p className="text-4xl font-bold">{value}</p>
+      </div>
+
+      <div
+        className={`flex items-center text-sm ${
+          highlight
+            ? "text-white"
+            : "text-gray-700 dark:text-white"
+        }`}
+      >
+        <MoveUp className="w-4 h-4" />
+        Next 24 Hours
+      </div>
     </div>
   );
 };
 
-const UpcomingActivities: React.FC<{ activities?: Activity[] }> = ({
-  activities = sampleActivities,
-}) => {
+const getStatusColor = (status: string) => {
+  switch (status.toLowerCase()) {
+    case "participated":
+      return "text-blue-600 bg-blue-500/20";
+    case "upcoming":
+      return "text-teal-400 bg-teal-500/20";
+    default:
+      return "text-gray-400 bg-gray-500/20";
+  }
+};
+
+const renderIcon = (icon: string) => {
   return (
-    <div className="space-y-4">
+    <div className="flex items-center justify-center w-10 h-10 rounded-full bg-teal-600 text-white">
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        width="20"
+        height="20"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      >
+        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+        <polyline points="14 2 14 8 20 8"></polyline>
+        <line x1="16" y1="13" x2="8" y2="13"></line>
+        <line x1="16" y1="17" x2="8" y2="17"></line>
+        <polyline points="10 9 9 9 8 9"></polyline>
+      </svg>
+    </div>
+  );
+};
+
+const ExamHistory = ({ activities = sampleActivities }) => {
+  return (
+    <div className="space-y-4 max-h-[300px] overflow-y-auto scrollbar-custom pr-2 custom-scrollbar">
       {activities.map((activity) => (
         <div
           key={activity.id}
-          className="flex flex-col sm:flex-row sm:items-center sm:justify-between bg-[#F6F6F6]  dark:bg-black/80 rounded-2xl p-5 dark:border border-teal-600/50 hover:border-teal-500 hover:bg-gray-200 dark:hover:bg-black/90 transition-all duration-300 backdrop-blur-sm gap-4"
+          className="flex flex-col sm:flex-row sm:justify-between gap-4 bg-[#F6F6F6] dark:bg-black/80 rounded-xl p-4 dark:border border-teal-600/50 hover:border-teal-500 hover:bg-gray-200 dark:hover:bg-black/90 transition-all duration-300 backdrop-blur-sm"
         >
-          <div className="flex items-center gap-4">
-            {renderIcon(activity.icon)}
-            <div>
-              <p className="font-medium text-gray-700 dark:text-white">
+          {/* Left Section: Icon + Course + Date */}
+          <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4">
+            <div className="flex items-center gap-2">
+              {renderIcon(activity.icon)}
+              <span className="font-medium text-gray-800 dark:text-white">
                 {activity.course}
-              </p>
-              <p className="text-sm text-gray-500 dark:text-gray-400">
-                {activity.type}
-              </p>
+              </span>
+            </div>
+            <div className="text-left sm:text-center mt-2 sm:mt-0">
+            <span className="text-sm text-gray-500 dark:text-gray-400">
+              {activity.date}
+            </span>
             </div>
           </div>
 
-          <div className="text-left sm:text-center mt-2 sm:mt-0">
-            <p className="text-gray-500 dark:text-gray-400 text-sm">
-              {activity.date}
-            </p>
-          </div>
-
-          <div className="text-left sm:text-right mt-2 sm:mt-0">
-            {renderStatus(activity.status)}
+          {/* Right Section: Badges */}
+          <div className="flex flex-row flex-wrap items-center gap-2 sm:gap-3">
+            <span className="text-sm text-green-600 bg-green-500/20 rounded-full px-3 py-1 font-medium w-fit">
+              {activity.type}
+            </span>
+            <span
+              className={`text-sm rounded-full px-3 py-1 font-medium w-fit ${getStatusColor(
+                activity.status
+              )}`}
+            >
+              {activity.status}
+            </span>
           </div>
         </div>
       ))}
@@ -190,74 +165,97 @@ const UpcomingActivities: React.FC<{ activities?: Activity[] }> = ({
   );
 };
 
-const RecentAccessList: React.FC<{ accesses: RecentAccess[] }> = ({
+const iconMap: { [key: string]: JSX.Element } = {
+  "Upload Course work": <FileText className="w-5 h-5 text-white" />,
+  "View Results": <ClipboardList className="w-5 h-5 text-white" />,
+  "Course Work Details": <BookOpen className="w-5 h-5 text-white" />,
+  "Data Management Exam": <Database className="w-5 h-5 text-white" />,
+  "View profile": <User className="w-5 h-5 text-white" />,
+  "Online Exam": <Laptop className="w-5 h-5 text-white" />,
+};
+
+const UpcomingActivityList: React.FC<{ accesses: upcomingActivity[] }> = ({
   accesses,
 }) => {
   return (
-    <ul className="space-y-3 max-h-[700px] overflow-y-auto scrollbar-custom pr-2 custom-scrollbar">
-      {accesses.map((user, index) => (
+    <ul className="space-y-3">
+      {accesses.map((access, index) => (
         <li
           key={index}
-          className="flex items-center justify-between p-4 hover:bg-gray-100
-           dark:hover:bg-black/90 rounded-t-2xl dark:rounded-xl transition-all duration-300 border-b dark:border dark:border-teal-600/50 hover:border-teal-500 backdrop-blur-sm"
+          className="flex items-start gap-4 p-4 hover:bg-gray-100 dark:hover:bg-black/90 rounded-xl transition-all duration-300 border-b dark:border dark:border-teal-600/50 hover:border-teal-500 backdrop-blur-sm"
         >
-          <div className="flex items-center gap-3">
-            <div className="relative w-10 h-10 overflow-hidden rounded-full border-2 border-cyan-500/50 dark:border-cyan-500/30">
-              <Image
-                src={user.avatar}
-                alt="User Avatar"
-                fill
-                className="rounded-full object-cover"
-              />
-            </div>
-            <div>
-              <p className="font-medium text-sm">{user.id}</p>
-              <p className="text-xs text-gray-400">{user.time}</p>
-            </div>
+          <div className="bg-cyan-600/80 dark:bg-teal-600 p-2 rounded-full">
+            {iconMap[access.id] ?? <FileText className="w-5 h-5 text-white" />}
           </div>
-          <button className="px-4 py-1.5 text-xs border border-cyan-500/50 dark:border-cyan-400/50 rounded-lg text-cyan-700/80 dark:text-cyan-400 hover:bg-gray-200 dark:hover:bg-cyan-400/10 transition-all duration-300 cursor-pointer">
-            View
-          </button>
+          <div className="flex flex-col">
+            <p className="font-medium text-sm">{access.id}</p>
+            <p className="text-xs text-gray-400">{access.time}</p>
+          </div>
         </li>
       ))}
     </ul>
   );
 };
 
-const sampleActivities: Activity[] = [
+const sampleActivities = [
   {
-    id: "1",
-    icon: "code",
+    id: 1,
     course: "Data Management",
     date: "12/03/2025",
     type: "Online Exam",
-    status: "Ongoing",
+    status: "Participated",
+    icon: "document",
   },
   {
-    id: "2",
-    icon: "server",
-    course: "Network Security",
-    date: "15/03/2025",
-    type: "Practical Lab",
-    status: "Pending",
+    id: 2,
+    course: "Data Management",
+    date: "12/03/2025",
+    type: "Course Work",
+    status: "Upcoming",
+    icon: "document",
   },
   {
-    id: "3",
-    icon: "code",
-    course: "Web Development",
-    date: "18/03/2025",
-    type: "Assignment",
-    status: "Completed",
+    id: 3,
+    course: "Software Engineering",
+    date: "12/03/2025",
+    type: "Online Exam",
+    status: "Participated",
+    icon: "document",
+  },
+  {
+    id: 4,
+    course: "EAD2",
+    date: "12/03/2025",
+    type: "Online Exam",
+    status: "Participated",
+    icon: "document",
+  },
+  {
+    id: 5,
+    course: "Data Management",
+    date: "12/03/2025",
+    type: "Online Exam",
+    status: "Participated",
+    icon: "document",
+  },
+  {
+    id: 6,
+    course: "Data Management",
+    date: "12/03/2025",
+    type: "Course Work",
+    status: "Upcoming",
+    icon: "document",
   },
 ];
 
-const studentParticipation = [
-  { name: "DW", value: 60 },
-  { name: "EW", value: 80 },
-  { name: "EN", value: 50 },
-  { name: "MAO", value: 90 },
-  { name: "FAO", value: 70 },
-  { name: "FR", value: 85 },
+const weeklyActivityData = [
+  { day: "Mon", hours: 2 },
+  { day: "Tue", hours: 3 },
+  { day: "Wed", hours: 1 },
+  { day: "Thu", hours: 4 },
+  { day: "Fri", hours: 2 },
+  { day: "Sat", hours: 5 },
+  { day: "Sun", hours: 0 },
 ];
 
 const examinationSummary = [
@@ -269,20 +267,25 @@ const examinationSummary = [
   { name: "Jun", value: 90 },
 ];
 
-const recentAccess: RecentAccess[] = [
-  { id: "KUDE524F-042", time: "11:45 AM", avatar: avatar1.src },
-  { id: "KUDE524F-021", time: "11:32 AM", avatar: avatar2.src },
-  { id: "KUDE524F-056", time: "10:15 AM", avatar: avatar3.src },
-  { id: "KUDE524F-071", time: "09:45 AM", avatar: avatar4.src },
-  { id: "KUDE524F-069", time: "Yesterday", avatar: avatar5.src },
-  { id: "KUDE524F-069", time: "Yesterday", avatar: avatar6.src },
-
-  { id: "KUDE524F-069", time: "Yesterday", avatar: avatar1.src },
-  { id: "KUDE524F-069", time: "Yesterday", avatar: avatar2.src },
-  { id: "KUDE524F-069", time: "Yesterday", avatar: avatar3.src },
-  { id: "KUDE524F-069", time: "Yesterday", avatar: avatar4.src },
-  { id: "KUDE524F-069", time: "Yesterday", avatar: avatar5.src },
-  { id: "KUDE524F-069", time: "Yesterday", avatar: avatar6.src },
+const upcomingActivity = [
+  { id: "Upload Course work", time: "11.45 A.M" },
+  { id: "View Results", time: "11.45 A.M" },
+  { id: "Course Work Details", time: "11.45 A.M" },
+  { id: "Data Management Exam", time: "11.45 A.M" },
+  { id: "View profile", time: "11.45 A.M" },
+  { id: "Online Exam", time: "11.45 A.M" },
+  { id: "Upload Course work", time: "11.45 A.M" },
+  { id: "View Results", time: "11.45 A.M" },
+  { id: "Course Work Details", time: "11.45 A.M" },
+  { id: "Data Management Exam", time: "11.45 A.M" },
+  { id: "View profile", time: "11.45 A.M" },
+  { id: "Online Exam", time: "11.45 A.M" },
+  { id: "Upload Course work", time: "11.45 A.M" },
+  { id: "View Results", time: "11.45 A.M" },
+  { id: "Course Work Details", time: "11.45 A.M" },
+  { id: "Data Management Exam", time: "11.45 A.M" },
+  { id: "View profile", time: "11.45 A.M" },
+  { id: "Online Exam", time: "11.45 A.M" },
 ];
 
 export default function AdminDashboard() {
@@ -313,92 +316,77 @@ export default function AdminDashboard() {
               Overview
             </h1>
             <p className="text-black/80 dark:text-gray-400 text-sm">
-              Welcome back! Here’s what’s happening with your reports and exams.
+              Welcome back! Here's what's happening with your reports and exams.
             </p>
-          </div>
-
-          <div className="mt-4 md:mt-0 flex items-center gap-4">
-            <button className="px-4 py-2 bg-gray-100 dark:bg-cyan-500/10 dark:hover:bg-cyan-500/40 cursor-pointer hover:bg-cyan-500/20 border border-cyan-500/30 rounded-lg text-cyan-600 dark:text-cyan-400 transition-all duration-300 text-sm">
-              Export Data
-            </button>
-            <button className="px-4 py-2 bg-teal-500/80 hover:bg-teal-500 rounded-lg cursor-pointer text-white transition-all duration-300 text-sm font-medium">
-              New Report
-            </button>
           </div>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           <div className="col-span-1 md:col-span-2 grid grid-cols-1 sm:grid-cols-2 gap-6 bg-white dark:bg-black p-2.5 rounded-3xl">
-            <StatCard title="Total Exams" value={4} />
-            <StatCard title="Total Students" value={210} />
-            <StatCard title="Total Lecturers" value={5} />
-            <StatCard title="Total Hours" value={12} />
+            <StatCard
+              title="Total Completed Exams"
+              value={1}
+              icon={<GraduationCap className="w-6 h-6" />}
+              highlight
+            />
+            <StatCard
+              title="Total Completed CWs"
+              value={2}
+              icon={<BookOpen className="w-5 h-5" />}
+            />
+            <StatCard
+              title="Total Lecturers"
+              value={5}
+              icon={<Users className="w-6 h-6" />}
+            />
+            <StatCard
+              title="Total Hours"
+              value={12}
+              icon={<Hourglass className="w-5 h-5" />}
+            />
           </div>
 
           <div className="col-span-1 md:col-span-2 bg-white dark:bg-black/80 p-6 rounded-2xl dark:shadow-lg dark:border dark:border-teal-600/50 backdrop-blur-sm">
             <h3 className="text-xl font-semibold mb-4 text-gray-900 dark:text-gray-100">
-              Examination Summary
+              Result Summary
             </h3>
-            <div className="h-70">
-              <ResponsiveContainer width="100%" height="100%">
-                <LineChart data={examinationSummary}>
-                  <XAxis dataKey="name" stroke="#94a3b8" />
-                  <Tooltip
-                    contentStyle={{
-                      backgroundColor: "rgba(0, 0, 0, 0.85)",
-                      borderColor: "#0d9488",
-                      borderRadius: "0.75rem",
-                      boxShadow: "0 10px 15px -3px rgba(0, 0, 0, 0.3)",
-                    }}
-                    itemStyle={{ color: "#f8fafc" }}
-                  />
-                  <Line
-                    type="monotone"
-                    dataKey="value"
-                    stroke="#1EBFBF"
-                    strokeWidth={3}
-                    dot={{ r: 6, fill: "#096F6E", strokeWidth: 3 }}
-                    activeDot={{ r: 8, fill: "#096F6E", strokeWidth: 0 }}
-                  />
-                </LineChart>
-              </ResponsiveContainer>
+            {/* Increased chart height for better visibility */}
+            <div className="h-80">
+              <AreaChart
+                data={examinationSummary}
+                categories={["value"]}
+                index="name"
+                colors={["#1EBFBF"]}
+                className="h-full w-full"
+                showLegend={false}
+                yAxisWidth={40}
+                tooltip={true}
+              />
             </div>
           </div>
 
           <div className="col-span-1 md:col-span-3 bg-white dark:bg-black/80 p-6 rounded-2xl dark:shadow-lg dark:border dark:border-teal-600/50 backdrop-blur-sm">
             <h3 className="text-xl font-semibold mb-4 text-gray-800 dark:text-gray-100">
-              Student Participation
+              Weekly Exam Activity
             </h3>
-            <div className="h-64">
-              <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={studentParticipation}>
-                  <XAxis dataKey="name" stroke="#94a3b8" />
-                  <YAxis stroke="#94a3b8" />
-                  <Tooltip
-                    cursor={{ fill: "rgba(14, 116, 144, 0.2)" }}
-                    contentStyle={{
-                      backgroundColor: "rgba(0, 0, 0, 0.85)",
-                      borderColor: "#0d9488",
-                      borderRadius: "0.75rem",
-                      boxShadow: "0 10px 15px -3px rgba(0, 0, 0, 0.3)",
-                    }}
-                    itemStyle={{ color: "#f8fafc" }}
-                  />
-                  <Bar
-                    dataKey="value"
-                    fill="#1EBFBF"
-                    radius={[8, 8, 0, 0]}
-                    barSize={38}
-                  />
-                </BarChart>
-              </ResponsiveContainer>
+            <div className="h-80">
+              <BarChart
+                data={weeklyActivityData}
+                categories={["hours"]}
+                index="day"
+                colors={["#1EBFBF"]}
+                className="h-full w-full"
+                showLegend={false}
+                yAxisWidth={40}
+                tooltip={true}
+              />
             </div>
           </div>
 
-          <div className="bg-white dark:bg-black/80 p-6 rounded-2xl dark:shadow-lg text-gray-800 dark:text-white row-span-2 overflow-y-hidden dark:border dark:border-teal-600/50 backdrop-blur-sm">
+          <div className="bg-white dark:bg-black/80 p-6 rounded-2xl dark:shadow-lg text-gray-800 dark:text-white overflow-y-hidden dark:border dark:border-teal-600/50 backdrop-blur-sm">
             <div className="flex justify-between items-center mb-6">
               <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
-                Recent Access
+                Upcoming Activities
               </h3>
               <Link
                 href="/access"
@@ -407,22 +395,10 @@ export default function AdminDashboard() {
                 View all
               </Link>
             </div>
-            <RecentAccessList accesses={recentAccess} />
-          </div>
-
-          <div className="col-span-1 md:col-span-3 bg-white dark:bg-black/80 rounded-2xl dakr:shadow-lg dark:border border-teal-600/50 p-6 backdrop-blur-sm">
-            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6">
-              <h2 className="text-xl font-semibold text-gray-800 dark:text-gray-100">
-                Upcoming Activities
-              </h2>
-              <Link
-                href="/activities"
-                className="text-sm px-4 py-1.5 border border-cyan-700/50 dark:border-cyan-400/30 rounded-lg text-cyan-700/80 dark:text-cyan-300 hover:bg-gray-100  dark:hover:bg-cyan-900/30 transition-all duration-300"
-              >
-                View all
-              </Link>
+            {/* Made container taller to match other content heights */}
+            <div className="h-[300px] overflow-y-auto scrollbar-custom pr-2 custom-scrollbar">
+              <UpcomingActivityList accesses={upcomingActivity} />
             </div>
-            <UpcomingActivities />
           </div>
         </div>
       </div>
