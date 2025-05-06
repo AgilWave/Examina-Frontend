@@ -57,9 +57,7 @@ function LoginPageContent() {
     }
 
     try {
-      const response = await signIn("microsoft-entra-id" , {
-        redirectTo: `https://lecturer.examina.live/login`,
-      });
+      const response = await signIn("microsoft-entra-id" )
       console.log("SignIn Response:", response); 
     } catch (error) {
       console.error("Login error:", error);
