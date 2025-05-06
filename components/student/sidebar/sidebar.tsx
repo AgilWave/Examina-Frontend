@@ -26,12 +26,12 @@ const Sidebar = () => {
   }, []);
 
   const menuItems = [
-    { name: "Overview", icon: LayoutGrid, href: "/student/dashboard/overview" },
-    { name: "Exams", icon: GraduationCap, href: "/student/dashboard/exams" },
+    { name: "Overview", icon: LayoutGrid, href: "/dashboard/overview" },
+    { name: "Exams", icon: GraduationCap, href: "/dashboard/exams" },
     {
       name: "Course Works",
       icon: BookCopy,
-      href: "/student/dashboard/course-works",
+      href: "/dashboard/course-works",
     },
   ];
 
