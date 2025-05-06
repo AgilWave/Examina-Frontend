@@ -1,10 +1,9 @@
 "use server";
-import { cookies } from "next/headers";
 import { encrypt } from "@/lib/encryption";
 import { BACKEND_URL } from "@/Constants/backend";
+import Cookies from "js-cookie"
 
 export async function loginActionMS({ idToken }: { idToken: string }) {
-  const cookieStore = await cookies();
 
   const LectuerEmailArray = [
     "lishanichamathka@outlook.com",
@@ -44,20 +43,24 @@ export async function loginActionMS({ idToken }: { idToken: string }) {
       let redirectUrl = `${origin}/dashboard/overview`;
 
       if (LectuerEmailArray.includes(responseBody.content.user.email)) {
-        cookieStore.set("lecturerjwt", responseBody.content.jwt, {
+        Cookies.set("lecturerjwt", responseBody.content.jwt, {
           domain: "lecturer.examina.live",
+          secure: true,
+          sameSite: "Lax",
         });
         origin = process.env.NEXT_LECTURER_PUBLIC_URL || "http://localhost:3000";
         redirectUrl = `${origin}/lecturer/dashboard/overview`;
       } else {
-        cookieStore.set("jwt", responseBody.content.jwt);
+        Cookies.set("jwt", responseBody.content.jwt);
       }
       const userDetails = JSON.stringify(responseBody.content.user);
       const encryptedUserDetails = encrypt(userDetails);
-      cookieStore.set("userDetails", encryptedUserDetails , {
+      Cookies.set("userDetails", encryptedUserDetails, {
         domain: ".examina.live",
+        secure: true,
+        sameSite: "Lax",
       });
-   
+
       return {
         success: true,
         message: "Login successful",
@@ -73,13 +76,12 @@ export async function loginActionMS({ idToken }: { idToken: string }) {
 }
 
 export async function LogoutAction() {
-  const cookieStore = await cookies();
   try {
     const res = await fetch(`${BACKEND_URL}/auth/logout`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${cookieStore.get("jwt")?.value}`,
+        Authorization: `Bearer ${Cookies.get("jwt")?.valueOf}`,
       },
     });
 
@@ -91,7 +93,7 @@ export async function LogoutAction() {
     }
 
     const responseData = await res.json();
-    cookieStore.delete("jwt");
+    Cookies.remove("jwt");
     return responseData;
   } catch (error) {
     console.error("Error during logout:", error);
@@ -106,7 +108,6 @@ export async function LoginAdmin({
   email: string;
   password: string;
 }) {
-  const cookieStore = await cookies();
   try {
     const res = await fetch(
       `${BACKEND_URL}/auth/admin-login`,
@@ -133,10 +134,10 @@ export async function LoginAdmin({
     }
 
     if (responseBody.content.token && responseBody.content.user) {
-      cookieStore.set("adminjwt", responseBody.content.token);
+      Cookies.set("adminjwt", responseBody.content.token);
       const userDetails = JSON.stringify(responseBody.content.user);
       const encryptedUserDetails = encrypt(userDetails);
-      cookieStore.set("userDetails", encryptedUserDetails)
+      Cookies.set("userDetails", encryptedUserDetails)
       const origin = process.env.NEXT_Admin_PUBLIC_URL || "http://localhost:3000";
       let redirectUrl = `${origin}/admin/dashboard/overview`;
 
