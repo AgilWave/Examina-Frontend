@@ -13,10 +13,6 @@ const nextConfig: NextConfig = {
         has: [{ type: 'host', value: 'lecturer.examina.live' }],
         destination: '/lecturer/:path*',
       },
-      {
-        source: '/api/:path*',
-        destination: '/api/:path*',
-      },
     ];
   },
   async headers() {

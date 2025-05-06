@@ -139,10 +139,6 @@ export async function middleware(req: NextRequest) {
       return NextResponse.next();
     }
 
-    if (url.pathname.startsWith("/api")) {
-      return NextResponse.next();
-    }
-
     if (url.pathname.startsWith("/lecturer/api")) {
       const newPath = url.pathname.replace("/lecturer/api", "/api");
       const newUrl = new URL(newPath, req.url);

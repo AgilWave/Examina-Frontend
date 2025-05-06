@@ -61,7 +61,7 @@ function LoginPageContent() {
         redirect: true,
         callbackUrl: "https://lecturer.examina.live/login",
       });
-      console.log("SignIn Response:", response); // Log the sign-in response
+      console.log("SignIn Response:", response); 
     } catch (error) {
       console.error("Login error:", error);
       setLoadingStudent(false);
