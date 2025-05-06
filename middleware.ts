@@ -161,10 +161,10 @@ export async function middleware(req: NextRequest) {
 
     // THEN: Allow /api to pass through
     if (url.pathname.startsWith("/api")) {
-      console.log("API request detected, allowing through middleware.");
-      console.log("Request URL:", req.url);
-      console.log("Request Pathname:", url.pathname);
-      return NextResponse.next();
+      const newPath = url.pathname.replace("/api", "/lecturer/api");
+      const newUrl = new URL(newPath, req.url);
+      console.log(`Rewriting /api to ${newUrl}`);
+      return NextResponse.rewrite(newUrl);
     }
 
     if (!lecturerJwt) {
