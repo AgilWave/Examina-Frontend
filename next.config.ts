@@ -8,8 +8,35 @@ const nextConfig: NextConfig = {
         has: [{ type: 'host', value: 'admin.examina.live' }],
         destination: '/admin/:path*',
       },
+      {
+        source: '/:path*',
+        has: [{ type: 'host', value: 'lecturer.examina.live' }],
+        destination: '/lecturer/:path*',
+      },
+      {
+        source: '/api/:path*',
+        destination: '/api/:path*',
+      },
     ];
   },
+  async headers() {
+    return [
+      {
+        source: '/(.*)',
+        headers: [
+          {
+            key: 'Access-Control-Allow-Origin',
+            value: '.examina.live',
+          },
+          {
+            key: 'Access-Control-Allow-Credentials',
+            value: 'true',
+          },
+        ],
+      },
+    ];
+  }
+
 };
 
 export default nextConfig;

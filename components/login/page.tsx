@@ -57,7 +57,8 @@ function LoginPageContent() {
     }
 
     try {
-      await signIn("microsoft-entra-id");
+      const response = await signIn("microsoft-entra-id");
+      console.log("SignIn Response:", response); // Log the sign-in response
     } catch (error) {
       console.error("Login error:", error);
       setLoadingStudent(false);

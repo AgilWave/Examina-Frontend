@@ -33,32 +33,12 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
   ],
   cookies: {
     sessionToken: {
-      name: `__Secure-next-auth.session-token`,
+      name: `__Secure-authjs.session-token`,
       options: {
-        domain: "lecturer.examina.live",
+        domain: ".examina.live",
         path: "/",
-        secure: true,
         httpOnly: true,
-        sameSite: 'lax',
-      },
-    },
-    csrfToken: {
-      name: `__Secure-next-auth.csrf-token`,
-      options: {
-        domain: "lecturer.examina.live",
-        path: "/",
-        secure: true,
-        httpOnly: true,
-        sameSite: 'lax',
-      },
-    },
-    callbackUrl: {
-      name: `__Secure-next-auth.callback-url`,
-      options: {
-        domain: "lecturer.examina.live",
-        path: "/",
-        secure: true,
-        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
         sameSite: 'lax',
       },
     },
@@ -80,5 +60,7 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
       }
       return session;
     },
-  }
+  },
+  trustHost: true,
+  
 });
