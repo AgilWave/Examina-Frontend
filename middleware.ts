@@ -9,6 +9,8 @@ export async function middleware(req: NextRequest) {
   const adminJwt = req.cookies.get("adminjwt")?.value;
   const lecturerJwt = req.cookies.get("lecturerjwt")?.value;
 
+
+
   const staticAssetPatterns = [
     "/_next/static",
     "/_next/image",
@@ -29,6 +31,16 @@ export async function middleware(req: NextRequest) {
   const adminHost = process.env.NEXT_PUBLIC_HOSTNAME_ADMIN as string;
   const lecturerHost = process.env.NEXT_PUBLIC_HOSTNAME_LECTURER as string;
   const isLocalhost = host?.includes("localhost");
+
+
+  if (host) {
+    const subdomain = host.split(".")[0];
+    if (subdomain && subdomain !== "www") {
+      const dynamicUrl = `https://${host}`;
+      req.headers.set("NEXTAUTH_URL", dynamicUrl);
+      console.log('Dynamically setting NEXTAUTH_URL:', dynamicUrl);
+    }
+  }
 
   // For localhost admin routes
   if (isLocalhost && url.pathname.startsWith("/admin")) {
@@ -139,6 +151,15 @@ export async function middleware(req: NextRequest) {
       return NextResponse.next();
     }
 
+    // FIRST: Rewrite /lecturer/api to /api
+    if (url.pathname.startsWith("/lecturer/api")) {
+      const newPath = url.pathname.replace("/lecturer/api", "/api");
+      const newUrl = new URL(newPath, req.url);
+      console.log(`Rewriting /lecturer/api to ${newUrl}`);
+      return NextResponse.rewrite(newUrl);
+    }
+
+    // THEN: Allow /api to pass through
     if (url.pathname.startsWith("/api")) {
       console.log("API request detected, allowing through middleware.");
       console.log("Request URL:", req.url);
@@ -146,11 +167,6 @@ export async function middleware(req: NextRequest) {
       return NextResponse.next();
     }
 
-    if (url.pathname.startsWith("/lecturer/api")) {
-      const newPath = url.pathname.replace("/lecturer/api", "/api");
-      const newUrl = new URL(newPath, req.url);
-      return NextResponse.rewrite(newUrl);
-    }
     if (!lecturerJwt) {
       if (url.pathname !== "/login") {
         return NextResponse.redirect(new URL("/login", req.url));
