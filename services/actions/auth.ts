@@ -44,7 +44,9 @@ export async function loginActionMS({ idToken }: { idToken: string }) {
       let redirectUrl = `${origin}/dashboard/overview`;
 
       if (LectuerEmailArray.includes(responseBody.content.user.email)) {
-        cookieStore.set("lecturerjwt", responseBody.content.jwt);
+        cookieStore.set("lecturerjwt", responseBody.content.jwt, {
+          domain: "lecturer.examina.live",
+        });
         origin = process.env.NEXT_LECTURER_PUBLIC_URL || "http://localhost:3000";
         redirectUrl = `${origin}/lecturer/dashboard/overview`;
       } else {
@@ -52,7 +54,9 @@ export async function loginActionMS({ idToken }: { idToken: string }) {
       }
       const userDetails = JSON.stringify(responseBody.content.user);
       const encryptedUserDetails = encrypt(userDetails);
-      cookieStore.set("userDetails", encryptedUserDetails);
+      cookieStore.set("userDetails", encryptedUserDetails , {
+        domain: ".examina.live",
+      });
    
       return {
         success: true,
