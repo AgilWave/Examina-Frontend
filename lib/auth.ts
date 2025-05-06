@@ -42,6 +42,26 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
         sameSite: 'lax',
       },
     },
+    csrfToken: {
+      name: `__Secure-next-auth.csrf-token`,
+      options: {
+        domain: ".examina.live",
+        path: "/",
+        secure: true,
+        httpOnly: true,
+        sameSite: 'lax',
+      },
+    },
+    callbackUrl: {
+      name: `__Secure-next-auth.callback-url`,
+      options: {
+        domain: ".examina.live",
+        path: "/",
+        secure: true,
+        httpOnly: true,
+        sameSite: 'lax',
+      },
+    },
   },
   callbacks: {
     async jwt({ token, account }) {

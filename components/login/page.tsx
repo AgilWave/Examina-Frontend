@@ -23,12 +23,12 @@ function LoginPageContent() {
           const response = await loginActionMS({
             idToken: session.idToken,
           });
-
-          if (response?.success && response?.redirect) {
+    
+          if (response && response.success && response.redirect) {
             router.push(response.redirect);
             toast.success("Login successful");
-          } else if (!response?.success) {
-            toast.error(response?.message || "Login failed");
+          } else if (response && !response.success) {
+            toast.error(response.message || "Login failed");
           }
         } catch (error) {
           console.error("Authentication error:", error);
@@ -36,6 +36,7 @@ function LoginPageContent() {
         }
       }
     };
+    
 
     handleMicrosoftAuth();
   }, [session, router]);
