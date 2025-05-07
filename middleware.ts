@@ -42,22 +42,18 @@ export async function middleware(req: NextRequest) {
     const isAdminRoute = url.pathname.startsWith("/admin");
     const isLoginPage = url.pathname === "/" || url.pathname === "/login";
 
-    // Block admin access on examina host
     if (isAdminRoute) {
       return NextResponse.redirect(new URL("/", req.url));
     }
 
-    // Prevent lecturer users from accessing student routes
     if (isStudentRoute && lecturerJwt && !jwt) {
       return NextResponse.redirect(new URL("/lecturer/dashboard/overview", req.url));
     }
 
-    // Prevent student users from accessing lecturer routes
     if (isLecturerRoute && jwt && !lecturerJwt) {
       return NextResponse.redirect(new URL("/student/dashboard/overview", req.url));
     }
 
-    // Prevent authenticated users from accessing login page
     if (isLoginPage && (jwt || lecturerJwt)) {
       if (lecturerJwt) {
         return NextResponse.redirect(new URL("/lecturer/dashboard/overview", req.url));
@@ -67,7 +63,6 @@ export async function middleware(req: NextRequest) {
       }
     }
 
-    // Auth guard: redirect unauthenticated users
     if (
       (isStudentRoute && !jwt && !userDetails) ||
       (isLecturerRoute && !lecturerJwt)
@@ -85,7 +80,6 @@ export async function middleware(req: NextRequest) {
   }
 
 
-  // For localhost admin routes
   if (isLocalhost && url.pathname.startsWith("/admin")) {
     if (isStaticAsset || isImageOptimizationRequest) {
       return NextResponse.next();
@@ -104,23 +98,19 @@ export async function middleware(req: NextRequest) {
     return NextResponse.next();
   }
 
-  // For localhost student and lecturer routes
   if (isLocalhost && !url.pathname.startsWith("/admin")) {
     const isStudentRoute = url.pathname.startsWith("/student");
     const isLecturerRoute = url.pathname.startsWith("/lecturer");
     const isLoginPage = url.pathname === "/" || url.pathname === "/login";
 
-    // Prevent lecturer users from accessing student routes
     if (isStudentRoute && lecturerJwt && !jwt) {
       return NextResponse.redirect(new URL("/lecturer/dashboard/overview", req.url));
     }
 
-    // Prevent student users from accessing lecturer routes
     if (isLecturerRoute && jwt && !lecturerJwt) {
       return NextResponse.redirect(new URL("/student/dashboard/overview", req.url));
     }
 
-    // Prevent authenticated users from accessing login page
     if (isLoginPage && (jwt || lecturerJwt)) {
       if (lecturerJwt) {
         return NextResponse.redirect(new URL("/lecturer/dashboard/overview", req.url));
@@ -130,7 +120,6 @@ export async function middleware(req: NextRequest) {
       }
     }
 
-    // Auth guard: redirect unauthenticated users
     if (
       (isStudentRoute && !jwt && !userDetails) ||
       (isLecturerRoute && !lecturerJwt)
@@ -149,9 +138,7 @@ export async function middleware(req: NextRequest) {
 
 
 
-  // Handle admin subdomain routing
   if (host?.includes(adminHost)) {
-    // Allow static assets to pass through
     if (isStaticAsset || isImageOptimizationRequest) {
       return NextResponse.next();
     }

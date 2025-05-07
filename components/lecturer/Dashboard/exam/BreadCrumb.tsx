@@ -15,7 +15,7 @@ function BreadCrumb() {
         <BreadcrumbList>
           <BreadcrumbItem>
             <BreadcrumbLink
-              href="/admin/dashboard/overview"
+              href="/lecturer/dashboard/overview"
               className="text-muted-foreground hover:text-foreground"
             >
               Dashboard

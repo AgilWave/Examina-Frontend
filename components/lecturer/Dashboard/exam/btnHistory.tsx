@@ -8,7 +8,7 @@ function CreateCourseDialog() {
   const router = useRouter();
 
   const handleNavigate = () => {
-    router.push("/dashboard/exams/history");
+    router.push("/lecturer/dashboard/exams/history");
   };
 
   return (
