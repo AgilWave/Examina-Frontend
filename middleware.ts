@@ -7,7 +7,6 @@ export async function middleware(req: NextRequest) {
   const jwt = req.cookies.get("jwt")?.value;
   const userDetails = req.cookies.get("userDetails")?.value;
   const adminJwt = req.cookies.get("adminjwt")?.value;
-  const lecturerJwt = req.cookies.get("lecturerjwt")?.value;
 
 
 
@@ -29,7 +28,6 @@ export async function middleware(req: NextRequest) {
 
   const examinaHost = process.env.NEXT_PUBLIC_HOSTNAME_EXAMINA as string;
   const adminHost = process.env.NEXT_PUBLIC_HOSTNAME_ADMIN as string;
-  const lecturerHost = process.env.NEXT_PUBLIC_HOSTNAME_LECTURER as string;
   const isLocalhost = host?.includes("localhost");
 
 
@@ -61,25 +59,6 @@ export async function middleware(req: NextRequest) {
     return NextResponse.next();
   }
 
-  // For localhost lecturer routes
-  if (isLocalhost && url.pathname.startsWith("/lecturer")) {
-    if (isStaticAsset || isImageOptimizationRequest) {
-      return NextResponse.next();
-    }
-
-    if (!lecturerJwt && url.pathname !== "/lecturer/login") {
-      return NextResponse.redirect(new URL("/lecturer/login", req.url));
-    }
-
-    if (lecturerJwt && url.pathname === "/lecturer/login") {
-      return NextResponse.redirect(
-        new URL("/lecturer/dashboard/overview", req.url)
-      );
-    }
-
-    return NextResponse.next();
-  }
-
   if (
     host?.includes(examinaHost) &&
     !host?.includes("admin") &&
@@ -90,7 +69,7 @@ export async function middleware(req: NextRequest) {
 
   if (
     host?.includes(examinaHost) &&
-    !host?.includes("admin") && !host?.includes("lecturer") &&
+    !host?.includes("admin") &&
     !isStaticAsset
   ) {
     if (!jwt && !userDetails) {
@@ -141,42 +120,6 @@ export async function middleware(req: NextRequest) {
     }
 
     const targetPath = `/admin${url.pathname}`;
-    return NextResponse.rewrite(new URL(targetPath, req.url));
-  }
-
-  // Handle lecturer subdomain routing
-  if (host?.includes(lecturerHost)) {
-    // Allow static assets to pass through
-    if (isStaticAsset || isImageOptimizationRequest) {
-      return NextResponse.next();
-    }
-
-    // THEN: Allow /api to pass through
-    if (url.pathname.startsWith("/api")) {
-      console.log("API request detected, allowing through middleware.");
-      console.log("Request URL:", req.url);
-      console.log("Request Pathname:", url.pathname);
-      return NextResponse.next();
-    }
-
-    if (!lecturerJwt) {
-      if (url.pathname !== "/login") {
-        return NextResponse.redirect(new URL("/login", req.url));
-      }
-    } else {
-      if (url.pathname === "/" || url.pathname === "/login") {
-        return NextResponse.redirect(new URL("/dashboard/overview", req.url));
-      }
-    }
-
-    if (url.pathname.startsWith("/lecturer")) {
-      const newPath = url.pathname.replace("/lecturer", "");
-      const newUrl = new URL(newPath, req.url);
-      newUrl.search = url.search;
-      return NextResponse.redirect(newUrl);
-    }
-
-    const targetPath = `/lecturer${url.pathname}`;
     return NextResponse.rewrite(new URL(targetPath, req.url));
   }
 }
