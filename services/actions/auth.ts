@@ -3,6 +3,9 @@ import { encrypt } from "@/lib/encryption";
 import { BACKEND_URL } from "@/Constants/backend";
 import { cookies } from "next/headers";
 
+const LecturerEmails = [
+  'lishanichamathka@outlook.com'
+]
 
 export async function loginActionMS({ idToken }: { idToken: string }) {
   const cookieStore = await cookies();
@@ -38,12 +41,27 @@ export async function loginActionMS({ idToken }: { idToken: string }) {
 
 
     if (responseBody.content.jwt) {
+      console.log("Content:", responseBody.content); 
+      if (LecturerEmails.includes(responseBody.content.user.email)) {
+        cookieStore.set("lecturerjwt", responseBody.content.jwt);
+        const userDetails = JSON.stringify(responseBody.content.user);
+        const encryptedUserDetails = encrypt(userDetails);
+        cookieStore.set("userDetails", encryptedUserDetails);
+        const origin = process.env.NEXT_PUBLIC_URL || "http://localhost:3000";
+        const redirectUrl = `${origin}/lecturer/dashboard/overview`;
+        return {
+          success: true,
+          message: "Login successful",
+          status: res.status,
+          redirect: redirectUrl
+        };
+      }
       cookieStore.set("jwt", responseBody.content.jwt);
       const userDetails = JSON.stringify(responseBody.content.user);
       const encryptedUserDetails = encrypt(userDetails);
       cookieStore.set("userDetails", encryptedUserDetails);
       const origin = process.env.NEXT_PUBLIC_URL || "http://localhost:3000";
-      const redirectUrl = `${origin}/dashboard/overview`;
+      const redirectUrl = `${origin}/student/dashboard/overview`;
       return {
         success: true,
         message: "Login successful",

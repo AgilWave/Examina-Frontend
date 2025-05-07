@@ -4,9 +4,10 @@ export async function middleware(req: NextRequest) {
   const url = req.nextUrl.clone();
   const host = req.headers.get("host");
   const isImageOptimizationRequest = url.pathname === "/_next/image";
-  const jwt = req.cookies.get("jwt")?.value;
+  const jwt = req.cookies.get("jwt")?.value; // JWT for student
   const userDetails = req.cookies.get("userDetails")?.value;
   const adminJwt = req.cookies.get("adminjwt")?.value;
+  const lecturerJwt = req.cookies.get("lecturerjwt")?.value;
 
 
 
@@ -26,19 +27,63 @@ export async function middleware(req: NextRequest) {
     (path) => url.pathname.includes(path) || url.pathname.startsWith(path)
   );
 
-  const examinaHost = process.env.NEXT_PUBLIC_HOSTNAME_EXAMINA as string;
+  const examinaHost = process.env.NEXT_PUBLIC_HOSTNAME_EXAMINA as string; // have /student and /lecturer folders
   const adminHost = process.env.NEXT_PUBLIC_HOSTNAME_ADMIN as string;
   const isLocalhost = host?.includes("localhost");
 
 
-  if (host) {
-    const subdomain = host.split(".")[0];
-    if (subdomain && subdomain !== "www") {
-      const dynamicUrl = `https://${host}`;
-      req.headers.set("NEXTAUTH_URL", dynamicUrl);
-      console.log('Dynamically setting NEXTAUTH_URL:', dynamicUrl);
+  if (
+    host?.includes(examinaHost) &&
+    !host?.includes("admin") &&
+    !isStaticAsset
+  ) {
+    const isStudentRoute = url.pathname.startsWith("/student");
+    const isLecturerRoute = url.pathname.startsWith("/lecturer");
+    const isAdminRoute = url.pathname.startsWith("/admin");
+    const isLoginPage = url.pathname === "/" || url.pathname === "/login";
+
+    // Block admin access on examina host
+    if (isAdminRoute) {
+      return NextResponse.redirect(new URL("/", req.url));
     }
+
+    // Prevent lecturer users from accessing student routes
+    if (isStudentRoute && lecturerJwt && !jwt) {
+      return NextResponse.redirect(new URL("/lecturer/dashboard/overview", req.url));
+    }
+
+    // Prevent student users from accessing lecturer routes
+    if (isLecturerRoute && jwt && !lecturerJwt) {
+      return NextResponse.redirect(new URL("/student/dashboard/overview", req.url));
+    }
+
+    // Prevent authenticated users from accessing login page
+    if (isLoginPage && (jwt || lecturerJwt)) {
+      if (lecturerJwt) {
+        return NextResponse.redirect(new URL("/lecturer/dashboard/overview", req.url));
+      }
+      if (jwt) {
+        return NextResponse.redirect(new URL("/student/dashboard/overview", req.url));
+      }
+    }
+
+    // Auth guard: redirect unauthenticated users
+    if (
+      (isStudentRoute && !jwt && !userDetails) ||
+      (isLecturerRoute && !lecturerJwt)
+    ) {
+      if (
+        url.pathname.startsWith("/student/dashboard") ||
+        url.pathname.startsWith("/lecturer/dashboard")
+      ) {
+        return NextResponse.redirect(new URL("/login", req.url));
+      }
+      return NextResponse.next();
+    }
+
+    return NextResponse.next();
   }
+
 
   // For localhost admin routes
   if (isLocalhost && url.pathname.startsWith("/admin")) {
@@ -59,35 +104,50 @@ export async function middleware(req: NextRequest) {
     return NextResponse.next();
   }
 
-  if (
-    host?.includes(examinaHost) &&
-    !host?.includes("admin") &&
-    url.pathname.startsWith("/admin")
-  ) {
-    return NextResponse.redirect(new URL("/", req.url));
-  }
+  // For localhost student and lecturer routes
+  if (isLocalhost && !url.pathname.startsWith("/admin")) {
+    const isStudentRoute = url.pathname.startsWith("/student");
+    const isLecturerRoute = url.pathname.startsWith("/lecturer");
+    const isLoginPage = url.pathname === "/" || url.pathname === "/login";
 
-  if (
-    host?.includes(examinaHost) &&
-    !host?.includes("admin") &&
-    !isStaticAsset
-  ) {
-    if (!jwt && !userDetails) {
-      if (url.pathname.startsWith("/dashboard")) {
+    // Prevent lecturer users from accessing student routes
+    if (isStudentRoute && lecturerJwt && !jwt) {
+      return NextResponse.redirect(new URL("/lecturer/dashboard/overview", req.url));
+    }
+
+    // Prevent student users from accessing lecturer routes
+    if (isLecturerRoute && jwt && !lecturerJwt) {
+      return NextResponse.redirect(new URL("/student/dashboard/overview", req.url));
+    }
+
+    // Prevent authenticated users from accessing login page
+    if (isLoginPage && (jwt || lecturerJwt)) {
+      if (lecturerJwt) {
+        return NextResponse.redirect(new URL("/lecturer/dashboard/overview", req.url));
+      }
+      if (jwt) {
+        return NextResponse.redirect(new URL("/student/dashboard/overview", req.url));
+      }
+    }
+
+    // Auth guard: redirect unauthenticated users
+    if (
+      (isStudentRoute && !jwt && !userDetails) ||
+      (isLecturerRoute && !lecturerJwt)
+    ) {
+      if (
+        url.pathname.startsWith("/student/dashboard") ||
+        url.pathname.startsWith("/lecturer/dashboard")
+      ) {
         return NextResponse.redirect(new URL("/login", req.url));
       }
       return NextResponse.next();
-    } else {
-      if (url.pathname === "/login") {
-        return NextResponse.redirect(new URL("/dashboard/overview", req.url));
-      }
-      if (url.pathname === "/" || url.pathname === "/login") {
-        return NextResponse.redirect(new URL("/dashboard/overview", req.url));
-      }
-
-      return NextResponse.next();
     }
+
+    return NextResponse.next();
   }
+
+
 
   // Handle admin subdomain routing
   if (host?.includes(adminHost)) {
