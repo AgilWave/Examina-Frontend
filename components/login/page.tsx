@@ -16,35 +16,27 @@ function LoginPageContent() {
   const loginProcessed = useRef(false);
 
   useEffect(() => {
-    // Check if session is loading or the token is missing
-    if (!session?.idToken || loginProcessed.current) return;
-
-    loginProcessed.current = true;
-
     const handleMicrosoftAuth = async () => {
-      try {
-        console.log("Session ID Token:", session.idToken); // Log to check if the token exists
-
-        if (!session.idToken) {
-          toast.error("Authentication token is missing");
-          return;
+      if (session?.idToken && !loginProcessed.current) {
+        loginProcessed.current = true;
+        try {
+          const response = await loginActionMS({
+            idToken: session.idToken,
+          });
+    
+          if (response && response.success && response.redirect) {
+            router.push(response.redirect);
+            toast.success("Login successful");
+          } else if (response && !response.success) {
+            toast.error(response.message || "Login failed");
+          }
+        } catch (error) {
+          console.error("Authentication error:", error);
+          toast.error("An error occurred during authentication");
         }
-
-        const response = await loginActionMS({
-          idToken: session.idToken,
-        });
-
-        if (response && response.success && response.redirect) {
-          router.push(response.redirect);
-          toast.success("Login successful");
-        } else if (response && !response.success) {
-          toast.error(response.message || "Login failed");
-        }
-      } catch (error) {
-        console.error("Authentication error:", error);
-        toast.error("An error occurred during authentication");
       }
     };
+    
 
     handleMicrosoftAuth();
   }, [session, router]);
