@@ -208,7 +208,7 @@ function LoginPageContent() {
 
 export default function LoginPage() {
   return (
-    <SessionProvider session={null} refetchInterval={0}>
+    <SessionProvider>
       <LoginPageContent />
     </SessionProvider>
   );
