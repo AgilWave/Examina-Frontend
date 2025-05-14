@@ -1,4 +1,4 @@
-import Exam from '@/components/student/Dashboard/exam/index'
+import Exam from '@/components/lecturer/Dashboard/exam/index'
 
 const ExamTab = () => {
     return (
