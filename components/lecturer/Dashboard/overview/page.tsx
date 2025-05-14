@@ -1,7 +1,6 @@
 "use client";
 
 import React, { JSX } from "react";
-import Link from "next/link";
 import { ReactNode } from "react";
 import {
   Breadcrumb,
@@ -24,9 +23,6 @@ import {
   Laptop,
 } from "lucide-react";
 
-// Import custom shadcn chart components
-import { BarChart } from "@/components/ui/charts/bar-chart";
-import { AreaChart } from "@/components/ui/charts/area-chart";
 import { Card, CardContent } from "@/components/ui/card";
 import {
   Table,
@@ -184,28 +180,6 @@ const iconMap: { [key: string]: JSX.Element } = {
   "Online Exam": <Laptop className="w-5 h-5 text-white" />,
 };
 
-const UpcomingActivityList: React.FC<{ accesses: upcomingActivity[] }> = ({
-  accesses,
-}) => {
-  return (
-    <ul className="space-y-3">
-      {accesses.map((access, index) => (
-        <li
-          key={index}
-          className="flex items-start gap-4 p-4 hover:bg-gray-100 dark:hover:bg-black/90 rounded-xl transition-all duration-300 border-b dark:border dark:border-teal-600/50 hover:border-teal-500 backdrop-blur-sm"
-        >
-          <div className="bg-cyan-600/80 dark:bg-teal-600 p-2 rounded-full">
-            {iconMap[access.id] ?? <FileText className="w-5 h-5 text-white" />}
-          </div>
-          <div className="flex flex-col">
-            <p className="font-medium text-sm">{access.id}</p>
-            <p className="text-xs text-gray-400">{access.time}</p>
-          </div>
-        </li>
-      ))}
-    </ul>
-  );
-};
 
 const sampleActivities = [
   {
@@ -258,37 +232,6 @@ const sampleActivities = [
   },
 ];
 
-const weeklyActivityData = [
-  { day: "Mon", hours: 2 },
-  { day: "Tue", hours: 3 },
-  { day: "Wed", hours: 1 },
-  { day: "Thu", hours: 4 },
-  { day: "Fri", hours: 2 },
-  { day: "Sat", hours: 5 },
-  { day: "Sun", hours: 0 },
-];
-
-const examinationSummary = [
-  { name: "Jan", value: 30 },
-  { name: "Feb", value: 50 },
-  { name: "Mar", value: 45 },
-  { name: "Apr", value: 70 },
-  { name: "May", value: 60 },
-  { name: "Jun", value: 90 },
-];
-
-const upcomingActivity = [
-  { id: "Grade Final Assignments", time: "11.45 A.M" },
-  { id: "Conduct AI Lecture", time: "11.45 A.M" },
-  { id: "Meeting with HOD", time: "11.45 A.M" },
-  { id: "Upload Exam Marks ", time: "11.45 A.M" },
-  { id: "Meeting with HR", time: "11.45 A.M" },
-  { id: "Online Exam", time: "11.45 A.M" },
-  { id: "Grade Final Assignments", time: "11.45 A.M" },
-  { id: "Conduct AI Lecture", time: "11.45 A.M" },
-  { id: "Meeting with HOD", time: "11.45 A.M" },
-  { id: "Upload Exam Marks ", time: "11.45 A.M" },
-];
 
 export default function AdminDashboard() {
   return (
