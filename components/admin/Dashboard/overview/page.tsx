@@ -29,6 +29,14 @@ import avatar4 from "@/public/imgs/dashboard/common/overview/avatar4.png";
 import avatar5 from "@/public/imgs/dashboard/common/overview/avatar5.png";
 import avatar6 from "@/public/imgs/dashboard/common/overview/avatar6.png";
 
+import {
+  BookCopy,
+  BookOpen,
+  Users,
+  Hourglass,
+  MoveUp
+} from "lucide-react";
+
 type ActivityStatus = "Ongoing" | "Pending" | "Completed";
 
 interface Activity {
@@ -46,19 +54,52 @@ interface RecentAccess {
   avatar: string;
 }
 
-const StatCard: React.FC<{ title: string; value: number }> = ({
+const StatCard: React.FC<{ title: string; value: number; icon?: React.ReactNode; highlight?: boolean }> = ({
   title,
   value,
-}) => (
-  <div className="bg-[#F6F6F6] dark:bg-[#0A0A0A] p-6 rounded-2xl dark:shadow-lg hover:bg-gray-100 dark:hover:bg-black/90 transition-all duration-300 dark:border dark:border-teal-600/50 hover:border-teal-500 backdrop-blur-sm transform hover:scale-105">
-    <h3 className="text-lg font-medium text-gray-800 dark:text-gray-300 mb-2">
-      {title}
-    </h3>
-    <p className="text-4xl font-bold text-black dark:text-cyan-400 tracking-tight">
-      {value}
-    </p>
-  </div>
-);
+  icon,
+  highlight,
+}) => {
+  return (
+    <div
+      className={`p-6 rounded-2xl transition-all duration-300 transform hover:scale-102
+        ${
+          highlight
+            ? "bg-gradient-to-l from-teal-600/60 to-teal-500/60 text-white"
+            : "bg-[#F6F6F6] text-black dark:bg-[#0A0A0A] dark:text-gray-300"
+        }
+        dark:shadow-lg  hover:bg-gray-100 dark:hover:bg-black/90 dark:border dark:border-teal-600/50 hover:border-teal-500 backdrop-blur-sm
+        flex flex-col justify-between h-48`}
+    >
+      <div className="flex justify-between items-start">
+        <h3 className="text-1.5xl font-bold">{title}</h3>
+        <div
+          className={`p-2 rounded-full ${
+            highlight
+              ? "bg-white/20 text-white dark:bg-white/10 dark:text-teal-300"
+              : "bg-black/10 text-teal-500 dark:bg-white/10 dark:text-teal-300"
+          }`}
+        >
+          {icon}
+        </div>
+      </div>
+
+      <div className="flex justify-center items-center flex-grow">
+        <p className="text-4xl font-bold">{value}</p>
+      </div>
+
+      <div
+        className={`flex items-center text-sm ${
+          highlight ? "text-white" : "text-gray-700 dark:text-white"
+        }`}
+      >
+        <MoveUp className="w-4 h-4" />
+        Past 24 Hours
+      </div>
+    </div>
+  );
+};
+
 
 const CodeIcon = () => (
   <svg
@@ -194,7 +235,7 @@ const RecentAccessList: React.FC<{ accesses: RecentAccess[] }> = ({
   accesses,
 }) => {
   return (
-    <ul className="space-y-3 max-h-[700px] overflow-y-auto scrollbar-custom pr-2 custom-scrollbar">
+    <ul className="space-y-3 max-h-[700px]">
       {accesses.map((user, index) => (
         <li
           key={index}
@@ -329,10 +370,27 @@ export default function AdminDashboard() {
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           <div className="col-span-1 md:col-span-2 grid grid-cols-1 sm:grid-cols-2 gap-6 bg-white dark:bg-black p-2.5 rounded-3xl">
-            <StatCard title="Total Exams" value={4} />
-            <StatCard title="Total Students" value={210} />
-            <StatCard title="Total Lecturers" value={5} />
-            <StatCard title="Total Hours" value={12} />
+            <StatCard
+            title="Total Exams"
+            value={4}
+            icon={<BookCopy className="w-6 h-6" />}
+            highlight
+          />
+          <StatCard
+            title="Total Students"
+            value={210}
+            icon={<BookOpen className="w-5 h-5" />}
+          />
+          <StatCard
+            title="Total Lecturers"
+            value={12}
+            icon={<Users className="w-6 h-6" />}
+          />
+          <StatCard
+            title="Total Hours"
+            value={15}
+            icon={<Hourglass className="w-5 h-5" />}
+          />
           </div>
 
           <div className="col-span-1 md:col-span-2 bg-white dark:bg-black/80 p-6 rounded-2xl dark:shadow-lg dark:border dark:border-teal-600/50 backdrop-blur-sm">
@@ -395,7 +453,7 @@ export default function AdminDashboard() {
             </div>
           </div>
 
-          <div className="bg-white dark:bg-black/80 p-6 rounded-2xl dark:shadow-lg text-gray-800 dark:text-white row-span-2 overflow-y-hidden dark:border dark:border-teal-600/50 backdrop-blur-sm">
+          <div className="bg-white dark:bg-black/80 p-6 rounded-2xl dark:shadow-lg text-gray-800 dark:text-white  overflow-y-hidden dark:border dark:border-teal-600/50 backdrop-blur-sm">
             <div className="flex justify-between items-center mb-6">
               <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
                 Recent Access
@@ -407,10 +465,13 @@ export default function AdminDashboard() {
                 View all
               </Link>
             </div>
-            <RecentAccessList accesses={recentAccess} />
+            <div className="h-[300px] overflow-y-auto scrollbar-custom pr-2 custom-scrollbar">
+              <RecentAccessList accesses={recentAccess} />
+            </div>
+            
           </div>
 
-          <div className="col-span-1 md:col-span-3 bg-white dark:bg-black/80 rounded-2xl dakr:shadow-lg dark:border border-teal-600/50 p-6 backdrop-blur-sm">
+          <div className="col-span-1 md:col-span-4 bg-white dark:bg-black/80 rounded-2xl dakr:shadow-lg dark:border border-teal-600/50 p-6 backdrop-blur-sm">
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6">
               <h2 className="text-xl font-semibold text-gray-800 dark:text-gray-100">
                 Upcoming Activities
