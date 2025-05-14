@@ -9,8 +9,6 @@ export async function middleware(req: NextRequest) {
   const adminJwt = req.cookies.get("adminjwt")?.value;
   const lecturerJwt = req.cookies.get("lecturerjwt")?.value;
 
-
-
   const staticAssetPatterns = [
     "/_next/static",
     "/_next/image",
@@ -31,6 +29,30 @@ export async function middleware(req: NextRequest) {
   const adminHost = process.env.NEXT_PUBLIC_HOSTNAME_ADMIN as string;
   const isLocalhost = host?.includes("localhost");
 
+  if (isLocalhost) {
+    const isAdminRoute = url.pathname.startsWith("/admin");
+    const isLoginPage = url.pathname === "/admin/login";
+
+    if (isAdminRoute && !adminJwt) {
+      if (url.pathname !== "/admin/login") {
+        return NextResponse.redirect(new URL("/admin/login", req.url));
+      }
+    }
+    if (adminJwt) {
+      if (url.pathname === "/admin/login") {
+        return NextResponse.redirect(
+          new URL("/admin/dashboard/overview", req.url)
+        );
+      } else {
+        return NextResponse.next();
+      }
+    }
+    if (isLoginPage && adminJwt) {
+      return NextResponse.redirect(
+        new URL("/admin/dashboard/overview", req.url)
+      );
+    }
+  }
 
   if (
     host?.includes(examinaHost) &&
@@ -47,19 +69,27 @@ export async function middleware(req: NextRequest) {
     }
 
     if (isStudentRoute && lecturerJwt && !jwt) {
-      return NextResponse.redirect(new URL("/lecturer/dashboard/overview", req.url));
+      return NextResponse.redirect(
+        new URL("/lecturer/dashboard/overview", req.url)
+      );
     }
 
     if (isLecturerRoute && jwt && !lecturerJwt) {
-      return NextResponse.redirect(new URL("/student/dashboard/overview", req.url));
+      return NextResponse.redirect(
+        new URL("/student/dashboard/overview", req.url)
+      );
     }
 
     if (isLoginPage && (jwt || lecturerJwt)) {
       if (lecturerJwt) {
-        return NextResponse.redirect(new URL("/lecturer/dashboard/overview", req.url));
+        return NextResponse.redirect(
+          new URL("/lecturer/dashboard/overview", req.url)
+        );
       }
       if (jwt) {
-        return NextResponse.redirect(new URL("/student/dashboard/overview", req.url));
+        return NextResponse.redirect(
+          new URL("/student/dashboard/overview", req.url)
+        );
       }
     }
 
@@ -74,25 +104,6 @@ export async function middleware(req: NextRequest) {
         return NextResponse.redirect(new URL("/login", req.url));
       }
       return NextResponse.next();
-    }
-
-    return NextResponse.next();
-  }
-
-
-  if (isLocalhost && url.pathname.startsWith("/admin")) {
-    if (isStaticAsset || isImageOptimizationRequest) {
-      return NextResponse.next();
-    }
-
-    if (!adminJwt && url.pathname !== "/admin/login") {
-      return NextResponse.redirect(new URL("/admin/login", req.url));
-    }
-
-    if (adminJwt && url.pathname === "/admin/login") {
-      return NextResponse.redirect(
-        new URL("/admin/dashboard/overview", req.url)
-      );
     }
 
     return NextResponse.next();
@@ -104,19 +115,27 @@ export async function middleware(req: NextRequest) {
     const isLoginPage = url.pathname === "/" || url.pathname === "/login";
 
     if (isStudentRoute && lecturerJwt && !jwt) {
-      return NextResponse.redirect(new URL("/lecturer/dashboard/overview", req.url));
+      return NextResponse.redirect(
+        new URL("/lecturer/dashboard/overview", req.url)
+      );
     }
 
     if (isLecturerRoute && jwt && !lecturerJwt) {
-      return NextResponse.redirect(new URL("/student/dashboard/overview", req.url));
+      return NextResponse.redirect(
+        new URL("/student/dashboard/overview", req.url)
+      );
     }
 
     if (isLoginPage && (jwt || lecturerJwt)) {
       if (lecturerJwt) {
-        return NextResponse.redirect(new URL("/lecturer/dashboard/overview", req.url));
+        return NextResponse.redirect(
+          new URL("/lecturer/dashboard/overview", req.url)
+        );
       }
       if (jwt) {
-        return NextResponse.redirect(new URL("/student/dashboard/overview", req.url));
+        return NextResponse.redirect(
+          new URL("/student/dashboard/overview", req.url)
+        );
       }
     }
 
@@ -135,8 +154,6 @@ export async function middleware(req: NextRequest) {
 
     return NextResponse.next();
   }
-
-
 
   if (host?.includes(adminHost)) {
     if (isStaticAsset || isImageOptimizationRequest) {
@@ -160,9 +177,16 @@ export async function middleware(req: NextRequest) {
       return NextResponse.redirect(newUrl);
     }
 
-    if (url.pathname.startsWith("/admin/dashboard/exams/questions-bank/view-questions")) {
+    if (
+      url.pathname.startsWith(
+        "/admin/dashboard/exams/questions-bank/view-questions"
+      )
+    ) {
       const id = url.pathname.split("/").pop();
-      const newUrl = new URL(`/admin/dashboard/exams/questions-bank/view-questions/${id}`, req.url);
+      const newUrl = new URL(
+        `/admin/dashboard/exams/questions-bank/view-questions/${id}`,
+        req.url
+      );
       return NextResponse.redirect(newUrl);
     }
 
@@ -173,10 +197,14 @@ export async function middleware(req: NextRequest) {
 
 export const config = {
   matcher: [
-    "/:path*",
     "/_next/static/:path*",
     "/_next/image",
     "/_next/static/media/:path*",
+    "/admin/:path*",
+    "/student/:path*",
+    "/lecturer/:path*",
+    "/login",
+    "/",
     "/favicon.ico",
     "/manifest.json",
     "/robots.txt",
