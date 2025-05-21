@@ -53,4 +53,16 @@ export interface PageState {
     nextPage: number;
     prevPage: number;
   };
+  exam: {
+    totalPages: number;
+    page: number;
+    nextPage: number;
+    prevPage: number;
+  };
+  examHistory: {
+    totalPages: number;
+    page: number;
+    nextPage: number;
+    prevPage: number;
+  };
 }

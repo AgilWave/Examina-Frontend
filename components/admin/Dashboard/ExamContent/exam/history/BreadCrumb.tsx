@@ -24,10 +24,19 @@ function BreadCrumb() {
           <BreadcrumbSeparator />
           <BreadcrumbItem>
             <BreadcrumbLink
-              href="/dashboard/exams"
+              href="/admin/dashboard/exams"
               className="text-muted-foreground hover:text-foreground"
             >
               Exams
+            </BreadcrumbLink>
+          </BreadcrumbItem>
+          <BreadcrumbSeparator />
+          <BreadcrumbItem>
+            <BreadcrumbLink
+              href="/admin/dashboard/exams/manage-exams"
+              className="text-muted-foreground hover:text-foreground"
+            >
+              Manage Exams
             </BreadcrumbLink>
           </BreadcrumbItem>
           <BreadcrumbSeparator />
