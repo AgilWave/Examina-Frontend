@@ -58,6 +58,18 @@ const initialState: PageState = {
         nextPage: -1,
         prevPage: -1,
     },
+    exam: {
+        totalPages: 0,
+        page: 1,
+        nextPage: -1,
+        prevPage: -1,
+    },
+    examHistory: {
+        totalPages: 0,
+        page: 1,
+        nextPage: -1,
+        prevPage: -1,
+    },
 
 };
 
@@ -299,6 +311,60 @@ export const PageSlice = createSlice({
             }
         },
 
+        //exams
+        setExamPage: (state, action) => {
+            state.exam.page = action.payload;
+            if (typeof window !== "undefined") {
+                sessionStorage.setItem("examPage", JSON.stringify(action.payload));
+            }
+        },
+        setExamTotalPages: (state, action) => {
+            state.exam.totalPages = action.payload;
+            if (typeof window !== "undefined") {
+                sessionStorage.setItem("examTotalPages", JSON.stringify(action.payload));
+            }
+        },
+        setExamNextPage: (state, action) => {
+            state.exam.nextPage = action.payload;
+            if (typeof window !== "undefined") {
+                sessionStorage.setItem("examNextPage", JSON.stringify(action.payload));
+            }
+        },
+        setExamPrevPage: (state, action) => {
+            state.exam.prevPage = action.payload;
+            if (typeof window !== "undefined") {
+                sessionStorage.setItem("examPrevPage", JSON.stringify(action.payload));
+            }
+        },
+
+        //examHistory
+        setExamHistoryPage: (state, action) => {
+            state.examHistory.page = action.payload;
+            if (typeof window !== "undefined") {
+                sessionStorage.setItem("examHistoryPage", JSON.stringify(action.payload));
+            }
+        },
+        setExamHistoryTotalPages: (state, action) => {
+            state.examHistory.totalPages = action.payload;
+            if (typeof window !== "undefined") {
+                sessionStorage.setItem("examHistoryTotalPages", JSON.stringify(action.payload));
+            }
+        },
+        setExamHistoryNextPage: (state, action) => {
+            state.examHistory.nextPage = action.payload;
+            if (typeof window !== "undefined") {
+                sessionStorage.setItem("examHistoryNextPage", JSON.stringify(action.payload));
+            }
+        },
+        setExamHistoryPrevPage: (state, action) => {
+            state.examHistory.prevPage = action.payload;
+            if (typeof window !== "undefined") {
+                sessionStorage.setItem("examHistoryPrevPage", JSON.stringify(action.payload));
+            }
+        },
+        
+        
+        
         
     },
 });
@@ -356,6 +422,18 @@ export const {
     setQuestionTotalPages,
     setQuestionNextPage,
     setQuestionPrevPage,
+
+    //exams
+    setExamPage,
+    setExamTotalPages,
+    setExamNextPage,
+    setExamPrevPage,
+
+    //examHistory
+    setExamHistoryPage,
+    setExamHistoryTotalPages,
+    setExamHistoryNextPage,
+    setExamHistoryPrevPage,
     
 } = PageSlice.actions;
 

@@ -1,4 +1,4 @@
-import ExamManagement from '@/components/admin/Dashboard/ExamContent/exams/exams'
+import ExamManagement from '@/components/admin/Dashboard/ExamContent/exam/index'
 
 const ExamContent = () => {
     return (
