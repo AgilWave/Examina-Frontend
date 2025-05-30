@@ -1,0 +1,134 @@
+{
+  "facultyId": 2,
+  "courseId": 1,
+  "batchId": 1,
+  "moduleId": 1,
+  "examName": "Software Engineering Mid Exam",
+  "examCode": "KUHDSE241F-SOFTWA-MID",
+  "description": "This exam assesses students’ understanding of core software engineering principles, practices, and methodologies used throughout the software development lifecycle. It evaluates both theoretical knowledge and practical application of concepts related to requirements gathering, design, development, testing, and maintenance of software systems.",
+  "lectureId": 31,
+  "examDate": "2025-05-31",
+  "startTime": "2025-05-31T03:30:00.000Z",
+  "endTime": "2025-05-31T06:30:00.000Z",
+  "examMode": "Mixed",
+  "randomizeQuestions": true,
+  "randomizeAnswers": false,
+  "allowBackTracking": true,
+  "lateEntry": true,
+  "lateEntryTime": 2,
+  "webcamRequired": true,
+  "micRequired": true,
+  "networkStrengthTest": true,
+  "lockdownBrowser": true,
+  "surroundingEnvironmentCheck": true,
+  "examQuestions": [
+    {
+      "text": "Valid Type options: Multiple Choice",
+      "type": "Checkbox",
+      "category": "Choice (for mcq category) or Image Upload",
+      "attachment": "",
+      "answerOptions": [
+        {
+          "text": "Short Text",
+          "clarification": "",
+          "isCorrect": false,
+          "mark": 0
+        }
+      ],
+      "createdBy": "current-user"
+    },
+    {
+      "text": "What is 2+2?",
+      "type": "Multiple Choice",
+      "category": "mcq",
+      "attachment": "",
+      "answerOptions": [
+        {
+          "text": "3",
+          "clarification": "",
+          "isCorrect": false,
+          "mark": 0
+        },
+        {
+          "text": "4",
+          "clarification": "",
+          "isCorrect": true,
+          "mark": 1
+        },
+        {
+          "text": "5",
+          "clarification": "",
+          "isCorrect": false,
+          "mark": 0
+        },
+        {
+          "text": "6",
+          "clarification": "",
+          "isCorrect": false,
+          "mark": 0
+        }
+      ],
+      "createdBy": "current-user"
+    },
+    {
+      "text": "Select all prime numbers",
+      "type": "Checkbox",
+      "category": "mcq",
+      "attachment": "",
+      "answerOptions": [
+        {
+          "text": "2",
+          "clarification": "",
+          "isCorrect": true,
+          "mark": 1
+        },
+        {
+          "text": "4",
+          "clarification": "",
+          "isCorrect": false,
+          "mark": 0
+        },
+        {
+          "text": "5",
+          "clarification": "",
+          "isCorrect": true,
+          "mark": 1
+        },
+        {
+          "text": "6",
+          "clarification": "",
+          "isCorrect": false,
+          "mark": 0
+        }
+      ],
+      "createdBy": "current-user"
+    },
+    {
+      "text": "Explain photosynthesis in detail",
+      "type": "Long Text",
+      "category": "structured",
+      "attachment": "",
+      "answerOptions": [],
+      "createdBy": "current-user"
+    },
+    {
+      "text": "Define photosynthesis",
+      "type": "Short Text",
+      "category": "structured",
+      "attachment": "",
+      "answerOptions": [],
+      "createdBy": "current-user"
+    },
+    {
+      "text": "Upload your Excel solution",
+      "type": "Image Upload",
+      "category": "structured",
+      "attachment": "",
+      "answerOptions": [],
+      "createdBy": "current-user"
+    }
+  ],
+  "notifyStudents": true,
+  "sendReminders": false,
+  "reminderTime": 0
+}

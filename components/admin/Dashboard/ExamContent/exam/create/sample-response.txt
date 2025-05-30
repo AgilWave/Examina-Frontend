@@ -1,0 +1,153 @@
+{
+  "isSuccessful": true,
+  "message": "Exams created successfully",
+  "content": {
+    "id": 3,
+    "examName": "Software Engineering Mid Exam",
+    "examCode": "KUHDSE241F-SOFTWA-MID",
+    "description": "This exam assesses students’ understanding of core software engineering principles, practices, and methodologies used throughout the software development lifecycle. It evaluates both theoretical knowledge and practical application of concepts related to requirements gathering, design, development, testing, and maintenance of software systems.",
+    "examDate": "2025-05-31",
+    "startTime": "2025-05-31T03:30:00.000Z",
+    "endTime": "2025-05-31T06:30:00.000Z",
+    "examMode": "Mixed",
+    "randomizeQuestions": true,
+    "randomizeAnswers": false,
+    "allowBackTracking": true,
+    "lateEntry": true,
+    "lateEntryTime": 2,
+    "webcamRequired": true,
+    "micRequired": true,
+    "networkStrengthTest": true,
+    "lockdownBrowser": true,
+    "surroundingEnvironmentCheck": true,
+    "examQuestions": [
+      {
+        "id": 6,
+        "type": "Checkbox",
+        "category": "Choice (for mcq category) or Image Upload",
+        "text": "Valid Type options: Multiple Choice",
+        "attachment": "",
+        "answerOptions": [
+          {
+            "id": 14,
+            "text": "Short Text",
+            "clarification": "",
+            "isCorrect": false,
+            "mark": 0
+          }
+        ],
+        "createdBy": "admin@examina"
+      },
+      {
+        "id": 7,
+        "type": "Multiple Choice",
+        "category": "mcq",
+        "text": "What is 2+2?",
+        "attachment": "",
+        "answerOptions": [
+          {
+            "id": 15,
+            "text": "3",
+            "clarification": "",
+            "isCorrect": false,
+            "mark": 0
+          },
+          {
+            "id": 16,
+            "text": "4",
+            "clarification": "",
+            "isCorrect": true,
+            "mark": 1
+          },
+          {
+            "id": 17,
+            "text": "5",
+            "clarification": "",
+            "isCorrect": false,
+            "mark": 0
+          },
+          {
+            "id": 18,
+            "text": "6",
+            "clarification": "",
+            "isCorrect": false,
+            "mark": 0
+          }
+        ],
+        "createdBy": "admin@examina"
+      },
+      {
+        "id": 8,
+        "type": "Checkbox",
+        "category": "mcq",
+        "text": "Select all prime numbers",
+        "attachment": "",
+        "answerOptions": [
+          {
+            "id": 19,
+            "text": "2",
+            "clarification": "",
+            "isCorrect": true,
+            "mark": 1
+          },
+          {
+            "id": 20,
+            "text": "4",
+            "clarification": "",
+            "isCorrect": false,
+            "mark": 0
+          },
+          {
+            "id": 21,
+            "text": "5",
+            "clarification": "",
+            "isCorrect": true,
+            "mark": 1
+          },
+          {
+            "id": 22,
+            "text": "6",
+            "clarification": "",
+            "isCorrect": false,
+            "mark": 0
+          }
+        ],
+        "createdBy": "admin@examina"
+      },
+      {
+        "id": 9,
+        "type": "Long Text",
+        "category": "structured",
+        "text": "Explain photosynthesis in detail",
+        "attachment": "",
+        "answerOptions": [],
+        "createdBy": "admin@examina"
+      },
+      {
+        "id": 10,
+        "type": "Short Text",
+        "category": "structured",
+        "text": "Define photosynthesis",
+        "attachment": "",
+        "answerOptions": [],
+        "createdBy": "admin@examina"
+      },
+      {
+        "id": 11,
+        "type": "Image Upload",
+        "category": "structured",
+        "text": "Upload your Excel solution",
+        "attachment": "",
+        "answerOptions": [],
+        "createdBy": "admin@examina"
+      }
+    ],
+    "notifyStudents": true,
+    "sendReminders": false,
+    "reminderTime": 0,
+    "status": "pending",
+    "createdBy": "admin@examina",
+    "createdAt": "2025-05-30T15:46:43.692Z",
+    "isDeleted": false
+  }
+}

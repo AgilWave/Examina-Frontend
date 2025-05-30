@@ -30,6 +30,19 @@ import {
 import Image from "next/image";
 import { useDispatch, useSelector } from "react-redux";
 import { Label } from "@/components/ui/label";
+import { toast } from "sonner";
+
+interface ExamQuestion {
+  type: string;
+  category: string;
+  text: string;
+  attachment?: File | null;
+  answerOptions?: {
+    text: string;
+    clarification: string;
+    isCorrect: boolean;
+  }[];
+}
 
 interface QuestionData {
   id: string;
@@ -41,7 +54,6 @@ interface QuestionData {
   collapsed: boolean;
   category: string;
   questionType: string;
-
   saved: boolean;
   disabled?: boolean;
   attachment?: File | null;
@@ -53,6 +65,7 @@ interface CreationPageProps {
   category: string;
   questionType: string;
   onResetSelectors: () => void;
+  onQuestionAdded?: (question: ExamQuestion) => void;
 }
 
 import {
@@ -64,9 +77,8 @@ import {
 
 import { RootState } from "@/redux/store";
 import { useSearchParams } from "next/navigation";
-import { toast } from "sonner";
 
-const CreationPage: React.FC<CreationPageProps> = () => {
+const CreationPage: React.FC<CreationPageProps> = ({ onQuestionAdded }) => {
   const searchParams = useSearchParams();
   const idString = searchParams?.get("id");
   const id = idString ? parseInt(idString, 10) : undefined;
@@ -340,6 +352,11 @@ const CreationPage: React.FC<CreationPageProps> = () => {
       setCategory("");
       setQuestionType("");
       toast.success("Question Created Successfully");
+
+      // Call onQuestionAdded if provided
+      if (onQuestionAdded) {
+        onQuestionAdded(structuredQuestion);
+      }
     }
   };
 

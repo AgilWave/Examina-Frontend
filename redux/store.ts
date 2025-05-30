@@ -13,6 +13,7 @@ import moduleReducer from "./features/ModuleSlice";
 import facultyReducer from "./features/FacultySlice";
 import questionBank from "./features/QuestionBankSlice";
 import question from "./features/QuestionSlice";
+import examReducer from "./features/examSlice";
 
 const rootReducer = combineReducers({
   dialog: dialogReducer,
@@ -27,6 +28,7 @@ const rootReducer = combineReducers({
   faculty: facultyReducer,
   questionBank: questionBank,
   question: question,
+  exam: examReducer,
 });
 
 export const store = configureStore({

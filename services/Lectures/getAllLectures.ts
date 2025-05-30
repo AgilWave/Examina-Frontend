@@ -26,7 +26,7 @@ export async function getAllLectures(
         Authorization: `Bearer ${jwt}`,
     };
     try {
-        let url = `${BACKEND_URL}/users/Search?page=${page}&pageSize=${pageSize}&role=admin`;
+        let url = `${BACKEND_URL}/users/Search?page=${page}&pageSize=${pageSize}&role=lecturer`;
 
         if (filterApplied) {
             url += `&isBlacklisted=${isBlacklisted}`;
