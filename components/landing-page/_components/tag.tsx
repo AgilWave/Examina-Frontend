@@ -16,7 +16,7 @@ const Tag: React.FC<TagProps> = ({ label, className }) => {
     inline-flex justify-center items-center gap-1.5 sm:gap-2 md:gap-2.5 overflow-hidden 
     w-auto ${className}`}
 >
-  <div className="justify-start text-primary text-xs sm:text-sm font-medium whitespace-nowrap">
+  <div className="justify-start text-teal-300 text-xs sm:text-sm font-medium whitespace-nowrap">
     {label}
   </div>
 </div>

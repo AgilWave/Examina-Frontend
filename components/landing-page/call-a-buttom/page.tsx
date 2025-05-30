@@ -55,7 +55,8 @@ function Page() {
           className="
             h-15
             bg-black 
-            border-primary 
+            border-teal-500 
+            text-teal-300
             w-full 
             max-w-xs 
             md:w-auto 

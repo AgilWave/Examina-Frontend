@@ -143,7 +143,7 @@ function NavBar() {
               <Link href="/login" passHref>
                 <Button 
                   label="Portal" 
-                  className="bg-black border-primary"
+                  className="bg-black border-teal-500 text-teal-300"
                 />
               </Link>
             </div>
@@ -250,7 +250,7 @@ function NavBar() {
             style={{ transitionDelay: `${navItems.length * 100}ms` }}
           >
             <Link href="/login" passHref>
-              <Button label="Portal" className="text-base" onClick={closeMenu} />
+              <Button label="Portal" className="text-teal-300 border-teal-500  bg-black" onClick={closeMenu} />
             </Link>
           </div>
         </div>

@@ -1,7 +1,7 @@
 'use client'
 import React, { useState, useEffect } from 'react';
 import { Home } from 'lucide-react';
-import { Button } from "@/components/ui/button";
+import Button from "@/components/common/button";
 
 export default function NotFound() {
   const [mounted, setMounted] = useState(false);
@@ -11,14 +11,14 @@ export default function NotFound() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-900 to-gray-800 flex items-center justify-center px-4">
-      <div className={`text-center transition-all duration-1000 ${
+    <div className="min-h-screen bg-black flex items-center justify-center p-4 sm:p-6 md:p-8">
+      <div className={`max-w-2xl w-full text-center transition-all duration-1000 ${
         mounted ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
       }`}>
         
-        <div className="mb-3 relative" style={{ animationDuration: '4s' }}>
+        <div className="mb-6 sm:mb-8 relative" style={{ animationDuration: '4s' }}>
           <div className="absolute inset-0 bg-gradient-to-r from-teal-500/20 to-cyan-500/20 rounded-full blur-3xl animate-pulse" />
-          <svg width="240" height="180" viewBox="0 0 200 160" className="mx-auto relative">
+          <svg width="240" height="180" viewBox="0 0 200 160" className="mx-auto relative w-[240px] h-[180px] sm:w-[280px] sm:h-[210px]">
             <defs>
               <linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="100%">
                 <stop offset="0%" style={{ stopColor: '#14B8A6', stopOpacity: 0.8 }} />
@@ -44,21 +44,19 @@ export default function NotFound() {
           </svg>
         </div>
 
-        <h1 className="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-teal-400 to-cyan-400 mb-3 animate-fade-in">
+        <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-teal-400 to-cyan-400 mb-4 sm:mb-6 animate-fade-in">
           Page Not Found
         </h1>
-        <p className="text-gray-300 mb-8 text-lg animate-fade-in-delayed">
+        <p className="text-gray-300 mb-8 sm:mb-10 text-lg sm:text-xl animate-fade-in-delayed max-w-lg mx-auto">
           Oops! This page seems to be lost in the clouds.
         </p>
 
         <Button 
+          label="Return Home"
           onClick={() => window.location.href = '/'}
-          className="group gap-2 px-8 py-6 text-lg bg-teal-600 hover:bg-teal-500 text-white cursor-pointer"
-          size="lg"
-        >
-          <Home className="w-5 h-5 group-hover:animate-bounce" />
-          <span>Return Home</span>
-        </Button>
+          className="group gap-2 text-lg bg-black border-teal-500 text-teal-300 cursor-pointer"
+          icon={<Home className="w-5 h-5 group-hover:animate-bounce" />}
+        />
       </div>
 
       <style jsx global>{`
