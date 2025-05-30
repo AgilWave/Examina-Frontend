@@ -8,7 +8,6 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Input } from "@/components/ui/input"
 import { Label } from '@/components/ui/label'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { DatePicker } from '@/components/ui/date-picker'
 import { Card } from '@/components/ui/card'
 import {
     Breadcrumb,
@@ -199,7 +198,7 @@ export default function ExamDashboard() {
                 <div className="grid grid-cols-2 gap-4">
                   <div className="grid gap-2">
                     <Label htmlFor="date" className='dark:text-white text-black'>Date</Label>
-                    <DatePicker />
+                    {/* <DatePicker /> */}
                   </div>
                   <div className="grid gap-2">
                     <Label htmlFor="type" className='dark:text-white text-black'>Exam Status</Label>
@@ -240,7 +239,7 @@ export default function ExamDashboard() {
               <div className="bg-white dark:bg-black dark:text-white text-black ">
                 <Label htmlFor="dateFilter">Date</Label>
                 <div className='bg-white dark:bg-black dark:text-white text-black border-teal-600 mt-2'>
-                  <DatePicker />
+                  {/* <DatePicker /> */}
                 </div>
               </div>
               <div>
