@@ -52,7 +52,6 @@ export function DataTable() {
   const dispatch = useDispatch();
   const [searchQuery] = useQueryState("searchQuery");
   const moduleId = useSearchParams().get("id");
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [isLoading, setIsLoading] = useState(false);
 
 

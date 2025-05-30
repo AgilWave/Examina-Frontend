@@ -9,7 +9,6 @@ import CategorySelector from "../filter/selectors/CategorySelector";
 import QuestionTypeSelector from "../filter/selectors/QuestionTypeSelector";
 import {
   Plus,
-  Save,
   Paperclip,
   FileQuestion,
   Eye,
@@ -72,7 +71,7 @@ import {
   setCreateQuestionBankQuestion,
   setCreateQuestionModuleId,
   removeCreateQuestionBankQuestion,
-  updateCreateQuestionBankQuestion,
+  // updateCreateQuestionBankQuestion,
 } from "@/redux/features/QuestionBankSlice";
 
 import { RootState } from "@/redux/store";
@@ -91,13 +90,14 @@ const CreationPage: React.FC<CreationPageProps> = ({ onQuestionAdded }) => {
     [key: string]: string;
   }>({});
   const [dialogOpen, setDialogOpen] = useState(false);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [viewDialogOpen, setViewDialogOpen] = useState(false);
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [saveSuccess, setSaveSuccess] = useState(false);
   const [category, setCategory] = useState("");
   const [questionType, setQuestionType] = useState("");
-  const [currentIndex, setCurrentIndex] = useState<number>(-1);
+  // const [currentIndex, setCurrentIndex] = useState<number>(-1);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [addToExamDialogOpen, setAddToExamDialogOpen] = useState(false);
   const dispatch = useDispatch();
@@ -360,11 +360,11 @@ const CreationPage: React.FC<CreationPageProps> = ({ onQuestionAdded }) => {
     }
   };
 
-  const openEditDialog = (question: QuestionData, index: number) => {
-    setCurrentQuestion({ ...question });
-    setCurrentIndex(index);
-    setEditDialogOpen(true);
-  };
+  // const openEditDialog = (question: QuestionData, index: number) => {
+  //   setCurrentQuestion({ ...question });
+  //   setCurrentIndex(index);
+  //   setEditDialogOpen(true);
+  // };
 
   const openViewDialog = (question: QuestionData) => {
     setCurrentQuestion({ ...question });
@@ -383,120 +383,120 @@ const CreationPage: React.FC<CreationPageProps> = ({ onQuestionAdded }) => {
     }
   };
 
-  const handleEditWrongAnswerChange = (answerIndex: number, value: string) => {
-    if (currentQuestion) {
-      const updatedWrongAnswers = [...currentQuestion.wrongAnswers];
-      updatedWrongAnswers[answerIndex] = value;
-      setCurrentQuestion({
-        ...currentQuestion,
-        wrongAnswers: updatedWrongAnswers,
-      });
+  // const handleEditWrongAnswerChange = (answerIndex: number, value: string) => {
+  //   if (currentQuestion) {
+  //     const updatedWrongAnswers = [...currentQuestion.wrongAnswers];
+  //     updatedWrongAnswers[answerIndex] = value;
+  //     setCurrentQuestion({
+  //       ...currentQuestion,
+  //       wrongAnswers: updatedWrongAnswers,
+  //     });
 
-      if (validationErrors.wrongAnswers) {
-        const newErrors = { ...validationErrors };
-        delete newErrors.wrongAnswers;
-        setValidationErrors(newErrors);
-      }
-    }
-  };
+  //     if (validationErrors.wrongAnswers) {
+  //       const newErrors = { ...validationErrors };
+  //       delete newErrors.wrongAnswers;
+  //       setValidationErrors(newErrors);
+  //     }
+  //   }
+  // };
 
-  const handleEditWrongClarificationChange = (
-    answerIndex: number,
-    value: string
-  ) => {
-    if (currentQuestion) {
-      const updatedClarifications = [
-        ...(currentQuestion.wrongAnswerClarifications || []),
-      ];
-      while (updatedClarifications.length <= answerIndex) {
-        updatedClarifications.push("");
-      }
-      updatedClarifications[answerIndex] = value;
-      setCurrentQuestion({
-        ...currentQuestion,
-        wrongAnswerClarifications: updatedClarifications,
-      });
-    }
-  };
+  // const handleEditWrongClarificationChange = (
+  //   answerIndex: number,
+  //   value: string
+  // ) => {
+  //   if (currentQuestion) {
+  //     const updatedClarifications = [
+  //       ...(currentQuestion.wrongAnswerClarifications || []),
+  //     ];
+  //     while (updatedClarifications.length <= answerIndex) {
+  //       updatedClarifications.push("");
+  //     }
+  //     updatedClarifications[answerIndex] = value;
+  //     setCurrentQuestion({
+  //       ...currentQuestion,
+  //       wrongAnswerClarifications: updatedClarifications,
+  //     });
+  //   }
+  // };
 
-  const saveEditedQuestion = () => {
-    if (currentQuestion && validateQuestion(currentQuestion)) {
-      const updatedQuestions = [...questions];
-      updatedQuestions[currentIndex] = { ...currentQuestion };
-      setQuestions(updatedQuestions);
+  // const saveEditedQuestion = () => {
+  //   if (currentQuestion && validateQuestion(currentQuestion)) {
+  //     const updatedQuestions = [...questions];
+  //     updatedQuestions[currentIndex] = { ...currentQuestion };
+  //     setQuestions(updatedQuestions);
 
-      let answerOptions: {
-        text: string;
-        clarification: string;
-        isCorrect: boolean;
-      }[] = [];
+  //     let answerOptions: {
+  //       text: string;
+  //       clarification: string;
+  //       isCorrect: boolean;
+  //     }[] = [];
 
-      if (currentQuestion.category === "mcq") {
-        if (currentQuestion.questionType === "Multiple Choice") {
-          const correctAnswers = currentQuestion.correctAnswers.filter(
-            (answer) => answer.trim()
-          );
+  //     if (currentQuestion.category === "mcq") {
+  //       if (currentQuestion.questionType === "Multiple Choice") {
+  //         const correctAnswers = currentQuestion.correctAnswers.filter(
+  //           (answer) => answer.trim()
+  //         );
 
-          answerOptions = correctAnswers.map((text) => ({
-            text,
-            clarification:
-              currentQuestion.correctAnswerClarifications?.[0] || "",
-            isCorrect: true,
-          }));
+  //         answerOptions = correctAnswers.map((text) => ({
+  //           text,
+  //           clarification:
+  //             currentQuestion.correctAnswerClarifications?.[0] || "",
+  //           isCorrect: true,
+  //         }));
 
-          answerOptions = [
-            ...answerOptions,
-            ...currentQuestion.wrongAnswers.map((answer, index) => ({
-              text: answer,
-              clarification:
-                currentQuestion.wrongAnswerClarifications?.[index] || "",
-              isCorrect: false,
-            })),
-          ];
-        } else {
-          answerOptions = [
-            {
-              text: currentQuestion.correctAnswers[0],
-              clarification:
-                currentQuestion.correctAnswerClarifications?.[0] || "",
-              isCorrect: true,
-            },
-            ...currentQuestion.wrongAnswers.map((answer, index) => ({
-              text: answer,
-              clarification:
-                currentQuestion.wrongAnswerClarifications?.[index] || "",
-              isCorrect: false,
-            })),
-          ];
-        }
-      }
+  //         answerOptions = [
+  //           ...answerOptions,
+  //           ...currentQuestion.wrongAnswers.map((answer, index) => ({
+  //             text: answer,
+  //             clarification:
+  //               currentQuestion.wrongAnswerClarifications?.[index] || "",
+  //             isCorrect: false,
+  //           })),
+  //         ];
+  //       } else {
+  //         answerOptions = [
+  //           {
+  //             text: currentQuestion.correctAnswers[0],
+  //             clarification:
+  //               currentQuestion.correctAnswerClarifications?.[0] || "",
+  //             isCorrect: true,
+  //           },
+  //           ...currentQuestion.wrongAnswers.map((answer, index) => ({
+  //             text: answer,
+  //             clarification:
+  //               currentQuestion.wrongAnswerClarifications?.[index] || "",
+  //             isCorrect: false,
+  //           })),
+  //         ];
+  //       }
+  //     }
 
-      const structuredQuestion = {
-        category: currentQuestion.category,
-        type: currentQuestion.questionType,
-        text: currentQuestion.questionText,
-        attachment: currentQuestion.attachment,
+  //     const structuredQuestion = {
+  //       category: currentQuestion.category,
+  //       type: currentQuestion.questionType,
+  //       text: currentQuestion.questionText,
+  //       attachment: currentQuestion.attachment,
 
-        ...(currentQuestion.category === "mcq" ? { answerOptions } : {}),
-      };
+  //       ...(currentQuestion.category === "mcq" ? { answerOptions } : {}),
+  //     };
 
-      dispatch(
-        updateCreateQuestionBankQuestion({
-          index: currentIndex,
-          question: structuredQuestion,
-        })
-      );
-      dispatch(setCreateQuestionModuleId(id));
+  //     dispatch(
+  //       updateCreateQuestionBankQuestion({
+  //         index: currentIndex,
+  //         question: structuredQuestion,
+  //       })
+  //     );
+  //     dispatch(setCreateQuestionModuleId(id));
 
-      setEditDialogOpen(false);
-      setSaveSuccess(true);
-      toast.success("Question Updated Successfully");
+  //     setEditDialogOpen(false);
+  //     setSaveSuccess(true);
+  //     toast.success("Question Updated Successfully");
 
-      setTimeout(() => {
-        setSaveSuccess(false);
-      }, 3000);
-    }
-  };
+  //     setTimeout(() => {
+  //       setSaveSuccess(false);
+  //     }, 3000);
+  //   }
+  // };
 
   const openQuestionDialog = () => {
     setDialogOpen(true);
@@ -525,24 +525,24 @@ const CreationPage: React.FC<CreationPageProps> = ({ onQuestionAdded }) => {
     }
   };
 
-  const handleExistingFileChange = (
-    event: React.ChangeEvent<HTMLInputElement>
-  ) => {
-    const files = event.target.files;
-    if (files && files.length > 0) {
-      const file = files[0];
-      const previewUrl = URL.createObjectURL(file);
+  // const handleExistingFileChange = (
+  //   event: React.ChangeEvent<HTMLInputElement>
+  // ) => {
+  //   const files = event.target.files;
+  //   if (files && files.length > 0) {
+  //     const file = files[0];
+  //     const previewUrl = URL.createObjectURL(file);
 
-      if (currentQuestion) {
-        setCurrentQuestion({
-          ...currentQuestion,
-          attachment: file,
-          attachmentName: file.name,
-          attachmentPreviewUrl: previewUrl,
-        });
-      }
-    }
-  };
+  //     if (currentQuestion) {
+  //       setCurrentQuestion({
+  //         ...currentQuestion,
+  //         attachment: file,
+  //         attachmentName: file.name,
+  //         attachmentPreviewUrl: previewUrl,
+  //       });
+  //     }
+  //   }
+  // };
 
   const removeAttachment = () => {
     if (newQuestion && newQuestion.attachmentPreviewUrl) {
@@ -559,20 +559,20 @@ const CreationPage: React.FC<CreationPageProps> = ({ onQuestionAdded }) => {
     }
   };
 
-  const removeExistingAttachment = () => {
-    if (currentQuestion && currentQuestion.attachmentPreviewUrl) {
-      URL.revokeObjectURL(currentQuestion.attachmentPreviewUrl);
-    }
+  // const removeExistingAttachment = () => {
+  //   if (currentQuestion && currentQuestion.attachmentPreviewUrl) {
+  //     URL.revokeObjectURL(currentQuestion.attachmentPreviewUrl);
+  //   }
 
-    if (currentQuestion) {
-      setCurrentQuestion({
-        ...currentQuestion,
-        attachment: null,
-        attachmentName: undefined,
-        attachmentPreviewUrl: undefined,
-      });
-    }
-  };
+  //   if (currentQuestion) {
+  //     setCurrentQuestion({
+  //       ...currentQuestion,
+  //       attachment: null,
+  //       attachmentName: undefined,
+  //       attachmentPreviewUrl: undefined,
+  //     });
+  //   }
+  // };
 
   // Clean up object URLs when component unmounts
   useEffect(() => {
@@ -1119,7 +1119,7 @@ const CreationPage: React.FC<CreationPageProps> = ({ onQuestionAdded }) => {
                 No questions created yet
               </h3>
               <p className="text-sm text-gray-500 dark:text-gray-400 mb-4 max-w-md">
-                Click the "Create Question" button above to add your first
+                Click the &quot;Create Question&quot; button above to add your first
                 question.
               </p>
             </div>

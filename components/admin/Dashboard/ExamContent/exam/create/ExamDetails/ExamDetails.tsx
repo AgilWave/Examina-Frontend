@@ -96,6 +96,7 @@ export default function ExamDetailsForm() {
     if (newExamCode) {
       dispatch(setCreateExamCode(newExamCode));
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [examState.batchId, examState.moduleId, generateExamCode]);
 
   const fetchFaculties = useMemo(() => async () => {

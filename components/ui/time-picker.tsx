@@ -2,7 +2,6 @@
 
 import * as React from "react";
 import { Clock } from "lucide-react";
-import { format } from "date-fns";
 
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
