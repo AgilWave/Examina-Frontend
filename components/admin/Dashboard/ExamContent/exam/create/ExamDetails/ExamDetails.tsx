@@ -161,6 +161,11 @@ export default function ExamDetailsForm() {
       try {
         const lecturesData = await getAllLectures(null, 1, 10, false, null, null);
         if (lecturesData?.listContent) {
+          console.log("Fetched Lectures Data:", lecturesData.listContent);
+          // Check the structure of each lecture item
+          if (lecturesData.listContent.length > 0) {
+            console.log("Example lecture item:", lecturesData.listContent[0]);
+          }
           const filteredLectures = lecturesData.listContent.filter(
             (lecture: Lecture) => lecture.lecture.courses.some(course => course.id === examState.moduleId)
           );
@@ -382,9 +387,9 @@ export default function ExamDetailsForm() {
               </div>
 
               <div className="min-h-[56px] w-full">
-                <Label className="block text-sm font-medium text-gray-700 dark:text-white mb-1">Lecturer / Examiner Name</Label>
-                <Select
-                  value={examState.lectureId ? examState.lectureId.toString() : ""}
+                <Label className="block text-sm font-medium text-gray-700 dark:text-white mb-1">Lecturer / Examiner Name</Label>                <Select                  value={examState.lectureId ? 
+                    lectures.find(lecture => lecture.lecture.id === examState.lectureId)?.id.toString() || "" : 
+                    ""}
                   onValueChange={(value) => {
                     const selectedLecture = lectures.find(lecture => lecture.id.toString() === value);
                     if (selectedLecture) {
@@ -396,13 +401,11 @@ export default function ExamDetailsForm() {
                   <SelectTrigger className="h-12 w-full">
                     <SelectValue placeholder="Select a lecturer (e.g. Dr. Smith, Prof. Johnson)" />
                   </SelectTrigger>
-                  <SelectContent>
-                    {lectures.length === 0 ? (
+                  <SelectContent>                    {lectures.length === 0 ? (
                       <SelectItem value="no-lecturers" disabled>No lecturers found</SelectItem>
-                    ) : (
-                      lectures.map((lecture) => (
+                    ) : (                      lectures.map((lecture) => (
                         <SelectItem key={lecture.id} value={lecture.id.toString()}>
-                          {lecture.name}
+                          {lecture.name} {/* This represents the lecturer's name */}
                         </SelectItem>
                       ))
                     )}
