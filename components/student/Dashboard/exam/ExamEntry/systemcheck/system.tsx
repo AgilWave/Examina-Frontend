@@ -36,7 +36,9 @@ export function SystemCheckup({ onNext, onPrev }: SystemCheckupProps) {
   ]);
 
   const [allCompleted, setAllCompleted] = useState(false);
+   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [browserName, setBrowserName] = useState<string>("");
+   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [browserVersion, setBrowserVersion] = useState<string>("");
 
   // Detect browser name and version

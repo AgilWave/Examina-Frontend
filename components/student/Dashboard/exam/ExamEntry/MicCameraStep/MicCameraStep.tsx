@@ -30,7 +30,7 @@ export function MicCameraSetup({ onNext }: MicCameraSetupProps) {
   const requestMediaPermissions = async () => {
     try {
       setPermissionError(null);
-      
+
       // Request camera and microphone access
       const mediaStream = await navigator.mediaDevices.getUserMedia({
         video: true,
@@ -45,7 +45,9 @@ export function MicCameraSetup({ onNext }: MicCameraSetupProps) {
         videoRef.current.srcObject = mediaStream;
         // Ensure video plays when ready
         videoRef.current.onloadedmetadata = () => {
-          videoRef.current?.play().catch(e => console.error("Error playing video:", e));
+          videoRef.current
+            ?.play()
+            .catch((e) => console.error("Error playing video:", e));
         };
       }
 
@@ -56,7 +58,8 @@ export function MicCameraSetup({ onNext }: MicCameraSetupProps) {
         analyserRef.current = audioContextRef.current.createAnalyser();
         analyserRef.current.fftSize = 256;
 
-        const source = audioContextRef.current.createMediaStreamSource(mediaStream);
+        const source =
+          audioContextRef.current.createMediaStreamSource(mediaStream);
         source.connect(analyserRef.current);
       }
 
@@ -74,16 +77,20 @@ export function MicCameraSetup({ onNext }: MicCameraSetupProps) {
       });
     } catch (error: any) {
       console.error("Error accessing media devices:", error);
-      
+
       // Set more specific error message
-      if (error.name === 'NotAllowedError') {
-        setPermissionError("Camera or microphone permission denied. Please allow access in your browser settings.");
-      } else if (error.name === 'NotFoundError') {
+      if (error.name === "NotAllowedError") {
+        setPermissionError(
+          "Camera or microphone permission denied. Please allow access in your browser settings."
+        );
+      } else if (error.name === "NotFoundError") {
         setPermissionError("No camera or microphone found on your device.");
       } else {
-        setPermissionError(`Error accessing media devices: ${error.message || error.name}`);
+        setPermissionError(
+          `Error accessing media devices: ${error.message || error.name}`
+        );
       }
-      
+
       setHasPermissions({
         camera: false,
         mic: false,
@@ -103,7 +110,8 @@ export function MicCameraSetup({ onNext }: MicCameraSetupProps) {
     analyserRef.current.getByteFrequencyData(dataArray);
 
     // Calculate average volume level
-    const average = dataArray.reduce((sum, value) => sum + value, 0) / dataArray.length;
+    const average =
+      dataArray.reduce((sum, value) => sum + value, 0) / dataArray.length;
     const normalizedLevel = Math.min(average / 128, 1); // Normalize to 0-1 range
     setAudioLevel(normalizedLevel);
 
@@ -119,17 +127,17 @@ export function MicCameraSetup({ onNext }: MicCameraSetupProps) {
       setIsCameraEnabled(!isCameraEnabled);
     }
   };
-  
+
   // Handle microphone toggle
   const toggleMic = () => {
     if (stream) {
       stream.getAudioTracks().forEach((track) => {
         track.enabled = !isMicEnabled;
       });
-      
+
       const newMicState = !isMicEnabled;
       setIsMicEnabled(newMicState);
-      
+
       // Start audio analysis if mic is enabled
       if (newMicState && !animationFrameRef.current && analyserRef.current) {
         analyzeAudio();
@@ -142,11 +150,15 @@ export function MicCameraSetup({ onNext }: MicCameraSetupProps) {
     try {
       // Check if permissions API is available
       if (navigator.permissions && navigator.permissions.query) {
-        const cameraStatus = await navigator.permissions.query({ name: 'camera' as PermissionName });
-        const micStatus = await navigator.permissions.query({ name: 'microphone' as PermissionName });
-        
+        const cameraStatus = await navigator.permissions.query({
+          name: "camera" as PermissionName,
+        });
+        const micStatus = await navigator.permissions.query({
+          name: "microphone" as PermissionName,
+        });
+
         // If permissions are already granted, initialize immediately
-        if (cameraStatus.state === 'granted' && micStatus.state === 'granted') {
+        if (cameraStatus.state === "granted" && micStatus.state === "granted") {
           requestMediaPermissions();
         }
       } else {
@@ -170,12 +182,12 @@ export function MicCameraSetup({ onNext }: MicCameraSetupProps) {
       if (stream) {
         stream.getTracks().forEach((track) => track.stop());
       }
-      
+
       // Clean up audio analysis
       if (animationFrameRef.current) {
         cancelAnimationFrame(animationFrameRef.current);
       }
-      
+
       if (audioContextRef.current) {
         audioContextRef.current.close();
       }
@@ -237,7 +249,7 @@ export function MicCameraSetup({ onNext }: MicCameraSetupProps) {
                 </div>
               )}
             </div>
-          </div>{" "}          
+          </div>{" "}
           <div className="absolute bottom-6 left-1/2 transform -translate-x-1/2 flex flex-col items-center">
             <div className="flex items-center space-x-4 mb-2">
               <button
@@ -278,7 +290,8 @@ export function MicCameraSetup({ onNext }: MicCameraSetupProps) {
             </div>
           </div>
         </div>
-      </div>      {/* Simple Sound Level Visualization */}
+      </div>{" "}
+      {/* Simple Sound Level Visualization */}
       {hasPermissions.mic && (
         <div className="w-full max-w-sm mx-auto mb-4">
           <div className="flex items-center space-x-3 mb-2">
@@ -288,16 +301,16 @@ export function MicCameraSetup({ onNext }: MicCameraSetupProps) {
               <MicOff className="w-4 h-4 text-gray-400" />
             )}
             <div className="h-1.5 flex-1 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
-              <div 
+              <div
                 className={cn(
                   "h-full rounded-full transition-all duration-300",
-                  isMicEnabled ? (
-                    audioLevel < 0.3 
-                      ? "bg-teal-500" 
-                      : audioLevel < 0.6 
-                        ? "bg-blue-500" 
-                        : "bg-purple-500"
-                  ) : "bg-gray-400 dark:bg-gray-600"
+                  isMicEnabled
+                    ? audioLevel < 0.3
+                      ? "bg-teal-500"
+                      : audioLevel < 0.6
+                      ? "bg-blue-500"
+                      : "bg-purple-500"
+                    : "bg-gray-400 dark:bg-gray-600"
                 )}
                 style={{ width: `${isMicEnabled ? audioLevel * 100 : 0}%` }}
               />
@@ -305,12 +318,8 @@ export function MicCameraSetup({ onNext }: MicCameraSetupProps) {
           </div>
         </div>
       )}
-        <div className="pt-4">
-        <Button 
-          onClick={onNext} 
-          size="lg"
-          className="transition-all"
-        >
+      <div className="pt-4">
+        <Button onClick={onNext} size="lg" className="transition-all">
           Continue
           <svg
             className="w-5 h-5 ml-2"
@@ -326,7 +335,7 @@ export function MicCameraSetup({ onNext }: MicCameraSetupProps) {
             />
           </svg>
         </Button>
-        
+
         {hasPermissions.camera && !isCameraEnabled && (
           <p className="text-yellow-500 text-sm mt-2">
             Consider enabling your camera for a better exam experience

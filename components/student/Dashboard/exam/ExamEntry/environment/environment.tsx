@@ -10,11 +10,8 @@ interface EnvironmentCheckupProps {
   onPrev: () => void;
 }
 
-export function EnvironmentCheckup({
-  onNext,
-  onPrev,
-}: EnvironmentCheckupProps) {
-  const { theme } = useTheme();
+export function EnvironmentCheckup({ onNext }: EnvironmentCheckupProps) {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [uploadedFile, setUploadedFile] = useState<File | null>(null);
 
   const handleUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -26,13 +23,17 @@ export function EnvironmentCheckup({
   };
 
   const handleRecord = () => {
-    alert('Recording started... (mock)');
+    alert("Recording started... (mock)");
   };
   return (
     <div className="text-center space-y-8 w-full max-w-6xl mx-auto px-4">
       <div className="space-y-3">
-        <h1 className="text-3xl font-bold dark:text-white text-gray-900">Environment Checkup</h1>
-        <p className="dark:text-gray-400 text-gray-600 text-lg">Checking your Environment</p>
+        <h1 className="text-3xl font-bold dark:text-white text-gray-900">
+          Environment Checkup
+        </h1>
+        <p className="dark:text-gray-400 text-gray-600 text-lg">
+          Checking your Environment
+        </p>
       </div>
 
       {/* Upload and Record Cards - Centered and Responsive */}
@@ -47,7 +48,9 @@ export function EnvironmentCheckup({
                         transition border dark:border-zinc-700 border-gray-200"
             >
               <Upload className="w-8 h-8 text-teal-400" />
-              <span className="dark:text-white text-gray-900 font-semibold">Upload</span>
+              <span className="dark:text-white text-gray-900 font-semibold">
+                Upload
+              </span>
               <span className="text-sm dark:text-gray-400 text-gray-600 text-center">
                 Upload your environment snapshots here
               </span>
@@ -67,7 +70,9 @@ export function EnvironmentCheckup({
                       transition border dark:border-zinc-700 border-gray-200"
             >
               <Video className="w-8 h-8 text-teal-400" />
-              <span className="dark:text-white text-gray-900 font-semibold">Record</span>
+              <span className="dark:text-white text-gray-900 font-semibold">
+                Record
+              </span>
               <span className="text-sm dark:text-gray-400 text-gray-600 text-center">
                 Record your environment here
               </span>

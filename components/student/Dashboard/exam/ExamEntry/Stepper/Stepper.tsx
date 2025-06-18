@@ -1,34 +1,4 @@
-// 'use client'
-
-// import { Circle } from "lucide-react"
-// import { cn } from "@/lib/utils"
-
-// type StepperProps = {
-//   currentStep: number
-//   totalSteps?: number
-// }
-
-// export const Stepper = ({ currentStep, totalSteps = 5 }: StepperProps) => {
-//   return (
-//     <div className="flex items-center justify-center gap-4 mb-6">
-//       {Array.from({ length: totalSteps }, (_, i) => {
-//         const step = i + 1
-//         const isActive = step <= currentStep
-//         return (
-//           <Circle
-//             key={step}
-//             size={18}
-//             className={cn(
-//               "text-muted-foreground",
-//               isActive && "text-teal-500 fill-teal-500"
-//             )}
-//           />
-//         )
-//       })}
-//     </div>
-//   )
-// }
-
+'use client';
 
 import { cn } from '@/lib/utils';
 

@@ -8,6 +8,7 @@ interface DataManagementProps {
   examStartDelaySeconds?: number; // using seconds instead of minutes
 }
 
+ // eslint-disable-next-line @typescript-eslint/no-unused-vars
 export function DataManagement({ onPrev, examStartDelaySeconds = 30 }: DataManagementProps) {
   const [timeLeft, setTimeLeft] = useState<number>(0);
   const [stream, setStream] = useState<MediaStream | null>(null);

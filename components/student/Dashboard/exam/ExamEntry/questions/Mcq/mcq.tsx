@@ -115,7 +115,7 @@ export function MCQQuestion({
         throw new Error("No camera detected on this device");
       }
 
-      console.log("Video devices found:", videoDevices.length);      // Request camera access with fallback options
+      console.log("Video devices found:", videoDevices.length); // Request camera access with fallback options
       const mediaStream = await navigator.mediaDevices.getUserMedia({
         video: {
           facingMode: "user",
@@ -379,7 +379,8 @@ export function MCQQuestion({
             ))}
           </div>
         </div>
-      </div>{" "}      {/* Bottom section with camera preview and navigation button */}
+      </div>{" "}
+      {/* Bottom section with camera preview and navigation button */}
       <div className="w-[90vw] flex justify-between items-end mb-6">
         {/* Camera preview */}
         <div className="relative">
