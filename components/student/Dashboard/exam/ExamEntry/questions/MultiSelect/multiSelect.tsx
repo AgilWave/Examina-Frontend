@@ -8,19 +8,19 @@ import { TimerIcon, Camera, RefreshCw, AlertCircle } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { toast } from "sonner";
 
-interface MCQQuestionProps {
+interface MultiSelectQuestionProps {
   question: string;
   options: string[];
   currentQuestion: number;
   totalQuestions: number;
-  selected: number | null;
+  selected: number[];
   onSelect: (index: number) => void;
   onNext: () => void;
   time: string;
   attachment?: string; // Optional attachment URL or content
 }
 
-export function MCQQuestion({
+export function MultiSelectQuestion({
   question,
   options,
   currentQuestion,
@@ -30,7 +30,7 @@ export function MCQQuestion({
   onNext,
   time,
   attachment,
-}: MCQQuestionProps) {
+}: MultiSelectQuestionProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const [cameraActive, setCameraActive] = useState<boolean>(false);
   const [cameraError, setCameraError] = useState<string | null>(null);
@@ -115,7 +115,7 @@ export function MCQQuestion({
         throw new Error("No camera detected on this device");
       }
 
-      console.log("Video devices found:", videoDevices.length); // Request camera access with fallback options
+      console.log("Video devices found:", videoDevices.length);      // Request camera access with fallback options
       const mediaStream = await navigator.mediaDevices.getUserMedia({
         video: {
           facingMode: "user",
@@ -347,16 +347,15 @@ export function MCQQuestion({
           </ScrollArea>
         </div>
 
-        {/* Right side - Answer options */}
-        <div className="w-[90vw] md:w-3/5 border rounded-lg p-5 shadow-md">
-          <h3 className="font-medium text-lg mb-3">Select your answer</h3>{" "}
-          <div className="grid grid-cols-1 gap-4 mt-2">
-            {options.map((option, index) => (
+        {/* Right side - Answer options */}        <div className="w-[90vw] md:w-3/5 border rounded-lg p-5 shadow-md">
+          <h3 className="font-medium text-lg">Select your answer(s)</h3>
+          <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">You may select multiple correct options</p>{" "}          <div className="grid grid-cols-1 gap-4 mt-2">
+            {options.map((option: string, index: number) => (
               <Card
                 key={index}
                 className={cn(
                   "p-4 cursor-pointer border transition",
-                  selected === index
+                  selected.includes(index)
                     ? "bg-teal-100 dark:bg-teal-800 text-black dark:text-white"
                     : "hover:bg-gray-100 dark:hover:bg-gray-800"
                 )}
@@ -365,13 +364,13 @@ export function MCQQuestion({
                 <div className="flex items-start gap-3">
                   <div
                     className={cn(
-                      "flex justify-center items-center h-6 w-6 rounded-full text-sm font-medium",
-                      selected === index
+                      "flex justify-center items-center h-6 w-6 rounded-md text-sm font-medium",
+                      selected.includes(index)
                         ? "bg-teal-600 text-white"
                         : "bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300"
                     )}
                   >
-                    {index + 1}
+                    {selected.includes(index) ? "✓" : ""}
                   </div>
                   <p className="flex-1 text-base">{option}</p>
                 </div>
@@ -379,8 +378,7 @@ export function MCQQuestion({
             ))}
           </div>
         </div>
-      </div>{" "}
-      {/* Bottom section with camera preview and navigation button */}
+      </div>{" "}      {/* Bottom section with camera preview and navigation button */}
       <div className="w-[90vw] flex justify-between items-end mb-6">
         {/* Camera preview */}
         <div className="relative">
