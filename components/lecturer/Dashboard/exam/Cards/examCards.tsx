@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import {  Clock, Calendar, BookCheck , FileType2  } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { useRouter } from 'next/navigation';
 
 // Types
 interface ExamSession {
@@ -19,6 +20,12 @@ interface ExamSession {
 
 // ExamCard Component
 const ExamCard = ({ session }: { session: ExamSession }) => {
+  const router = useRouter();
+  const handleEnterExam = () => {
+    router.push(`/lecturer/dashboard/exams/proctor/`);
+  };
+
+
   return (
     <div className="rounded-lg border border-gray-200 shadow-sm bg-white dark:bg-[#0A0A0A] dark:border-teal-900 overflow-hidden w-full">
       <div className="border-b-4 border-primary/50 dark:border-teal-900 px-4 py-3 flex justify-between items-center">
@@ -60,7 +67,7 @@ const ExamCard = ({ session }: { session: ExamSession }) => {
         
         <div className="flex justify-between items-center pt-2">
           <div className="text-xs text-gray-500">Opened by: {session.openedBy}</div>
-          <Button>
+          <Button onClick={handleEnterExam}>
             Enter
           </Button>
         </div>
