@@ -13,7 +13,7 @@ import NIBMCropLight from "@/public/imgs/dashboard/light/NIBMMobileColor.png";
 import PoweredByLight from "@/public/imgs/dashboard/light/ExaminaDeskColor.png";
 import examinaMobileLight from "@/public/imgs/dashboard/light/examinamobilecolor.png";
 import { usePathname } from "next/navigation";
-import { LayoutGrid, BookCopy, GraduationCap } from "lucide-react";
+import { LayoutGrid, BookCopy, GraduationCap, Medal  } from "lucide-react";
 import { useTheme } from "next-themes";
 
 const Sidebar = () => {
@@ -32,6 +32,11 @@ const Sidebar = () => {
       name: "Course Works",
       icon: BookCopy,
       href: "/student/dashboard/course-works",
+    },
+    {
+      name: "Results",
+      icon: Medal ,
+      href: "/student/dashboard/results",
     },
   ];
 
