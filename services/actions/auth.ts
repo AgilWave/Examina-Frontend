@@ -41,7 +41,6 @@ export async function loginActionMS({ idToken }: { idToken: string }) {
 
 
     if (responseBody.content.jwt) {
-      console.log("Content:", responseBody.content); 
       if (LecturerEmails.includes(responseBody.content.user.email)) {
         cookieStore.set("lecturerjwt", responseBody.content.jwt);
         const userDetails = JSON.stringify(responseBody.content.user);
@@ -141,7 +140,7 @@ export async function LoginAdmin({
       cookieStore.set("adminjwt", responseBody.content.token);
       const userDetails = JSON.stringify(responseBody.content.user);
       const encryptedUserDetails = encrypt(userDetails);
-      cookieStore.set("userDetails", encryptedUserDetails)
+      cookieStore.set("adminUserDetails", encryptedUserDetails)
       const origin = process.env.NEXT_Admin_PUBLIC_URL || "http://localhost:3000";
       let redirectUrl = `${origin}/admin/dashboard/overview`;
 

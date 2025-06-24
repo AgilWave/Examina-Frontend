@@ -58,7 +58,7 @@ const Topbar = () => {
       if (response.isSuccessful) {
         toast.success(response.message || "Logout successful!");
         Cookies.remove("adminjwt");
-        Cookies.remove("userDetails");
+        Cookies.remove("adminUserDetails");
         router.push("/admin/login");
       } else {
         toast.error(response.message || "Logout failed!");
@@ -69,7 +69,7 @@ const Topbar = () => {
   };
 
   useEffect(() => {
-    const userData = Cookies.get("userDetails");
+    const userData = Cookies.get("adminUserDetails");
     if (userData) {
       const decryptedData = decrypt(userData);
       const parsedData = JSON.parse(decryptedData);

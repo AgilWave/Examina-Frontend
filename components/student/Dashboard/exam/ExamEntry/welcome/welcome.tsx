@@ -5,6 +5,8 @@ import Peer, { Instance as PeerInstance } from 'simple-peer';
 import socket from '@/lib/socket';
 import { toast } from 'sonner';
 import MessageInbox from '@/components/common/MessageInbox';
+import { decrypt } from '@/lib/encryption';
+import Cookies from 'js-cookie';
 
 interface DataManagementProps {
   onPrev: () => void;
@@ -69,12 +71,12 @@ export function DataManagement({ onPrev, onNext, examStartTime, examId = 'test-e
     });
 
     peer.on('signal', (signal) => {
-      console.log(`[Student] Sending signal to ${id}`, signal.type);
+      // console.log(`[Student] Sending signal to ${id}`, signal.type);
       socket.emit('signal', { target: id, signalData: signal });
     });
 
     peer.on('connect', () => {
-      console.log(`[Student] Connected to peer ${id}`);
+      // console.log(`[Student] Connected to peer ${id}`);
       setIsConnected(true);
       // toast.success(`Connected to proctor ${id}`);
     });
@@ -87,7 +89,7 @@ export function DataManagement({ onPrev, onNext, examStartTime, examId = 'test-e
     });
 
     peer.on('close', () => {
-      console.log(`[Student] Peer connection closed with ${id}`);
+      // console.log(`[Student] Peer connection closed with ${id}`);
       setIsConnected(false);
       delete peersRef.current[id];
       setPeers(prev => prev.filter(p => p.id !== id));
@@ -142,8 +144,14 @@ export function DataManagement({ onPrev, onNext, examStartTime, examId = 'test-e
         setPeers([]);
 
         if (!isConnected && !hasJoined) {
+          const userData = Cookies.get("userDetails");
+          if (userData) {
+            const decryptedData = decrypt(userData);
+            const parsedData = JSON.parse(decryptedData);
+            console.log('parsedData', parsedData);
+            socket.emit('join-exam', { examId, role: "student", studentId: parsedData.studentDetails.studentId, studentName: parsedData.name });
+          }
           hasJoined = true;
-          socket.emit('join-exam', { examId, role: "student" });
         }
 
         // Socket event listeners
@@ -182,12 +190,12 @@ export function DataManagement({ onPrev, onNext, examStartTime, examId = 'test-e
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const handleSignal = ({ sender, signalData }: { sender: string, signalData: any }) => {
           if (!mounted) return;
-          console.log(`[Student] Received signal from ${sender}`, signalData.type);
+          // console.log(`[Student] Received signal from ${sender}`, signalData.type);
 
           let peer = peersRef.current[sender];
 
           if (!peer) {
-            console.log(`[Student] Creating new peer for ${sender}`);
+            // console.log(`[Student] Creating new peer for ${sender}`);
             peer = createPeer(sender, false, stream);
           }
 
@@ -281,7 +289,7 @@ export function DataManagement({ onPrev, onNext, examStartTime, examId = 'test-e
 
   useEffect(() => {
     const handleAdminInfo = ({ adminId }: { adminId: string }) => {
-      console.log('[Student] Admin ID:', adminId);
+      // console.log('[Student] Admin ID:', adminId);
       setAdminId(adminId);
     };
     socket.on('admin-info', handleAdminInfo);

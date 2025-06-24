@@ -9,6 +9,10 @@ import socket from '@/lib/socket';
 import { toast } from 'sonner';
 import MessageInbox from '@/components/common/MessageInbox';
 import { Mic, AlertTriangle, Hand } from 'lucide-react';
+import { decrypt } from '@/lib/encryption';
+import Cookies from 'js-cookie';
+
+// console.log('[Student] question.tsx file loaded');
 
 export type QuestionType = 'mcq' | 'multiSelect' | 'structured';
 
@@ -64,6 +68,7 @@ export function QuestionComponent({
   onAnswerChange,
   examId = 'test-exam',
 }: QuestionComponentProps) {
+  // console.log('[Student] QuestionComponent rendered');
   const [mcqSelected, setMcqSelected] = useState<number | null>(null);
   const [multiSelectSelected, setMultiSelectSelected] = useState<number[]>([]);
   const [structuredAnswer, setStructuredAnswer] = useState<string>('');
@@ -73,7 +78,7 @@ export function QuestionComponent({
   const [peers, setPeers] = useState<PeerData[]>([]);
   const [isConnected, setIsConnected] = useState(false);
   const [inboxOpen, setInboxOpen] = useState(false);
-  const [messages, setMessages] = useState<{ from: string; message: string }[]>([]);
+  const [messages, setMessages] = useState<{ from: string; message: string; studentName?: string; studentId?: string }[]>([]);
   const [adminId, setAdminId] = useState<string | null>(null);
   const voicePeerRef = useRef<Peer.Instance | null>(null);
   const [voiceConnected, setVoiceConnected] = useState(false);
@@ -85,6 +90,8 @@ export function QuestionComponent({
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [lastActivity, setLastActivity] = useState(Date.now());
   const activityTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const [studentName, setStudentName] = useState<string>('');
+  const [studentId, setStudentId] = useState<string>('');
 
   // Get stream with specific devices
   const getStream = useCallback(async () => {
@@ -113,12 +120,12 @@ export function QuestionComponent({
     });
 
     peer.on('signal', (signal) => {
-      console.log(`[Student] Sending signal to ${id}`, signal.type);
+      // console.log(`[Student] Sending signal to ${id}`, signal.type);
       socket.emit('signal', { target: id, signalData: signal });
     });
 
     peer.on('connect', () => {
-      console.log(`[Student] Connected to peer ${id}`);
+      // console.log(`[Student] Connected to peer ${id}`);
       setIsConnected(true);
       // toast.success(`Connected to proctor ${id}`);
     });
@@ -134,7 +141,7 @@ export function QuestionComponent({
     });
 
     peer.on('close', () => {
-      console.log(`[Student] Peer connection closed with ${id}`);
+      // console.log(`[Student] Peer connection closed with ${id}`);
       setIsConnected(false);
       delete peersRef.current[id];
       setPeers(prev => prev.filter(p => p.id !== id));
@@ -184,16 +191,23 @@ export function QuestionComponent({
 
         if (!isConnected && !hasJoined) {
           hasJoined = true;
-          socket.emit('join-exam', { examId, role: "student" });
+          const userData = Cookies.get("userDetails");
+          if (userData) {
+            const decryptedData = decrypt(userData);
+            const parsedData = JSON.parse(decryptedData);
+            socket.emit('join-exam', { examId, role: "student", studentId: parsedData.studentDetails.studentId, studentName: parsedData.name });
+            setStudentName(parsedData.name);
+            setStudentId(parsedData.studentDetails.studentId);
+          }
         }
 
         // Socket event listeners
         const handleExistingUsers = ({ users }: { users: string[] }) => {
           if (!mounted) return;
-          console.log('[Student] Existing users:', users);
+          // console.log('[Student] Existing users:', users);
           users.forEach((id) => {
             if (id !== socket.id && !peersRef.current[id]) {
-              console.log(`[Student] Creating peer for existing user: ${id}`);
+              // console.log(`[Student] Creating peer for existing user: ${id}`);
               createPeer(id, true, stream);
             }
           });
@@ -201,7 +215,7 @@ export function QuestionComponent({
 
         const handleUserJoined = ({ id }: { id: string }) => {
           if (!mounted) return;
-          console.log('[Student] User joined:', id);
+          // console.log('[Student] User joined:', id);
           if (id !== socket.id && !peersRef.current[id]) {
             // toast.info('Proctor joined: ' + id);
             createPeer(id, false, stream);
@@ -210,7 +224,7 @@ export function QuestionComponent({
 
         const handleUserLeft = ({ id }: { id: string }) => {
           if (!mounted) return;
-          console.log('[Student] User left:', id);
+          // console.log('[Student] User left:', id);
           const peer = peersRef.current[id];
           if (peer) {
             peer.destroy();
@@ -224,12 +238,12 @@ export function QuestionComponent({
         const handleSignal = ({ sender, signalData }: { sender: string, signalData: any }) => {
           if (!mounted) return;
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          console.log(`[Student] Received signal from ${sender}`, (signalData as any).type);
+          //
 
           let peer = peersRef.current[sender];
 
           if (!peer) {
-            console.log(`[Student] Creating new peer for ${sender}`);
+            // console.log(`[Student] Creating new peer for ${sender}`);
             peer = createPeer(sender, false, stream);
           }
 
@@ -350,8 +364,8 @@ export function QuestionComponent({
 
   // Listen for incoming messages
   useEffect(() => {
-    const handlePrivateMessage = ({ from, message }: { from: string; message: string }) => {
-      setMessages(prev => [...prev, { from, message }]);
+    const handlePrivateMessage = ({ from, message, studentName, studentId }: { from: string; message: string; studentName?: string; studentId?: string }) => {
+      setMessages(prev => [...prev, { from, message, studentName, studentId }]);
       setInboxOpen(true);
       updateActivity();
     };
@@ -361,7 +375,7 @@ export function QuestionComponent({
 
   useEffect(() => {
     const handleAdminInfo = ({ adminId }: { adminId: string }) => {
-      console.log('[Student] Admin ID:', adminId);
+      // console.log('[Student] Admin ID:', adminId);
       setAdminId(adminId);
     };
     socket.on('admin-info', handleAdminInfo);
@@ -370,6 +384,7 @@ export function QuestionComponent({
 
   // Handle voice connect request from admin
   useEffect(() => {
+    // console.log('[Student] Setting up voice-connect-request listener');
     const handleVoiceConnectRequest = async ({ from }: { from: string }) => {
       if (voicePeerRef.current) {
         voicePeerRef.current.destroy();
@@ -378,6 +393,8 @@ export function QuestionComponent({
       }
       try {
         const stream = await navigator.mediaDevices.getUserMedia({ audio: true, video: false });
+        // console.log('[Student] Got local audio stream:', stream, stream.getAudioTracks());
+        // console.log('[Student] Creating Peer for voice, initiator: true, with stream:', stream);
         const peer = new Peer({
           initiator: true,
           trickle: false,
@@ -392,9 +409,23 @@ export function QuestionComponent({
         voicePeerRef.current = peer;
         setVoiceConnected(true);
         peer.on('signal', (signal) => {
+          // console.log('[Student] Sending voice-signal to', from, signal);
           socket.emit('voice-signal', { target: from, signalData: signal });
         });
+        peer.on('stream', (remoteStream) => {
+          // console.log('[Student] Received remote audio stream:', remoteStream); 
+          // console.log('[Student] Audio tracks:', remoteStream.getAudioTracks());
+          const audio = new window.Audio();
+          audio.srcObject = remoteStream;
+          audio.autoplay = true;
+          audio.play().then(() => {
+            // console.log('[Student] Audio playback started');
+          }).catch((e) => {
+            console.error('[Student] Audio playback failed:', e);
+          });
+        });
         peer.on('connect', () => {
+          // console.log('[Student] Peer connection established for voice!');
           setVoiceConnected(true);
           toast.success('Voice connection established');
         });
@@ -402,7 +433,8 @@ export function QuestionComponent({
           setVoiceConnected(false);
           voicePeerRef.current = null;
         });
-        peer.on('error', () => {
+        peer.on('error', (err) => {
+          console.error('[Student] Peer connection error:', err);
           setVoiceConnected(false);
           voicePeerRef.current = null;
         });
@@ -417,11 +449,11 @@ export function QuestionComponent({
 
   // Handle incoming voice-signal from admin
   useEffect(() => {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const handleVoiceSignal = ({ signalData }: { sender: string, signalData: any }) => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unused-vars
+    const handleVoiceSignal = ({ signalData, sender }: { sender: string, signalData: any }) => {
+      // console.log('[Student] Received voice-signal from', sender, signalData);
       if (voicePeerRef.current) {
         try {
-
           voicePeerRef.current.signal(signalData);
         } catch {
           // ignore
@@ -623,9 +655,13 @@ export function QuestionComponent({
         canSend={true}
         onSend={msg => {
           socket.emit('private-message', { to: adminId, from: socket.id, message: msg, participantId: socket.id ?? '' });
-          setMessages(prev => ([...prev, { from: socket.id ?? '', message: msg }]));
+          setMessages(prev => ([...prev, { from: socket.id ?? '', message: msg, studentName: studentName, studentId: studentId }]));
           updateActivity();
         }}
+        participantName={studentName}
+        participantId={studentId}
+        isProctor={false}
+        selfId={socket.id}
       />
 
       {/* Question Content */}
