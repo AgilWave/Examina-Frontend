@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import Peer from "simple-peer";
 import socket from "@/lib/socket";
 import MessageInbox from '@/components/common/MessageInbox';
-import { Video, Mic, MicOff, VideoOff, Hand, MessageCircle, User, VolumeX } from 'lucide-react';
+import { Video, Mic, MicOff, VideoOff, Hand, MessageCircle, User, VolumeX, AlertTriangle } from 'lucide-react';
 import { Tooltip, TooltipTrigger, TooltipContent } from '@/components/ui/tooltip';
 import { toast } from "sonner";
 
@@ -30,6 +30,7 @@ export default function AdminView({ examId }: AdminViewProps) {
   const [activeAudio, setActiveAudio] = useState<{ [id: string]: boolean }>({});
   const [mediaStatus, setMediaStatus] = useState<{ [id: string]: { webcam: boolean; mic: boolean } }>({});
   const [socketToStudentId, setSocketToStudentId] = useState<{ [socketId: string]: { studentId: string, studentName: string } }>({});
+  const [violationStatus, setViolationStatus] = useState<{ [id: string]: { type: string; count: number } }>({});
 
 
 
@@ -141,6 +142,7 @@ export default function AdminView({ examId }: AdminViewProps) {
         }
       }
     });
+
 
     socket.on("user-left", ({ id }) => {
       setSocketToStudentId(prev => {
@@ -281,6 +283,21 @@ export default function AdminView({ examId }: AdminViewProps) {
     };
   }, []);
 
+  useEffect(() => {
+    const handleSecurityViolation = ({ studentId, violationType, count, socketId }: { studentId: string, violationType: string, count: number, socketId: string }) => {
+      const studentInfo = Object.values(socketToStudentId).find(info => info.studentId === studentId);
+      const studentName = studentInfo?.studentName || studentId || socketId;
+      toast.error(`Security Violation: ${violationType} (Student: ${studentName}) [Count: ${count}]`, { duration: 7000 });
+      // Find the socket id for this studentId
+      const sid = Object.keys(socketToStudentId).find(key => socketToStudentId[key].studentId === studentId) || socketId;
+      setViolationStatus(prev => ({ ...prev, [sid]: { type: violationType, count } }));
+    };
+    socket.on('student-security-violation', handleSecurityViolation);
+    return () => {
+      socket.off('student-security-violation', handleSecurityViolation);
+    };
+  }, [socketToStudentId]);
+
   return (
     <div className="flex h-[90vh] w-full bg-gray-50 dark:bg-neutral-900 rounded-lg shadow-lg overflow-hidden">
       <div className="flex-1 p-6 overflow-y-auto">
@@ -297,6 +314,20 @@ export default function AdminView({ examId }: AdminViewProps) {
               {handsUp[id] && (
                 <div className="absolute top-3 right-3 z-10 animate-pulse">
                   <Hand className="text-yellow-400 w-8 h-8 drop-shadow-lg" />
+                </div>
+              )}
+              {violationStatus[id] && (
+                <div className="absolute top-3 left-3 z-20">
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <span className="inline-flex items-center">
+                        <AlertTriangle className="text-yellow-500 w-7 h-7 animate-pulse drop-shadow-lg" />
+                      </span>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      Security Violation: {violationStatus[id].type} (Count: {violationStatus[id].count})
+                    </TooltipContent>
+                  </Tooltip>
                 </div>
               )}
               <div className="w-full aspect-video bg-black rounded-lg overflow-hidden flex items-center justify-center">

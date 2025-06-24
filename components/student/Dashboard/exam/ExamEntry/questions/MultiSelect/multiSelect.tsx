@@ -16,6 +16,7 @@ interface MultiSelectQuestionProps {
   onNext: () => void;
   time: string;
   attachment?: string;
+  isLastQuestion?: boolean;
 }
 
 export function MultiSelectQuestion({
@@ -28,6 +29,7 @@ export function MultiSelectQuestion({
   onNext,
   time,
   attachment,
+  isLastQuestion = false,
 }: MultiSelectQuestionProps) {
   return (
     <div className="fixed inset-0 w-full h-screen z-50 flex flex-col items-center p-6 bg-white dark:bg-black text-black dark:text-white">
@@ -115,8 +117,16 @@ export function MultiSelectQuestion({
       {/* Bottom section with navigation button */}
       <div className="w-[90vw] flex justify-end items-end mb-6">
         {/* Navigation button */}
-        <Button className="px-8 py-2 text-base" onClick={onNext}>
-          Next Question
+        <Button 
+          className={cn(
+            "px-8 py-2 text-base",
+            isLastQuestion 
+              ? "bg-red-600 hover:bg-red-700 text-white" 
+              : "bg-teal-600 hover:bg-teal-700 text-white"
+          )} 
+          onClick={onNext}
+        >
+          {isLastQuestion ? "Submit and End Exam" : "Next Question"}
         </Button>
       </div>
     </div>

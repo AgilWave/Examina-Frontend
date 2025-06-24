@@ -20,10 +20,11 @@ interface PeerData {
     peer: PeerInstance;
 }
 
-export function DataManagement({ onPrev, onNext, examStartTime, examId = 'test-exam' }: DataManagementProps) {
+export function DataManagement({ onPrev, onNext, examStartTime, examId = 'test-exam-123' }: DataManagementProps) {
   const [timeLeft, setTimeLeft] = useState<number>(0);
   const [stream, setStream] = useState<MediaStream | null>(null);
   const [canProceed, setCanProceed] = useState(false);
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [currentTime, setCurrentTime] = useState<Date>(new Date());
   
   // WebRTC and proctoring states
@@ -39,6 +40,7 @@ export function DataManagement({ onPrev, onNext, examStartTime, examId = 'test-e
   const streamRef = useRef<MediaStream | null>(null);
   const peersRef = useRef<{ [id: string]: PeerInstance }>({});
   const videoRef = useRef<HTMLVideoElement>(null);
+  const [joining, setJoining] = useState(false);
 
   // Get stream with specific devices
   const getStream = useCallback(async () => {
@@ -415,22 +417,15 @@ export function DataManagement({ onPrev, onNext, examStartTime, examId = 'test-e
 
   const formatTime = (ms: number) => {
     const totalSec = Math.floor(ms / 1000);
-    const min = Math.floor(totalSec / 60);
+    const hours = Math.floor(totalSec / 3600);
+    const min = Math.floor((totalSec % 3600) / 60);
     const sec = totalSec % 60;
-    return `${String(min).padStart(2, '0')}:${String(sec).padStart(2, '0')}`;
-  };
-
-  const formatDateTime = (date: Date) => {
-    return date.toLocaleString("en-US", {
-      timeZone: "Asia/Colombo",
-      year: 'numeric',
-      month: '2-digit',
-      day: '2-digit',
-      hour: '2-digit',
-      minute: '2-digit',
-      second: '2-digit',
-      hour12: false
-    });
+    
+    if (hours > 0) {
+      return `${String(hours).padStart(2, '0')}:${String(min).padStart(2, '0')}:${String(sec).padStart(2, '0')}`;
+    } else {
+      return `${String(min).padStart(2, '0')}:${String(sec).padStart(2, '0')}`;
+    }
   };
 
   return (
@@ -452,12 +447,12 @@ export function DataManagement({ onPrev, onNext, examStartTime, examId = 'test-e
       </div>
 
       {/* Current Time Display */}
-      <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-4 max-w-md mx-auto">
+      {/* <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-4 max-w-md mx-auto">
         <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">Current Time (Sri Lanka)</p>
         <p className="text-lg font-mono text-black dark:text-white">
           {formatDateTime(currentTime)}
         </p>
-      </div>
+      </div> */}
 
       <div className="space-y-6">
         <div className="space-y-4">
@@ -532,8 +527,17 @@ export function DataManagement({ onPrev, onNext, examStartTime, examId = 'test-e
         </button>
         
         <button
-          onClick={onNext}
-          disabled={!canProceed}
+          onClick={async () => {
+            setJoining(true);
+            try {
+              await onNext();
+            } catch {
+              // Handle error silently or show toast
+            } finally {
+              setJoining(false);
+            }
+          }}
+          disabled={!canProceed || joining}
           className={`px-8 py-3 rounded-xl text-lg font-medium shadow-lg transition-all ${
             canProceed
               ? 'bg-teal-500 hover:bg-teal-600 text-white shadow-teal-500/25 hover:scale-105'

@@ -1,10 +1,10 @@
 import React from 'react'
-import StudentExam from '@/components/student/Dashboard/testExam'
+import ExamSetupPage from '@/components/student/Dashboard/exam/ExamEntry/ExamEntry'
 
 const page = () => {
   return (
-    <div className='flex flex-col items-center justify-center h-screen'>
-      <StudentExam examId="123" />
+    <div className='w-full h-screen'>
+      <ExamSetupPage />
     </div>
   )
 }

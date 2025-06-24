@@ -1,15 +1,8 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Input } from '@/components/ui/input';
-import {
-  Dialog,
-  DialogContent,
-  DialogOverlay,
-  DialogClose,
-  DialogTitle,
-} from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { UserCircle, Shield } from 'lucide-react';
+import { UserCircle, Shield, X, Send } from 'lucide-react';
 
 interface MessageInboxProps {
   open: boolean;
@@ -60,7 +53,7 @@ export default function MessageInbox({
       return participantName || 'Student';
     }
   };
-  
+
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const getStudentId = (msg: any) => {
     if (msg.from === selfId || msg.from === 'admin' || msg.from === 'proctor') return '';
@@ -89,12 +82,19 @@ export default function MessageInbox({
     }
   };
 
+  if (!open) return null;
+
   return (
-    <Dialog open={open} onOpenChange={v => { if (!v) onClose(); }}>
-      <DialogOverlay />
-      <DialogTitle className="sr-only">Message Inbox</DialogTitle>
-      <DialogContent
-        className="!top-6 !left-6 !translate-x-0 !translate-y-0 w-[350px] max-w-full p-0 rounded-xl shadow-2xl bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-700 flex flex-col"
+    <>
+      {/* Overlay */}
+      <div
+        className="fixed inset-0 bg-black/50 backdrop-blur-xs z-[9998]"
+        onClick={onClose}
+      />
+
+      {/* Dialog Content */}
+      <div
+        className="fixed top-6 left-6 w-[400px] max-w-full p-0 rounded-xl shadow-2xl bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-700 flex flex-col z-[9999]"
         style={{ position: 'fixed' }}
       >
         {/* Header with participant info */}
@@ -119,20 +119,17 @@ export default function MessageInbox({
             </>
           )}
           <div className="flex-1" />
-          <DialogClose asChild>
-            {/* <Button
-              variant="ghost"
-              size="icon"
-              onClick={onClose}
-              className="text-gray-500 hover:text-black dark:text-gray-400 dark:hover:text-white"
-              aria-label="Close"
-            >
-              &times;
-            </Button> */}
-          </DialogClose>
+          <button
+            onClick={onClose}
+            className="text-gray-500 hover:text-black dark:text-gray-400 dark:hover:text-white p-1 rounded"
+            aria-label="Close"
+          >
+            <X className="w-4 h-4" />
+          </button>
         </div>
+
         {/* Messages area */}
-        <ScrollArea className="flex-1 px-4 py-3 bg-white dark:bg-zinc-900 min-h-[200px] max-h-[200px] overflow-y-auto scrollbar-custom">
+        <ScrollArea className="flex-1 px-4 py-3 bg-white dark:bg-zinc-900 min-h-[300px] max-h-[300px] overflow-y-auto scrollbar-custom">
           <div className="flex flex-col space-y-3">
             {messages.length === 0 ? (
               <div className="text-gray-400 dark:text-gray-500 text-sm text-center mt-8">No messages yet.</div>
@@ -146,11 +143,10 @@ export default function MessageInbox({
                   >
                     {!isSelf && <div>{getAvatar(msg)}</div>}
                     <div
-                      className={`rounded-lg px-3 py-2 max-w-[70%] text-sm shadow-sm ${
-                        isSelf
+                      className={`rounded-lg px-3 py-2 max-w-[70%] text-sm shadow-sm ${isSelf
                           ? 'bg-teal-600 text-white rounded-br-none'
                           : 'bg-gray-100 dark:bg-zinc-800 text-gray-900 dark:text-gray-100 rounded-bl-none'
-                      }`}
+                        }`}
                     >
                       <div className="font-semibold text-xs mb-0.5">
                         {getSenderLabel(msg)}
@@ -168,6 +164,7 @@ export default function MessageInbox({
             <div ref={messagesEndRef} />
           </div>
         </ScrollArea>
+
         {/* Input area */}
         {canSend && (
           <form
@@ -187,12 +184,12 @@ export default function MessageInbox({
               onChange={e => setInput(e.target.value)}
               placeholder="Type a message..."
             />
-            <Button type="submit" className="px-4 py-2 rounded-lg" variant="default">
-              Send
+            <Button type="submit" className="px-3 py-2 rounded-lg" variant="default">
+              <Send className="w-4 h-4" />
             </Button>
           </form>
         )}
-      </DialogContent>
-    </Dialog>
+      </div>
+    </>
   );
 } 

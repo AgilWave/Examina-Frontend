@@ -84,8 +84,8 @@ const ExamCard = ({ session }: { session: ExamSession }) => {
           <div className="text-xs text-gray-500">
             Opened by: {session.openedBy}
           </div>
-          <Link href="/entry">
-            <Button >
+          <Link href={`/entry?examId=${session.examId}`}>
+            <Button>
               Enter
             </Button>
           </Link>
@@ -118,7 +118,7 @@ const ExamDashboard = () => {
       date: "Apr 30, 01:35 AM",
       time: "01:35 AM",
       duration: "10h 18m",
-      examId: 10,
+      examId: 3,
       type: "MCQ",
       isActive: true,
       openedBy: "a",

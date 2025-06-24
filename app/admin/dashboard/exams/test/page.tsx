@@ -3,7 +3,7 @@ import TextExamAdmin from '@/components/admin/Dashboard/ExamContent/textExamAdmi
 
 function page() {
   return (
-    <TextExamAdmin examId="test-exam-123" />
+    <TextExamAdmin examId="KUHDSE241F-SOFTWA-MID" />
   )
 }
 
