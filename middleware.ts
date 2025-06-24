@@ -32,47 +32,44 @@ export async function middleware(req: NextRequest) {
 
   const examinaHost = process.env.NEXT_PUBLIC_HOSTNAME_EXAMINA as string; // have /student and /lecturer folders
   const adminHost = process.env.NEXT_PUBLIC_HOSTNAME_ADMIN as string;
+  const isAdminSubdomain = host === adminHost;
   const isLocalhost = host?.includes("localhost");
 
   // Admin host routing (admin.examina.live)
-  if (host?.includes(adminHost) && !isLocalhost) {
-    console.log("Admin host detected:", host);
-    
-    if (!adminJwt) {
-      if (url.pathname !== "/login") {
-        return NextResponse.redirect(new URL("/login", req.url));
-      }
-    } else {
-      if (url.pathname === "/" || url.pathname === "/login") {
-        return NextResponse.redirect(new URL("/dashboard/overview", req.url));
-      }
+  if (isAdminSubdomain && !isLocalhost) {
+    console.log(`Admin subdomain access: ${url.pathname}`);
+
+    if (!adminJwt && !url.pathname.startsWith("/login")) {
+      return NextResponse.redirect(new URL("/login", req.url));
     }
 
-    // Remove /admin prefix if it exists and rewrite to /admin internally
-    if (url.pathname.startsWith("/admin")) {
-      const newPath = url.pathname.replace("/admin", "");
-      const targetPath = newPath || "/";
-      return NextResponse.rewrite(new URL(`/admin${targetPath}`, req.url));
+    if (adminJwt && (url.pathname === "/" || url.pathname === "/login")) {
+      return NextResponse.redirect(new URL("/dashboard", req.url));
     }
 
-    // For all other paths on admin host, rewrite to /admin prefix
-    const targetPath = `/admin${url.pathname}`;
-    return NextResponse.rewrite(new URL(targetPath, req.url));
+    if (!url.pathname.startsWith("/admin")) {
+      const newPath = url.pathname === "/" ? "" : url.pathname;
+      return NextResponse.rewrite(new URL(`/admin${newPath}`, req.url));
+    }
+
+    return NextResponse.next();
   }
 
   // Localhost admin routing
   if (isLocalhost) {
     const isAdminRoute = url.pathname.startsWith("/admin");
-    
+
     if (isAdminRoute) {
       if (!adminJwt && url.pathname !== "/admin/login") {
         return NextResponse.redirect(new URL("/admin/login", req.url));
       }
-      
+
       if (adminJwt && url.pathname === "/admin/login") {
-        return NextResponse.redirect(new URL("/admin/dashboard/overview", req.url));
+        return NextResponse.redirect(
+          new URL("/admin/dashboard/overview", req.url)
+        );
       }
-      
+
       return NextResponse.next();
     }
 
@@ -82,24 +79,38 @@ export async function middleware(req: NextRequest) {
     const isLoginPage = url.pathname === "/" || url.pathname === "/login";
 
     if (isStudentRoute && lecturerJwt && !jwt) {
-      return NextResponse.redirect(new URL("/lecturer/dashboard/overview", req.url));
+      return NextResponse.redirect(
+        new URL("/lecturer/dashboard/overview", req.url)
+      );
     }
 
     if (isLecturerRoute && jwt && !lecturerJwt) {
-      return NextResponse.redirect(new URL("/student/dashboard/overview", req.url));
+      return NextResponse.redirect(
+        new URL("/student/dashboard/overview", req.url)
+      );
     }
 
     if (isLoginPage && (jwt || lecturerJwt)) {
       if (lecturerJwt) {
-        return NextResponse.redirect(new URL("/lecturer/dashboard/overview", req.url));
+        return NextResponse.redirect(
+          new URL("/lecturer/dashboard/overview", req.url)
+        );
       }
       if (jwt) {
-        return NextResponse.redirect(new URL("/student/dashboard/overview", req.url));
+        return NextResponse.redirect(
+          new URL("/student/dashboard/overview", req.url)
+        );
       }
     }
 
-    if ((isStudentRoute && !jwt && !userDetails) || (isLecturerRoute && !lecturerJwt)) {
-      if (url.pathname.startsWith("/student/dashboard") || url.pathname.startsWith("/lecturer/dashboard")) {
+    if (
+      (isStudentRoute && !jwt && !userDetails) ||
+      (isLecturerRoute && !lecturerJwt)
+    ) {
+      if (
+        url.pathname.startsWith("/student/dashboard") ||
+        url.pathname.startsWith("/lecturer/dashboard")
+      ) {
         return NextResponse.redirect(new URL("/login", req.url));
       }
     }
@@ -120,24 +131,38 @@ export async function middleware(req: NextRequest) {
     }
 
     if (isStudentRoute && lecturerJwt && !jwt) {
-      return NextResponse.redirect(new URL("/lecturer/dashboard/overview", req.url));
+      return NextResponse.redirect(
+        new URL("/lecturer/dashboard/overview", req.url)
+      );
     }
 
     if (isLecturerRoute && jwt && !lecturerJwt) {
-      return NextResponse.redirect(new URL("/student/dashboard/overview", req.url));
+      return NextResponse.redirect(
+        new URL("/student/dashboard/overview", req.url)
+      );
     }
 
     if (isLoginPage && (jwt || lecturerJwt)) {
       if (lecturerJwt) {
-        return NextResponse.redirect(new URL("/lecturer/dashboard/overview", req.url));
+        return NextResponse.redirect(
+          new URL("/lecturer/dashboard/overview", req.url)
+        );
       }
       if (jwt) {
-        return NextResponse.redirect(new URL("/student/dashboard/overview", req.url));
+        return NextResponse.redirect(
+          new URL("/student/dashboard/overview", req.url)
+        );
       }
     }
 
-    if ((isStudentRoute && !jwt && !userDetails) || (isLecturerRoute && !lecturerJwt)) {
-      if (url.pathname.startsWith("/student/dashboard") || url.pathname.startsWith("/lecturer/dashboard")) {
+    if (
+      (isStudentRoute && !jwt && !userDetails) ||
+      (isLecturerRoute && !lecturerJwt)
+    ) {
+      if (
+        url.pathname.startsWith("/student/dashboard") ||
+        url.pathname.startsWith("/lecturer/dashboard")
+      ) {
         return NextResponse.redirect(new URL("/login", req.url));
       }
     }
@@ -157,6 +182,6 @@ export const config = {
      * - _next/image (image optimization files)
      * - favicon.ico (favicon file)
      */
-    '/((?!api|_next/static|_next/image|favicon.ico).*)',
+    "/((?!api|_next/static|_next/image|favicon.ico).*)",
   ],
 };

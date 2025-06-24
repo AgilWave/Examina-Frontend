@@ -4,7 +4,7 @@ const nextConfig: NextConfig = {
   async rewrites() {
     return [
       {
-        source: '/:path*',
+        source: '/admin/:path*',
         has: [{ type: 'host', value: 'admin.examina.live' }],
         destination: '/admin/:path*',
       },
