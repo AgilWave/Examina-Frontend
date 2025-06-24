@@ -48,8 +48,8 @@ export async function middleware(req: NextRequest) {
     }
 
     if (!url.pathname.startsWith("/admin")) {
-      const newPath = url.pathname === "/" ? "" : url.pathname;
-      return NextResponse.rewrite(new URL(`/admin${newPath}`, req.url));
+      // const newPath = url.pathname === "/" ? "" : url.pathname;
+      return NextResponse.rewrite(new URL(`/admin${url.pathname}`, req.url));
     }
 
     return NextResponse.next();
