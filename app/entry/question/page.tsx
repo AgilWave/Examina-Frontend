@@ -86,7 +86,19 @@ const ExamQuestionPage = () => {
       setShowSummary(false);
     }
   };
-    return (
+
+  const handleBackToQuestions = () => {
+    setShowSummary(false);
+  };
+
+  const handleFinalSubmit = () => {
+    // Handle final exam submission
+    console.log('Final answers:', userAnswers);
+    alert('Exam submitted successfully!');
+    // You can add navigation logic here
+  };
+
+  return (
     <div className="container mx-auto py-4 px-4">
       {!showSummary ? (
         <>
@@ -114,6 +126,8 @@ const ExamQuestionPage = () => {
           questions={exampleQuestions}
           userAnswers={userAnswers}
           onQuestionClick={handleQuestionClick}
+          onBackToQuestions={handleBackToQuestions}
+          onFinalSubmit={handleFinalSubmit}
         />
       )}
     </div>
