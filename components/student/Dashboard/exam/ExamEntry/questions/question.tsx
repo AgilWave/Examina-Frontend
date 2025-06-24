@@ -78,6 +78,7 @@ export function QuestionComponent({
   const voicePeerRef = useRef<Peer.Instance | null>(null);
   const [voiceConnected, setVoiceConnected] = useState(false);
   const streamRef = useRef<MediaStream | null>(null);
+  const [localStream, setLocalStream] = useState<MediaStream | null>(null);
   const peersRef = useRef<{ [id: string]: PeerInstance }>({});
   const videoRef = useRef<HTMLVideoElement>(null);
   const [showProctoringWarning, setShowProctoringWarning] = useState(false);
@@ -167,10 +168,7 @@ export function QuestionComponent({
         if (!mounted) return;
 
         streamRef.current = stream;
-
-        if (videoRef.current) {
-          videoRef.current.srcObject = stream;
-        }
+        setLocalStream(stream);
 
         // Emit webcam/mic access status to admin
         socket.emit('media-status', {
@@ -303,6 +301,13 @@ export function QuestionComponent({
       }
     };
   }, [examId, getStream, createPeer]);
+
+  // NEW: Set video element srcObject when both are available
+  useEffect(() => {
+    if (videoRef.current && localStream) {
+      videoRef.current.srcObject = localStream;
+    }
+  }, [localStream]);
 
   const updateActivity = useCallback(() => {
     setLastActivity(Date.now());
