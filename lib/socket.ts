@@ -2,6 +2,7 @@ import { io } from "socket.io-client";
 import { BACKEND_URL } from '@/Constants/backend';
 
 const socket = io(BACKEND_URL, {
+    transports: ['websocket'],
     reconnection: true,
     reconnectionAttempts: 5,
     reconnectionDelay: 10000,

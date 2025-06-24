@@ -1,3 +1,4 @@
+'use client'
 import React from 'react';
 import { useRouter } from 'next/navigation';
 import { Card, CardContent } from '@/components/ui/card';
@@ -14,7 +15,8 @@ interface QuestionData {
 // Interface for component props
 export interface SummaryProps {
   questions: QuestionData[];
-  userAnswers: Record<string, any>; // Map of question id to user answer
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  userAnswers: Record<string, any>; 
   onQuestionClick: (questionId: string) => void;
 }
 
@@ -22,6 +24,7 @@ export const Summary: React.FC<SummaryProps> = ({ questions, userAnswers, onQues
   const router = useRouter();
 
   // Function to display user answers based on question type
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const renderAnswer = (question: QuestionData, answer: any) => {
     if (!answer) return <span className="text-red-500">Not answered</span>;
 

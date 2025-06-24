@@ -21,6 +21,7 @@ interface CheckItem {
 const SUPPORTED_BROWSERS = ["chrome", "firefox", "safari", "edge"];
 // const REQUIRED_FEATURES = ['localStorage', 'sessionStorage', 'indexedDB', 'Blob'];
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 export function SystemCheckup({ onNext, onPrev }: SystemCheckupProps) {
   const [checks, setChecks] = useState<CheckItem[]>([
     {
@@ -36,6 +37,7 @@ export function SystemCheckup({ onNext, onPrev }: SystemCheckupProps) {
   ]);
 
   const [allCompleted, setAllCompleted] = useState(false);
+  const [allPassed, setAllPassed] = useState(false);
    // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [browserName, setBrowserName] = useState<string>("");
    // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -118,6 +120,26 @@ export function SystemCheckup({ onNext, onPrev }: SystemCheckupProps) {
     };
   };
 
+  // Device detection helpers
+  const isMobileOrTablet = () => {
+    const ua = navigator.userAgent.toLowerCase();
+    // Basic user agent check
+    if (
+      /android|webos|iphone|ipad|ipod|blackberry|iemobile|opera mini|mobile|tablet/.test(ua)
+    ) {
+      return true;
+    }
+    // // Screen size check (for edge cases)
+    // if (window.innerWidth < 1024 || window.innerHeight < 600) {
+    //   return true;
+    // }
+    return false;
+  };
+
+  const isScreenResolutionOk = () => {
+    return window.innerWidth >= 1024 && window.innerHeight >= 600;
+  };
+
   useEffect(() => {
     // Start the checking process
     const startChecking = async () => {
@@ -127,17 +149,13 @@ export function SystemCheckup({ onNext, onPrev }: SystemCheckupProps) {
           check.id === "browser" ? { ...check, status: "checking" } : check
         )
       );
-
       // Small delay to show the checking animation
       await new Promise((resolve) => setTimeout(resolve, 1000));
-
       // Actually detect the browser
       const { name, version } = detectBrowser();
       setBrowserName(name);
       setBrowserVersion(version);
-
       const formattedBrowserName = name.charAt(0).toUpperCase() + name.slice(1);
-
       setChecks((prev) =>
         prev.map((check) =>
           check.id === "browser"
@@ -149,34 +167,36 @@ export function SystemCheckup({ onNext, onPrev }: SystemCheckupProps) {
             : check
         )
       );
-
       // Then check browser features and compatibility
       setChecks((prev) =>
         prev.map((check) =>
           check.id === "support" ? { ...check, status: "checking" } : check
         )
       );
-
-      // Small delay to show the checking animation
       await new Promise((resolve) => setTimeout(resolve, 1000));
-
-      // Check browser features
-      const { supported, missingFeatures } = checkBrowserFeatures();
-      const isSupportedBrowser = SUPPORTED_BROWSERS.includes(name);
-
+      // Device and resolution checks (background)
+      const isMobileTablet = isMobileOrTablet();
+      const screenOk = isScreenResolutionOk();
       let supportStatus: "completed" | "failed" = "completed";
       let supportDetails = "Your browser is fully supported";
-
-      if (!isSupportedBrowser) {
+      if (isMobileTablet) {
         supportStatus = "failed";
-        supportDetails = `${formattedBrowserName} is not on our list of fully supported browsers. We recommend using Chrome, Firefox, Edge, or Safari for the best experience.`;
-      } else if (!supported) {
+        supportDetails = "Mobile or tablet devices are not allowed. Please use a desktop or laptop computer.";
+      } else if (!screenOk) {
         supportStatus = "failed";
-        supportDetails = `Missing required features: ${missingFeatures.join(
-          ", "
-        )}`;
+        supportDetails = `Screen resolution too small (${window.innerWidth}x${window.innerHeight}). Minimum required: 1024x600.`;
+      } else {
+        // Check browser features
+        const { supported, missingFeatures } = checkBrowserFeatures();
+        const isSupportedBrowser = SUPPORTED_BROWSERS.includes(name);
+        if (!isSupportedBrowser) {
+          supportStatus = "failed";
+          supportDetails = `${formattedBrowserName} is not on our list of fully supported browsers. We recommend using Chrome, Firefox, Edge, or Safari for the best experience.`;
+        } else if (!supported) {
+          supportStatus = "failed";
+          supportDetails = `Missing required features: ${missingFeatures.join(", ")}`;
+        }
       }
-
       setChecks((prev) =>
         prev.map((check) =>
           check.id === "support"
@@ -188,20 +208,58 @@ export function SystemCheckup({ onNext, onPrev }: SystemCheckupProps) {
             : check
         )
       );
-
-      // Set all completed to true regardless of failed checks so user can proceed
       setAllCompleted(true);
     };
-
     startChecking();
+    // Add resize event listener to re-check resolution if window is resized
+    const handleResize = () => {
+      // If screen becomes too small, fail the support check
+      const screenOk = isScreenResolutionOk();
+      const isMobileTablet = isMobileOrTablet();
+      setChecks((prev) =>
+        prev.map((check) => {
+          if (check.id === "support") {
+            if (isMobileTablet) {
+              return {
+                ...check,
+                status: "failed",
+                details: "Mobile or tablet devices are not allowed. Please use a desktop or laptop computer.",
+              };
+            } else if (!screenOk) {
+              return {
+                ...check,
+                status: "failed",
+                details: `Screen resolution too small (${window.innerWidth}x${window.innerHeight}). Minimum required: 1024x600.`,
+              };
+            } else {
+              // Optionally, re-run browser support check if needed
+              return {
+                ...check,
+                status: "completed",
+                details: check.details?.startsWith("Screen resolution") || check.details?.startsWith("Mobile") ? "Your browser is fully supported" : check.details,
+              };
+            }
+          }
+          return check;
+        })
+      );
+    };
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  useEffect(() => {
+    // Update allPassed whenever checks change
+    setAllPassed(checks.every((c) => c.status === "completed"));
+  }, [checks]);
+
   return (
-    <div className="text-center space-y-8 bg-white dark:bg-black px-4 sm:px-6 py-6 sm:py-8 rounded-xl">
+    <div className="text-center space-y-8 bg-white dark:bg-black px-4 py-6 rounded-xl max-w-md w-full mx-auto max-h-screen shadow-lg">
       <div className="space-y-3">
         <h1 className="text-3xl font-bold text-black dark:text-white">System Checkup</h1>
         <p className="text-gray-600 dark:text-gray-400 text-lg">
-          Checking Your Browser's Settings
+          Checking Your Browser&apos;s Settings
         </p>
       </div>
 
@@ -270,11 +328,11 @@ export function SystemCheckup({ onNext, onPrev }: SystemCheckupProps) {
       <div className="pt-8">
         <Button
           onClick={onNext}
-          disabled={!allCompleted}
+          disabled={!allCompleted || !allPassed}
           size="lg"
           className={cn(
             "px-6 sm:px-8 py-2.5 sm:py-3 rounded-xl font-medium transition-all duration-300 shadow-lg",
-            allCompleted
+            allCompleted && allPassed
               ? "bg-teal-500 hover:bg-teal-600 text-white hover:scale-105 shadow-teal-500/25"
               : "bg-gray-300 dark:bg-gray-600 text-gray-500 dark:text-gray-400 cursor-not-allowed"
           )}

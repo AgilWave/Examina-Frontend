@@ -1,9 +1,11 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { Upload, Video } from "lucide-react";
-import { useTheme } from "next-themes";
+import QRCode from "react-qr-code";
+import { Loader2, CheckCircle, Smartphone } from "lucide-react";
+import socket from '@/lib/socket';
+
 
 interface EnvironmentCheckupProps {
   onNext: () => void;
@@ -11,20 +13,83 @@ interface EnvironmentCheckupProps {
 }
 
 export function EnvironmentCheckup({ onNext }: EnvironmentCheckupProps) {
+  const [isLoading, setIsLoading] = useState(true);
+  const [isCompleted, setIsCompleted] = useState(false);
+  const [progressStatus, setProgressStatus] = useState<string>('');
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [uploadedFile, setUploadedFile] = useState<File | null>(null);
+  const [connectionStatus, setConnectionStatus] = useState<'connecting' | 'connected' | 'error'>('connecting');
 
-  const handleUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (file) {
-      setUploadedFile(file);
-      alert(`File uploaded: ${file.name}`);
+  const examId = "test-exam-123";
+  const studentId = "STUDENT456";
+  
+  // Mobile URL that includes the environment check page
+  const mobileUrl = `${window.location.origin}/exams/enviorment-check?examId=${examId}&studentId=${studentId}`;
+
+  useEffect(() => {
+    // Handler functions
+    const handleConnect = () => {
+      console.log('Connected to WebSocket');
+      setConnectionStatus('connected');
+      // Join the environment check room
+      socket.emit('join-environment-check', {
+        examId,
+        studentId,
+      });
+    };
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const handleJoined = (data: any) => {
+      console.log('Joined environment check room:', data);
+      setProgressStatus('Waiting for mobile device...');
+    };
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const handleProgress = (data: any) => {
+      console.log('Progress update:', data);
+      setProgressStatus(`Mobile status: ${data.status}`);
+      if (data.status === 'uploading') {
+        setProgressStatus('Mobile is uploading video...');
+      }
+    };
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const handleDone = (data: any) => {
+      console.log('Environment check completed:', data);
+      setIsLoading(false);
+      setIsCompleted(true);
+      setProgressStatus('Environment check completed successfully!');
+      setTimeout(() => {
+        onNext();
+      }, 2000);
+    };
+    const handleError = (error: unknown) => {
+      console.error('WebSocket connection error:', error);
+      setConnectionStatus('error');
+    };
+
+    socket.on('connect', handleConnect);
+    socket.on('joined-environment-check', handleJoined);
+    socket.on('environment-check-progress', handleProgress);
+    socket.on('environment-check-done', handleDone);
+    socket.on('connect_error', handleError);
+
+    // If already connected, trigger join
+    if (socket.connected) {
+      handleConnect();
     }
+
+    return () => {
+      socket.off('connect', handleConnect);
+      socket.off('joined-environment-check', handleJoined);
+      socket.off('environment-check-progress', handleProgress);
+      socket.off('environment-check-done', handleDone);
+      socket.off('connect_error', handleError);
+    };
+  }, [examId, studentId, onNext]);
+
+  const handleSkipToWebcam = () => {
+    // If user wants to use desktop webcam instead
+    setIsLoading(false);
+    // You can add webcam functionality here or redirect to a different component
   };
 
-  const handleRecord = () => {
-    alert("Recording started... (mock)");
-  };
   return (
     <div className="text-center space-y-8 w-full max-w-6xl mx-auto px-4">
       <div className="space-y-3">
@@ -32,78 +97,90 @@ export function EnvironmentCheckup({ onNext }: EnvironmentCheckupProps) {
           Environment Checkup
         </h1>
         <p className="dark:text-gray-400 text-gray-600 text-lg">
-          Checking your Environment
+          Scan this QR code with your mobile device to complete the environment verification
         </p>
       </div>
 
-      {/* Upload and Record Cards - Centered and Responsive */}
-      <div className="flex justify-center w-full">
-        <div className="w-full max-w-2xl dark:bg-zinc-900 bg-gray-100 p-4 sm:p-6 rounded-lg shadow-md">
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            {/* Upload */}
-            <label
-              htmlFor="upload"
-              className="w-full dark:bg-zinc-800 bg-white dark:hover:bg-zinc-700 hover:bg-gray-50 
-                        cursor-pointer rounded-lg flex flex-col items-center justify-center p-4 sm:p-6 space-y-2 
-                        transition border dark:border-zinc-700 border-gray-200"
-            >
-              <Upload className="w-8 h-8 text-teal-400" />
-              <span className="dark:text-white text-gray-900 font-semibold">
-                Upload
-              </span>
-              <span className="text-sm dark:text-gray-400 text-gray-600 text-center">
-                Upload your environment snapshots here
-              </span>
-              <input
-                id="upload"
-                type="file"
-                className="hidden"
-                onChange={handleUpload}
-              />
-            </label>
-
-            {/* Record */}
-            <div
-              onClick={handleRecord}
-              className="w-full dark:bg-zinc-800 bg-white dark:hover:bg-zinc-700 hover:bg-gray-50 
-                      cursor-pointer rounded-lg flex flex-col items-center justify-center p-4 sm:p-6 space-y-2 
-                      transition border dark:border-zinc-700 border-gray-200"
-            >
-              <Video className="w-8 h-8 text-teal-400" />
-              <span className="dark:text-white text-gray-900 font-semibold">
-                Record
-              </span>
-              <span className="text-sm dark:text-gray-400 text-gray-600 text-center">
-                Record your environment here
-              </span>
-            </div>
+      {/* Connection Status */}
+      {/* <div className="flex justify-center items-center space-x-2">
+        {connectionStatus === 'connecting' && (
+          <div className="flex items-center space-x-2 text-yellow-600">
+            <Loader2 className="w-4 h-4 animate-spin" />
+            <span className="text-sm">Connecting...</span>
           </div>
+        )}
+        {connectionStatus === 'connected' && (
+          <div className="flex items-center space-x-2 text-green-600">
+            <CheckCircle className="w-4 h-4" />
+            <span className="text-sm">Connected</span>
+          </div>
+        )}
+        {connectionStatus === 'error' && (
+          <div className="flex items-center space-x-2 text-red-600">
+            <span className="text-sm">Connection Error</span>
+          </div>
+        )}
+      </div> */}
+
+      {/* QR Code */}
+      <div className="flex flex-col items-center w-full">
+        <div className="bg-white p-6 rounded-xl shadow-lg">
+          <QRCode 
+            value={mobileUrl} 
+            size={200} 
+            className="mx-auto" 
+          />
+        </div>
+        
+        <div className="mt-4 flex items-center space-x-2 text-gray-600 dark:text-gray-400">
+          <Smartphone className="w-5 h-5" />
+          <span className="text-sm">Scan with your mobile camera</span>
         </div>
       </div>
 
-      {/* Continue Button */}
-      <div className="pt-4">
+      {/* Progress Status */}
+      {progressStatus && (
+        <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
+          <p className="text-blue-800 dark:text-blue-200 font-medium">
+            {progressStatus}
+          </p>
+        </div>
+      )}
+
+      {/* Loading State */}
+      {isLoading && !isCompleted && (
+        <div className="flex justify-center items-center space-y-4 flex-col">
+          <Loader2 className="w-8 h-8 animate-spin text-blue-500" />
+          <p className="text-gray-600 dark:text-gray-400">
+            Waiting for mobile environment check completion...
+          </p>
+        </div>
+      )}
+
+      {/* Completed State */}
+      {isCompleted && (
+        <div className="flex flex-col items-center space-y-4">
+          <div className="flex items-center space-x-2 text-green-600 dark:text-green-400">
+            <CheckCircle className="w-8 h-8" />
+            <span className="text-xl font-semibold">Environment Check Complete!</span>
+          </div>
+          <p className="text-gray-600 dark:text-gray-400">
+            Proceeding to next step...
+          </p>
+        </div>
+      )}
+
+      {/* Alternative Option */}
+      <div className="pt-4 border-t border-gray-200 dark:border-gray-700">
+        <p className="text-sm text-gray-500 dark:text-gray-400 mb-3">
+          Don&apos;t have a mobile device?
+        </p>
         <Button
-          onClick={onNext}
-          size="lg"
-          className="bg-teal-500 hover:bg-teal-600 text-white px-6 sm:px-8 py-2 sm:py-3 
-                   rounded-xl font-medium transition-all duration-300 hover:scale-105 
-                   shadow-lg shadow-teal-500/25"
+          variant="outline"
+          onClick={handleSkipToWebcam}
+          className="text-sm"
         >
-          Continue
-          <svg
-            className="w-5 h-5 ml-2"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M9 5l7 7-7 7"
-            />
-          </svg>
+          Use Desktop Camera Instead
         </Button>
       </div>
     </div>

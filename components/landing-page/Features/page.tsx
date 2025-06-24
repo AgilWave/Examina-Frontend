@@ -71,7 +71,7 @@ export default function FeaturesSection() {
       y: 0,
       transition: { 
         duration: 0.8, 
-        ease: "easeOut" 
+        ease: "easeOut"
       }
     }
   };
@@ -83,7 +83,7 @@ export default function FeaturesSection() {
       y: 0,
       transition: { 
         duration: 0.7, 
-        ease: "easeOut" 
+        ease: "easeOut"
       }
     }
   };
@@ -96,7 +96,8 @@ export default function FeaturesSection() {
           className="flex flex-col items-center justify-center gap-8 md:gap-11"
           initial="hidden"
           animate={titleControls}
-          variants={titleVariants}
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          variants={titleVariants as any}
         >
           <Tag label="Features" />
           <div className="flex flex-col items-center justify-center gap-4 md:gap-6">
@@ -119,7 +120,9 @@ export default function FeaturesSection() {
         >
           <motion.div 
             className="md:col-span-4 h-96 relative bg-gradient-to-br from-cyan-500/20 to-black/15 hover:bg-gradient-to-tl hover:from-cyan-500/15 hover:to-black/20 rounded-[48px] shadow-[0px_0px_10px_0px_rgba(38,254,253,0.4)] hover:shadow-[0px_0px_12px_0px_rgba(38,254,253,0.5)] shadow-[inset_0px_6px_4.4px_0px_rgba(0,0,0,0.57)] outline outline-[1.5px] outline-offset-[-1.5px] outline-cyan-400/50 hover:outline-cyan-400/70 overflow-hidden transition-all duration-300 ease-in-out hover:-translate-y-2"
-            variants={itemVariants}
+            
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            variants={itemVariants as any}
           >
             <div className="relative w-full h-full">
               <Image
@@ -143,7 +146,8 @@ export default function FeaturesSection() {
 
           <motion.div 
             className="md:col-span-8 h-96 relative bg-gradient-to-br from-cyan-500/20 to-black/15 hover:bg-gradient-to-tl hover:from-cyan-500/15 hover:to-black/20 rounded-[48px] shadow-[0px_0px_10px_0px_rgba(38,254,253,0.4)] hover:shadow-[0px_0px_12px_0px_rgba(38,254,253,0.5)] shadow-[inset_0px_6px_4.4px_0px_rgba(0,0,0,0.57)] outline outline-[1.5px] outline-offset-[-1.5px] outline-cyan-400/50 hover:outline-cyan-400/70 overflow-hidden transition-all duration-300 ease-in-out hover:-translate-y-2"
-            variants={itemVariants}
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            variants={itemVariants as any}
           >
             <div className="relative w-full h-full">
               <Image
@@ -176,7 +180,8 @@ export default function FeaturesSection() {
         >
           <motion.div 
             className="md:col-span-8 h-96 relative bg-gradient-to-br from-cyan-500/20 to-black/15 hover:bg-gradient-to-tl hover:from-cyan-500/15 hover:to-black/20 rounded-[48px] shadow-[0px_0px_10px_0px_rgba(38,254,253,0.4)] hover:shadow-[0px_0px_12px_0px_rgba(38,254,253,0.5)] shadow-[inset_0px_6px_4.4px_0px_rgba(0,0,0,0.57)] outline outline-[1.5px] outline-offset-[-1.5px] outline-cyan-400/50 hover:outline-cyan-400/70 overflow-hidden transition-all duration-300 ease-in-out hover:-translate-y-2"
-            variants={itemVariants}
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            variants={itemVariants as any}
           >
             <div className="relative w-full h-full">
               <Image
@@ -201,7 +206,8 @@ export default function FeaturesSection() {
 
           <motion.div 
             className="md:col-span-4 h-96 relative bg-gradient-to-br from-cyan-500/15 to-black/20 hover:bg-gradient-to-tl hover:from-cyan-500/15 hover:to-black/20 rounded-[48px] shadow-[0px_0px_10px_0px_rgba(38,254,253,0.4)] hover:shadow-[0px_0px_12px_0px_rgba(38,254,253,0.5)] shadow-[inset_0px_6px_4.4px_0px_rgba(0,0,0,0.57)] outline outline-[1.5px] outline-offset-[-1.5px] outline-cyan-400/50 hover:outline-cyan-400/70 overflow-hidden transition-all duration-300 ease-in-out hover:-translate-y-2"
-            variants={itemVariants}
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            variants={itemVariants as any}
           >
             <div className="relative w-full h-full">
               <div className="absolute bottom-0 w-full pt-20">

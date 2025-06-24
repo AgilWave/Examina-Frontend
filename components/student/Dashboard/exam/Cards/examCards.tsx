@@ -1,7 +1,6 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Clock, Calendar, BookCheck, FileType2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { useRouter } from "next/router";
 import Link from "next/link";
 
 // Types

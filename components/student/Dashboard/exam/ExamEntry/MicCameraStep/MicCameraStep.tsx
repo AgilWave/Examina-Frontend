@@ -1,12 +1,26 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import { Camera, Mic, MicOff, Expand } from "lucide-react";
 import { cn } from "@/lib/utils";
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from '@/components/ui/select';
+import { toast } from 'sonner';
+import { Loader2 } from "lucide-react";
 
 interface MicCameraSetupProps {
   onNext: () => void;
+}
+
+interface MediaDevice {
+    deviceId: string;
+    label: string;
 }
 
 export function MicCameraSetup({ onNext }: MicCameraSetupProps) {
@@ -20,22 +34,72 @@ export function MicCameraSetup({ onNext }: MicCameraSetupProps) {
   const [stream, setStream] = useState<MediaStream | null>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
 
+  // Device selection states
+  const [videoDevices, setVideoDevices] = useState<MediaDevice[]>([]);
+  const [audioDevices, setAudioDevices] = useState<MediaDevice[]>([]);
+  const [selectedVideo, setSelectedVideo] = useState<string | undefined>(undefined);
+  const [selectedAudio, setSelectedAudio] = useState<string | undefined>(undefined);
+
   // Audio visualization states
   const [audioLevel, setAudioLevel] = useState(0);
   const audioContextRef = useRef<AudioContext | null>(null);
   const analyserRef = useRef<AnalyserNode | null>(null);
   const animationFrameRef = useRef<number | null>(null);
 
+  // Mic level threshold for allowing continue
+  const MIC_LEVEL_THRESHOLD = 0.2; // Adjust as needed
+
+  // Track if user has passed the audio check
+  const [hasPassedAudioCheck, setHasPassedAudioCheck] = useState(false);
+
+  // Derived state for enabling continue
+  const canContinue = hasPassedAudioCheck;
+
+  // Get available devices
+  const getDevices = useCallback(async () => {
+    try {
+      await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+
+      const devices = await navigator.mediaDevices.enumerateDevices();
+      const videoList = devices.filter(d => d.kind === 'videoinput').map(d => ({
+        deviceId: d.deviceId,
+        label: d.label || `Camera ${d.deviceId.slice(0, 8)}`
+      }));
+      const audioList = devices.filter(d => d.kind === 'audioinput').map(d => ({
+        deviceId: d.deviceId,
+        label: d.label || `Microphone ${d.deviceId.slice(0, 8)}`
+      }));
+
+      setVideoDevices(videoList);
+      setAudioDevices(audioList);
+
+      if (!selectedVideo && videoList.length > 0) setSelectedVideo(videoList[0].deviceId);
+      if (!selectedAudio && audioList.length > 0) setSelectedAudio(audioList[0].deviceId);
+    } catch (err: unknown) {
+      const error = err as Error;
+      toast.error('Could not enumerate devices: ' + error.message);
+    }
+  }, [selectedVideo, selectedAudio]);
+
+  // Get stream with specific devices
+  const getStream = useCallback(async (videoId?: string, audioId?: string) => {
+    const constraints: MediaStreamConstraints = {
+      video: videoId ? { deviceId: { exact: videoId } } : { width: 640, height: 480 },
+      audio: audioId ? { deviceId: { exact: audioId } } : true,
+    };
+    return navigator.mediaDevices.getUserMedia(constraints);
+  }, []);
+
   // Function to request and handle media permissions
   const requestMediaPermissions = async () => {
     try {
       setPermissionError(null);
 
-      // Request camera and microphone access
-      const mediaStream = await navigator.mediaDevices.getUserMedia({
-        video: true,
-        audio: true,
-      });
+      // Get devices first
+      await getDevices();
+
+      // Request camera and microphone access with selected devices
+      const mediaStream = await getStream(selectedVideo, selectedAudio);
 
       setStream(mediaStream);
       setHasPermissions({ camera: true, mic: true });
@@ -54,6 +118,7 @@ export function MicCameraSetup({ onNext }: MicCameraSetupProps) {
       // Initialize audio analyzer
       if (!audioContextRef.current) {
         audioContextRef.current = new (window.AudioContext ||
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
           (window as any).webkitAudioContext)();
         analyserRef.current = audioContextRef.current.createAnalyser();
         analyserRef.current.fftSize = 256;
@@ -75,19 +140,20 @@ export function MicCameraSetup({ onNext }: MicCameraSetupProps) {
       mediaStream.getAudioTracks().forEach((track) => {
         track.enabled = false;
       });
-    } catch (error: any) {
-      console.error("Error accessing media devices:", error);
+    } catch (error: unknown) {
+      const err = error as Error;
+      console.error("Error accessing media devices:", err);
 
       // Set more specific error message
-      if (error.name === "NotAllowedError") {
+      if (err.name === "NotAllowedError") {
         setPermissionError(
           "Camera or microphone permission denied. Please allow access in your browser settings."
         );
-      } else if (error.name === "NotFoundError") {
+      } else if (err.name === "NotFoundError") {
         setPermissionError("No camera or microphone found on your device.");
       } else {
         setPermissionError(
-          `Error accessing media devices: ${error.message || error.name}`
+          `Error accessing media devices: ${err.message || err.name}`
         );
       }
 
@@ -141,6 +207,81 @@ export function MicCameraSetup({ onNext }: MicCameraSetupProps) {
       // Start audio analysis if mic is enabled
       if (newMicState && !animationFrameRef.current && analyserRef.current) {
         analyzeAudio();
+      }
+    }
+  };
+
+  // Handle device changes
+  const handleVideoChange = async (value: string) => {
+    setSelectedVideo(value || undefined);
+    if (stream) {
+      try {
+        const newStream = await getStream(value || undefined, selectedAudio);
+        
+        // Update video element
+        if (videoRef.current) {
+          videoRef.current.srcObject = newStream;
+        }
+
+        // Stop old stream
+        stream.getTracks().forEach(track => track.stop());
+        setStream(newStream);
+
+        // Reinitialize audio analyzer with new stream
+        if (audioContextRef.current) {
+          audioContextRef.current.close();
+        }
+        
+        audioContextRef.current = new (window.AudioContext ||
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          (window as any).webkitAudioContext)();
+        analyserRef.current = audioContextRef.current.createAnalyser();
+        analyserRef.current.fftSize = 256;
+
+        const source = audioContextRef.current.createMediaStreamSource(newStream);
+        source.connect(analyserRef.current);
+
+        toast.success('Camera device updated');
+      } catch (err: unknown) {
+        const error = err as Error;
+        toast.error('Failed to update camera: ' + error.message);
+      }
+    }
+  };
+
+  const handleAudioChange = async (value: string) => {
+    setSelectedAudio(value || undefined);
+    if (stream) {
+      try {
+        const newStream = await getStream(selectedVideo, value || undefined);
+        
+        // Update video element
+        if (videoRef.current) {
+          videoRef.current.srcObject = newStream;
+        }
+
+        // Stop old stream
+        stream.getTracks().forEach(track => track.stop());
+        setStream(newStream);
+
+        // Reinitialize audio analyzer with new stream
+        if (audioContextRef.current) {
+          audioContextRef.current.close();
+        }
+        
+        audioContextRef.current = new (window.AudioContext ||
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          (window as any).webkitAudioContext)();
+        analyserRef.current = audioContextRef.current.createAnalyser();
+        analyserRef.current.fftSize = 256;
+
+        const source = audioContextRef.current.createMediaStreamSource(newStream);
+        source.connect(analyserRef.current);
+
+        toast.success('Microphone device updated');
+      } catch (err: unknown) {
+        const error = err as Error;
+        toast.error('Failed to update microphone: ' + error.message);
       }
     }
   };
@@ -203,6 +344,18 @@ export function MicCameraSetup({ onNext }: MicCameraSetupProps) {
     };
   }, [isMicEnabled]);
 
+  // Add effect to set hasPassedAudioCheck when requirements are met
+  useEffect(() => {
+    if (
+      !hasPassedAudioCheck &&
+      isCameraEnabled &&
+      isMicEnabled &&
+      audioLevel > MIC_LEVEL_THRESHOLD
+    ) {
+      setHasPassedAudioCheck(true);
+    }
+  }, [audioLevel, isCameraEnabled, isMicEnabled, hasPassedAudioCheck]);
+
   return (
     <div className="text-center space-y-8">
       <div className="space-y-3">
@@ -212,7 +365,50 @@ export function MicCameraSetup({ onNext }: MicCameraSetupProps) {
         <p className="text-gray-600 dark:text-gray-400 text-lg">
           Please turn on your mic and camera
         </p>
-      </div>{" "}
+      </div>
+
+      {/* Device Selection */}
+      {hasPermissions.camera && hasPermissions.mic && (
+        <div className="max-w-2xl mx-auto space-y-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                Camera Device:
+              </label>
+              <Select value={selectedVideo || ''} onValueChange={handleVideoChange}>
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="Select camera" />
+                </SelectTrigger>
+                <SelectContent>
+                  {videoDevices.map(device => (
+                    <SelectItem key={device.deviceId} value={device.deviceId}>
+                      {device.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                Microphone Device:
+              </label>
+              <Select value={selectedAudio || ''} onValueChange={handleAudioChange}>
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="Select microphone" />
+                </SelectTrigger>
+                <SelectContent>
+                  {audioDevices.map(device => (
+                    <SelectItem key={device.deviceId} value={device.deviceId}>
+                      {device.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+        </div>
+      )}
+
       <div className="max-w-2xl mx-auto">
         <div className="relative bg-white dark:bg-card rounded-2xl overflow-hidden shadow-2xl">
           <div className="aspect-video bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-700 dark:to-gray-800 flex items-center justify-center">
@@ -249,7 +445,7 @@ export function MicCameraSetup({ onNext }: MicCameraSetupProps) {
                 </div>
               )}
             </div>
-          </div>{" "}
+          </div>
           <div className="absolute bottom-6 left-1/2 transform -translate-x-1/2 flex flex-col items-center">
             <div className="flex items-center space-x-4 mb-2">
               <button
@@ -290,7 +486,8 @@ export function MicCameraSetup({ onNext }: MicCameraSetupProps) {
             </div>
           </div>
         </div>
-      </div>{" "}
+      </div>
+
       {/* Simple Sound Level Visualization */}
       {hasPermissions.mic && (
         <div className="w-full max-w-sm mx-auto mb-4">
@@ -319,29 +516,66 @@ export function MicCameraSetup({ onNext }: MicCameraSetupProps) {
         </div>
       )}
       <div className="pt-4">
-        <Button onClick={onNext} size="lg" className="transition-all">
-          Continue
-          <svg
-            className="w-5 h-5 ml-2"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M9 5l7 7-7 7"
-            />
-          </svg>
-        </Button>
+        {canContinue ? (
+          <Button onClick={onNext} size="lg" className="transition-all">
+            Continue
+            <svg
+              className="w-5 h-5 ml-2"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M9 5l7 7-7 7"
+              />
+            </svg>
+          </Button>
+        ) : (
+          <div className="flex flex-col items-center text-yellow-500 text-sm mt-2">
+            {!isCameraEnabled && !isMicEnabled && (
+              <span className="">Please turn on your mic and camera</span>
+            )}
+            {!isCameraEnabled && isMicEnabled && (
+              <span className="">Please turn on your camera</span>
+            )}
+            {isCameraEnabled && !isMicEnabled && (
+              <span className="">Please turn on your mic and make a sound to continue</span>
+            )}
 
-        {hasPermissions.camera && !isCameraEnabled && (
+            {isCameraEnabled && isMicEnabled && !hasPassedAudioCheck && (
+              <>
+                <Loader2 className="w-10 h-10 animate-spin mb-2" />
+                <span className="m">Please make a sound to continue</span>
+              </>
+            )}
+          </div>
+        )}
+
+        {/* {hasPermissions.camera && !isCameraEnabled && (
           <p className="text-yellow-500 text-sm mt-2">
             Consider enabling your camera for a better exam experience
           </p>
-        )}
+        )} */}
       </div>
     </div>
   );
 }
+
+/* Add a simple spinner style at the bottom of the file */
+<style jsx global>{`
+  .loader2 {
+    border: 4px solid #e5e7eb;
+    border-top: 4px solid #14b8a6;
+    border-radius: 50%;
+    width: 32px;
+    height: 32px;
+    animation: spin 1s linear infinite;
+  }
+  @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+`}</style>

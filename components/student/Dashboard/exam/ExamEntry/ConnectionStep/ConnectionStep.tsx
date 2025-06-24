@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { motion } from "framer-motion";
 import styles from "./ConnectionStep.module.css";
+import { Loader2 } from "lucide-react";
 
 interface ConnectionStepProps {
   onNext: () => void;
@@ -198,6 +199,7 @@ export function ConnectionStep({ onNext }: ConnectionStepProps) {
             {Array.from({ length: 8 }).map((_, i) => {
               const angle = (Math.PI * 2 * i) / 8;
               const length = 20 + Math.random() * 30;
+              // eslint-disable-next-line @typescript-eslint/no-unused-vars
               const width = 1 + Math.random() * 1;
               const delay = i * 0.2;
 
@@ -585,7 +587,6 @@ export function ConnectionStep({ onNext }: ConnectionStepProps) {
               : "bg-teal-500 hover:bg-teal-600 text-white hover:scale-105 shadow-teal-500/25"
           )}
         >
-          {/* Button background animation */}
           {!isChecking && connectionStrength >= 1 && (
             <motion.div
               className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent"
@@ -595,7 +596,12 @@ export function ConnectionStep({ onNext }: ConnectionStepProps) {
             />
           )}
 
-          <span className="relative z-10 flex items-center">
+          {connectionStrength < 3 ? (
+            <Loader2 className="h-4 w-4 animate-spin mr-2" />
+            
+          ) : (
+
+            <span className="relative z-10 flex items-center">
             Continue
             <svg
               fill="none"
@@ -610,7 +616,14 @@ export function ConnectionStep({ onNext }: ConnectionStepProps) {
               />
             </svg>
           </span>
+          )}
+
         </Button>
+        {connectionStrength < 3 && (
+          <div className="relative z-10 flex items-center justify-center mt-2 text-xs text-yellow-500">
+            <span>Please move closer to a signal source or improve your connection.</span>
+          </div>
+        )}
 
         {connectionStrength < 1 && !isChecking && (
           <motion.p

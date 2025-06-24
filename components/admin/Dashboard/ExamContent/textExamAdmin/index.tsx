@@ -220,6 +220,7 @@ export default function AdminView({ examId }: AdminViewProps) {
 
   // --- AUDIO SIGNALING ---
   useEffect(() => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any  
     const handleVoiceSignal = ({ sender, signalData }: { sender: string, signalData: any }) => {
       let peer = audioPeerMap.current[sender];
       if (!peer) {
@@ -263,6 +264,7 @@ export default function AdminView({ examId }: AdminViewProps) {
 
   useEffect(() => {
     // Listen for media status updates from students
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const handleMediaStatus = ({ sender, webcam, mic, examId }: { sender: string, webcam: boolean, mic: boolean, examId: string }) => {
       setMediaStatus(prev => ({ ...prev, [sender]: { webcam, mic } }));
     };

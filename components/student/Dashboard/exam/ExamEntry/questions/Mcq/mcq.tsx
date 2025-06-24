@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import { useState, useEffect, useRef } from "react";
-import { TimerIcon, Camera, RefreshCw, AlertCircle } from "lucide-react";
+import { TimerIcon } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { toast } from "sonner";
 
@@ -17,7 +17,7 @@ interface MCQQuestionProps {
   onSelect: (index: number) => void;
   onNext: () => void;
   time: string;
-  attachment?: string; // Optional attachment URL or content
+  attachment?: string;
 }
 
 export function MCQQuestion({
@@ -33,6 +33,7 @@ export function MCQQuestion({
 }: MCQQuestionProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const [cameraActive, setCameraActive] = useState<boolean>(false);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [cameraError, setCameraError] = useState<string | null>(null);
   const [stream, setStream] = useState<MediaStream | null>(null);
   const [playAttempts, setPlayAttempts] = useState<number>(0);
@@ -154,6 +155,7 @@ export function MCQQuestion({
         console.error("Video element ref is null");
         throw new Error("Video element not ready");
       }
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
       console.error("Error accessing camera:", error);
       setCameraActive(false);
@@ -184,46 +186,7 @@ export function MCQQuestion({
       throw error;
     }
   };
-  const toggleCamera = async () => {
-    // Dismiss any existing toasts before showing new ones
-    toast.dismiss();
 
-    if (cameraActive) {
-      // Stop the camera if it's active
-      if (stream) {
-        stream.getTracks().forEach((track) => {
-          console.log("Stopping track:", track.kind, track.label);
-          track.stop();
-        });
-      }
-
-      if (videoRef.current && videoRef.current.srcObject) {
-        videoRef.current.srcObject = null;
-      }
-
-      setCameraActive(false);
-      setStream(null);
-      toast.info("Camera turned off", { duration: 3000 });
-    } else {
-      console.log("Attempting to start camera via toggle");
-      // Give user feedback before starting with a unique ID
-      const toastId = toast.loading("Activating camera...", {
-        id: "camera-loading",
-        duration: Infinity, // Don't auto-dismiss this toast
-      });
-
-      // Start the camera if it's inactive
-      try {
-        await startCamera();
-        // Toast will be dismissed in oncanplay handler
-      } catch (error) {
-        // Error already handled in startCamera function
-        console.log("Camera activation failed via toggle");
-        // Just in case, dismiss the loading toast
-        toast.dismiss(toastId);
-      }
-    }
-  }; // Reset play attempts when camera status changes
   useEffect(() => {
     if (cameraActive) {
       setPlayAttempts(0);
@@ -275,6 +238,7 @@ export function MCQQuestion({
             );
             startCamera();
           }
+          // eslint-disable-next-line @typescript-eslint/no-unused-vars
         } catch (error) {
           console.error("Error checking permissions:", error);
           // Fall back to direct camera access
@@ -381,93 +345,7 @@ export function MCQQuestion({
         </div>
       </div>{" "}
       {/* Bottom section with camera preview and navigation button */}
-      <div className="w-[90vw] flex justify-between items-end mb-6">
-        {/* Camera preview */}
-        <div className="relative">
-          <div className="w-[320px] h-[240px] rounded-lg overflow-hidden border-2 border-gray-300 dark:border-gray-700 bg-gray-100 dark:bg-gray-800 shadow-md">
-            {" "}
-            {/* Always render the video element but control visibility */}
-            <div className="relative w-full h-full">
-              {" "}
-              <video
-                ref={videoRef}
-                autoPlay
-                playsInline
-                muted
-                onClick={() => {
-                  if (videoRef.current) {
-                    videoRef.current
-                      .play()
-                      .catch((e) => console.log("Manual play click:", e));
-                  }
-                }}
-                style={{ display: cameraActive ? "block" : "none" }}
-                className="w-full h-full object-cover cursor-pointer"
-              />
-              {/* Hidden manual play button, only shown when needed */}
-              {cameraActive && !videoRef.current?.played.length && (
-                <button
-                  onClick={() => {
-                    setPlayAttempts(0); // Reset attempts counter
-                    safePlayVideo();
-                  }}
-                  className="absolute inset-0 opacity-0 cursor-pointer"
-                  title="Click to start camera if not showing"
-                >
-                  <span className="sr-only">Start camera</span>
-                </button>
-              )}
-            </div>
-            {/* Show placeholder when camera is inactive */}
-            {!cameraActive && (
-              <div className="w-full h-full flex flex-col items-center justify-center p-2">
-                {cameraError ? (
-                  <>
-                    <AlertCircle className="h-6 w-6 text-red-500 mb-1" />
-                    <span className="text-xs text-red-500 text-center">
-                      {cameraError}
-                    </span>
-                  </>
-                ) : (
-                  <>
-                    <Camera className="h-6 w-6 text-gray-400 mb-1" />
-                    <span className="text-xs text-gray-500 text-center">
-                      Camera inactive
-                    </span>
-                  </>
-                )}
-              </div>
-            )}
-          </div>{" "}
-          <div className="absolute bottom-2 left-2 right-2 flex justify-between">
-            <div className="bg-black/40 text-white text-xs px-2 py-0.5 rounded">
-              {cameraActive ? "Proctoring active" : "Proctoring inactive"}
-            </div>
-            <div className="flex gap-1">
-              {cameraError && (
-                <button
-                  onClick={() => startCamera()}
-                  className="bg-red-600/80 text-white text-xs p-1 rounded hover:bg-red-600"
-                  title="Retry camera access"
-                >
-                  <RefreshCw className="h-3 w-3" />
-                </button>
-              )}
-              <button
-                onClick={toggleCamera}
-                className="bg-black/40 text-white text-xs p-1 rounded hover:bg-black/60"
-                title={cameraActive ? "Turn off camera" : "Turn on camera"}
-              >
-                {cameraActive ? (
-                  <Camera className="h-3 w-3" />
-                ) : (
-                  <Camera className="h-3 w-3" />
-                )}
-              </button>
-            </div>
-          </div>
-        </div>
-
+      <div className="w-[90vw] flex justify-end items-end mb-6">
         {/* Navigation button */}
         <Button className="px-8 py-2 text-base" onClick={onNext}>
           Next Question

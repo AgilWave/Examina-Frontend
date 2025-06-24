@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button';
 const ExamQuestionPage = () => {
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [showSummary, setShowSummary] = useState(false);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [userAnswers, setUserAnswers] = useState<Record<string, any>>({});
   
   // Example questions with mixed types
@@ -51,6 +52,7 @@ const ExamQuestionPage = () => {
   const timeRemaining = "10:00";
 
   // Handle answer updates for different question types
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const handleAnswerUpdate = (answer: any) => {
     const currentQuestion = exampleQuestions[currentQuestionIndex];
     setUserAnswers(prev => ({

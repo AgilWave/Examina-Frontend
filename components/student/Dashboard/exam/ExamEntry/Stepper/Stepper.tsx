@@ -14,6 +14,7 @@ export function StepIndicator({ currentStep, totalSteps }: StepIndicatorProps) {
         const stepNumber = index + 1;
         const isActive = stepNumber === currentStep;
         const isCompleted = stepNumber < currentStep;
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
         const isNext = stepNumber === currentStep + 1;
         
         return (
