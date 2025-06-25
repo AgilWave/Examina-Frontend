@@ -57,6 +57,7 @@ export async function loginActionMS({ idToken }: { idToken: string }) {
       }
       cookieStore.set("jwt", responseBody.content.jwt);
       const userDetails = JSON.stringify(responseBody.content.user);
+      console.log("User Details:", userDetails);
       const encryptedUserDetails = encrypt(userDetails);
       cookieStore.set("userDetails", encryptedUserDetails);
       const origin = process.env.NEXT_PUBLIC_URL || "http://localhost:3000";

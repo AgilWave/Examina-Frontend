@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
-import { LogoutAction } from "@/services/actions/auth";
+// import { LogoutAction } from "@/services/actions/auth";
 import axios from "axios";
 import Cookies from "js-cookie";
 import { BACKEND_URL } from "@/Constants/backend";
@@ -22,9 +22,9 @@ export async function getExamById(examId: string) {
             throw new Error(response.data.message || "Failed to fetch exam");
         }
     } catch (err: any) {
-        if (err.response?.status === 401) {
-            LogoutAction();
-        }
+        // if (err.response?.status === 401) {
+        //     LogoutAction();
+        // }
         throw err;
     }
 } 

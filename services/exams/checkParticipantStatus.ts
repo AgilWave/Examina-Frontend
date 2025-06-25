@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
-import { LogoutAction } from "@/services/actions/auth";
+// import { LogoutAction } from "@/services/actions/auth";
 import axios from "axios";
 import Cookies from "js-cookie";
 import { BACKEND_URL } from "@/Constants/backend";
@@ -36,9 +36,9 @@ export async function checkParticipantStatus(examId: number, studentId: number):
             };
         }
     } catch (err: any) {
-        if (err.response?.status === 401) {
-            LogoutAction();
-        }
+        // if (err.response?.status === 401) {
+        //     LogoutAction();
+        // }
         // If participant not found (404), return default status
         if (err.response?.status === 404) {
             return {
