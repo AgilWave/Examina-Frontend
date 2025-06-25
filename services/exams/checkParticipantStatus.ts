@@ -16,7 +16,7 @@ export interface ParticipantStatus {
 }
 
 export async function checkParticipantStatus(examId: number, studentId: number): Promise<ParticipantStatus> {
-    const jwt = Cookies.get("jwt") || Cookies.get("adminjwt") || Cookies.get("lecturerjwt");
+    const jwt = Cookies.get("jwt");
     const headers = {
         Accept: "application/json",
         Authorization: `Bearer ${jwt}`,

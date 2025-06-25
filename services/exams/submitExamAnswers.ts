@@ -15,7 +15,7 @@ export interface ExamAnswerSubmission {
 }
 
 export async function submitExamAnswers(answers: ExamAnswerSubmission[]) {
-    const jwt = Cookies.get("jwt") || Cookies.get("adminjwt") || Cookies.get("lecturerjwt");
+    const jwt = Cookies.get("jwt");
     const headers = {
         Accept: "application/json",
         "Content-Type": "application/json",

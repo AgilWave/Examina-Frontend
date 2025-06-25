@@ -12,7 +12,7 @@ export interface JoinExamRequest {
 }
 
 export async function joinExam(examId: number, studentId: number) {
-    const jwt = Cookies.get("jwt") || Cookies.get("adminjwt") || Cookies.get("lecturerjwt");
+    const jwt = Cookies.get("jwt");
     const headers = {
         Accept: "application/json",
         "Content-Type": "application/json",
