@@ -32,6 +32,7 @@ import {
 import { setViewDialog, setViewDialogId } from "@/redux/features/dialogState";
 import { useDispatch, useSelector } from "react-redux";
 import { RefreshCcw } from "lucide-react";
+  //eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { parseAsString, useQueryState, parseAsBoolean } from "nuqs";
 import SearchField from "./helpers/Search";
 import ExamCards from "./Cards/examCards";
@@ -41,6 +42,7 @@ export function DataTable() {
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [rowSelection, setRowSelection] = useState({});
+  //eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [data, setData] = useState([]);
   const [pageSize, setPageSize] = useState(25);
   const page = useSelector((state: RootState) => state.page);
