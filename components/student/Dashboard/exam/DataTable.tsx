@@ -94,6 +94,7 @@ export function DataTable() {
     // fetchData(page);
   }, [searchQuery]);
 
+  //eslint-disable-next-line @typescript-eslint/no-unused-vars
   const table = useReactTable({
     data,
     columns,
@@ -119,6 +120,7 @@ export function DataTable() {
 
   const handleNext = () => {
     if (page.course.nextPage > page.course.page) {
+      //eslint-disable-next-line @typescript-eslint/no-unused-vars
       const curPage = page.course.nextPage;
       // fetchData(curPage);
     }
@@ -126,6 +128,7 @@ export function DataTable() {
 
   const handlePrev = () => {
     if (page.course.prevPage >= 0) {
+      //eslint-disable-next-line @typescript-eslint/no-unused-vars
       const curPage = page.course.prevPage;
       // fetchData(curPage);
     }
