@@ -66,59 +66,61 @@ export function DataTable() {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [filterApplied] = useQueryState("filterApplied", parseAsBoolean);
 
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [LectureQuery] = useQueryState("Lecture", parseAsString);
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [questionType] = useQueryState("questionType", parseAsString);
 
-  const fetchData = async (page: number) => {
-    setIsLoading(true);
-    try {
-      const response = await getAllModules(
-        dispatch,
-        page,
-        pageSize,
-        LectureQuery,
-        questionType,
-        searchQuery
-      );
-      if (response.isSuccessful) {
-        if (response.listContent.length === 0) {
-          setData([]);
-          toast.error(response.message);
-          return;
-        }
-        setData(response.listContent);
-        dispatch(setQuestionBankPage(response.paginationInfo.page));
-        dispatch(setQuestionBankTotalPages(response.paginationInfo.totalPages));
-        dispatch(setQuestionBankNextPage(response.paginationInfo.nextPage));
-        dispatch(setQuestionBankPrevPage(response.paginationInfo.page - 1));
-      } else {
-        setData([]);
-        toast.error(response.message);
-        dispatch(setQuestionBankPage(1));
-        dispatch(setQuestionBankTotalPages(0));
-        dispatch(setQuestionBankNextPage(-1));
-        dispatch(setQuestionBankPrevPage(-1));
-      }
-    } catch (error: any) {
-      if (error.response) {
-        if (error.response.status === 401) {
-          toast.error("Unauthorized access. Please login again.");
-          LogoutAction();
-        } else {
-          toast.error(error.response.data.message);
-        }
-      }
-    } finally {
-      setIsLoading(false);
-    }
-  };
+  // const fetchData = async (page: number) => {
+  //   setIsLoading(true);
+  //   try {
+  //     const response = await getAllModules(
+  //       dispatch,
+  //       page,
+  //       pageSize,
+  //       LectureQuery,
+  //       questionType,
+  //       searchQuery
+  //     );
+  //     if (response.isSuccessful) {
+  //       if (response.listContent.length === 0) {
+  //         setData([]);
+  //         toast.error(response.message);
+  //         return;
+  //       }
+  //       setData(response.listContent);
+  //       dispatch(setQuestionBankPage(response.paginationInfo.page));
+  //       dispatch(setQuestionBankTotalPages(response.paginationInfo.totalPages));
+  //       dispatch(setQuestionBankNextPage(response.paginationInfo.nextPage));
+  //       dispatch(setQuestionBankPrevPage(response.paginationInfo.page - 1));
+  //     } else {
+  //       setData([]);
+  //       toast.error(response.message);
+  //       dispatch(setQuestionBankPage(1));
+  //       dispatch(setQuestionBankTotalPages(0));
+  //       dispatch(setQuestionBankNextPage(-1));
+  //       dispatch(setQuestionBankPrevPage(-1));
+  //     }
+  //   } catch (error: any) {
+  //     if (error.response) {
+  //       if (error.response.status === 401) {
+  //         toast.error("Unauthorized access. Please login again.");
+  //         LogoutAction();
+  //       } else {
+  //         toast.error(error.response.data.message);
+  //       }
+  //     }
+  //   } finally {
+  //     setIsLoading(false);
+  //   }
+  // };
 
   useEffect(() => {
-    const page = JSON.parse(sessionStorage.getItem("QuestionBankPage") || "1");
+    // const page = JSON.parse(sessionStorage.getItem("QuestionBankPage") || "1");
     if (!dialog.createDialog) {
-      fetchData(page);
+      // fetchData(page);
     } else if (dialog.viewDialog) {
-      fetchData(page);
+      // fetchData(page);
     }
   }, [dialog]);
 
@@ -149,18 +151,21 @@ export function DataTable() {
     dispatch(
       setViewDialogId(JSON.parse(sessionStorage.getItem("viewDialogId") || "0"))
     );
+    // es-lint-disable-next-line @typescript-eslint/no-unused-vars
     const page = JSON.parse(sessionStorage.getItem("QuestionBankPage") || "1");
-    fetchData(page);
+    // fetchData(page);
   }, []);
 
   useEffect(() => {
+    // es-lint-disable-next-line @typescript-eslint/no-unused-vars
     const page = JSON.parse(sessionStorage.getItem("QuestionBankPage") || "1");
-    fetchData(page);
+    // fetchData(page);
   }, [pageSize]);
 
   useEffect(() => {
+        // es-lint-disable-next-line @typescript-eslint/no-unused-vars
     const page = JSON.parse(sessionStorage.getItem("QuestionBankPage") || "1");
-    fetchData(page);
+    // fetchData(page);
   }, [searchQuery]);
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -190,14 +195,14 @@ export function DataTable() {
   const handleNext = async () => {
     if (page.course.nextPage > page.course.page) {
       const curPage = page.course.nextPage;
-      fetchData(curPage);
+      // fetchData(curPage);
     }
   };
 
   const handlePrev = async () => {
     if (page.course.prevPage >= 0) {
       const curPage = page.course.prevPage;
-      fetchData(curPage);
+      // fetchData(curPage);
     }
   };
 
@@ -214,7 +219,7 @@ export function DataTable() {
                 <Button
                   className="p-[10px] h-[36px] items-center border-[1px]  rounded-lg flex"
                   variant={"outline"}
-                  onClick={() => fetchData(1)}
+                  // onClick={() => fetchData(1)}
                 >
                   <RefreshCcw className="2xl:h-[20px] h-[15px] text-primary/65" />
                 </Button>
