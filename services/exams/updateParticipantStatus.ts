@@ -15,6 +15,8 @@ export interface UpdateParticipantStatusRequest {
 
 export async function updateParticipantStatus(data: UpdateParticipantStatusRequest) {
     const jwt = Cookies.get("jwt");
+    console.log(jwt)
+    console.log(data)
     const headers = {
         Accept: "application/json",
         "Content-Type": "application/json",
