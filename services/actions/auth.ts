@@ -96,7 +96,7 @@ export async function LogoutAction() {
     }
 
     const responseData = await res.json();
-    // cookieStore.delete("jwt");
+    cookieStore.delete("jwt");
     return responseData;
   } catch (error) {
     console.error("Error during logout:", error);

@@ -39,7 +39,7 @@ export async function joinExam(examId: number, studentId: number) {
 }
 
 export async function updateConnectionStatus(examId: number, studentId: number, isConnected: boolean) {
-    const jwt = Cookies.get("studentjwt") || Cookies.get("adminjwt") || Cookies.get("lecturerjwt");
+    const jwt = Cookies.get("jwt");
     const headers = {
         Accept: "application/json",
         "Content-Type": "application/json",
