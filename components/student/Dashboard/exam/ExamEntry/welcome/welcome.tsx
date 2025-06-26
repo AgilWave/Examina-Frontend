@@ -20,6 +20,7 @@ interface PeerData {
     peer: PeerInstance;
 }
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 export function DataManagement({ onPrev, onNext, examStartTime, examId = 'test-exam-123' }: DataManagementProps) {
   const [timeLeft, setTimeLeft] = useState<number>(0);
   const [stream, setStream] = useState<MediaStream | null>(null);
@@ -40,7 +41,15 @@ export function DataManagement({ onPrev, onNext, examStartTime, examId = 'test-e
   const streamRef = useRef<MediaStream | null>(null);
   const peersRef = useRef<{ [id: string]: PeerInstance }>({});
   const videoRef = useRef<HTMLVideoElement>(null);
-  const [joining, setJoining] = useState(false);
+  
+  // const [joining, setJoining] = useState(false);
+
+  // Loading screen state
+  const [loading, setLoading] = useState(true);
+  useEffect(() => {
+    const timer = setTimeout(() => setLoading(false), 3000);
+    return () => clearTimeout(timer);
+  }, []);
 
   // Get stream with specific devices
   const getStream = useCallback(async () => {
@@ -415,6 +424,15 @@ export function DataManagement({ onPrev, onNext, examStartTime, examId = 'test-e
     return () => clearInterval(timer);
   }, [examStartTime]);
 
+  // Add auto-advance effect
+  useEffect(() => {
+    if (canProceed) {
+      onNext();
+    }
+    // Only run when canProceed becomes true
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [canProceed]);
+
   const formatTime = (ms: number) => {
     const totalSec = Math.floor(ms / 1000);
     const hours = Math.floor(totalSec / 3600);
@@ -427,6 +445,18 @@ export function DataManagement({ onPrev, onNext, examStartTime, examId = 'test-e
       return `${String(min).padStart(2, '0')}:${String(sec).padStart(2, '0')}`;
     }
   };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center bg-white dark:bg-black">
+        <div className="flex flex-col items-center space-y-4">
+          <div className="animate-spin rounded-full h-16 w-16 border-b-4 border-teal-500 mb-4"></div>
+          <h2 className="text-2xl font-semibold text-gray-900 dark:text-white">Preparing Exam...</h2>
+          <p className="text-gray-600 dark:text-gray-400">Please wait while we set up your exam environment.</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="text-center space-y-8">
@@ -517,36 +547,6 @@ export function DataManagement({ onPrev, onNext, examStartTime, examId = 'test-e
           setMessages(prev => ([...prev, { from: socket.id ?? '', message: msg }]));
         }}
       />
-
-      <div className="pt-4 flex justify-center space-x-4">
-        <button
-          onClick={onPrev}
-          className="bg-gray-500 hover:bg-gray-600 text-white px-8 py-3 rounded-xl text-lg font-medium shadow-lg transition-colors"
-        >
-          Back
-        </button>
-        
-        <button
-          onClick={async () => {
-            setJoining(true);
-            try {
-              await onNext();
-            } catch {
-              // Handle error silently or show toast
-            } finally {
-              setJoining(false);
-            }
-          }}
-          disabled={!canProceed || joining}
-          className={`px-8 py-3 rounded-xl text-lg font-medium shadow-lg transition-all ${
-            canProceed
-              ? 'bg-teal-500 hover:bg-teal-600 text-white shadow-teal-500/25 hover:scale-105'
-              : 'bg-gray-300 dark:bg-gray-600 text-gray-500 dark:text-gray-400 cursor-not-allowed'
-          }`}
-        >
-          {canProceed ? 'Start Exam' : 'Waiting for Exam to Start...'}
-        </button>
-      </div>
     </div>
   );
 }

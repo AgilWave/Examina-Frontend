@@ -1,5 +1,6 @@
 "use client";
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 import React, { useEffect, useState } from "react";
 import {
   ColumnFiltersState,
@@ -24,25 +25,29 @@ import {
 import { columns } from "./helpers/columns";
 import { RootState } from "@/redux/store";
 import {
-  setQuestionBankPage,
-  setQuestionBankTotalPages,
-  setQuestionBankNextPage,
-  setQuestionBankPrevPage,
-} from "@/redux/features/QuestionBankSlice";
+  setExamPage,
+  setExamTotalPages,
+  setExamNextPage,
+  setExamPrevPage,
+} from "@/redux/features/pageSlice";
 import { setViewDialog, setViewDialogId } from "@/redux/features/dialogState";
 import { useDispatch, useSelector } from "react-redux";
 import { RefreshCcw } from "lucide-react";
-  //eslint-disable-next-line @typescript-eslint/no-unused-vars
-import { parseAsString, useQueryState, parseAsBoolean } from "nuqs";
+import { useQueryState } from "nuqs";
 import SearchField from "./helpers/Search";
+import { getActiveExams } from "@/services/exams/getActiveExams";
 import ExamCards from "./Cards/examCards";
+import { decrypt } from "@/lib/encryption";
+import Cookies from "js-cookie";
+import { useRouter } from "next/navigation";
+import { toast } from "sonner";
+import { LogoutAction } from "@/services/actions/auth";
 
 export function DataTable() {
   const [sorting, setSorting] = useState<SortingState>([]);
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [rowSelection, setRowSelection] = useState({});
-  //eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [data, setData] = useState([]);
   const [pageSize, setPageSize] = useState(25);
   const page = useSelector((state: RootState) => state.page);
@@ -50,31 +55,82 @@ export function DataTable() {
   const dispatch = useDispatch();
   const [searchQuery] = useQueryState("searchQuery");
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [isLoading, setIsLoading] = useState(false);
+  const [batchId, setBatchId] = useState(0);
+  const router = useRouter();
+  const fetchData = async (page: number) => {
+    setIsLoading(true);
+    try {
+      const userData = Cookies.get("userDetails");
+      if (userData) {
+        const decryptedData = decrypt(userData);
+        const parsedData = JSON.parse(decryptedData);
+        setBatchId(parsedData.studentDetails.batchId);
+      }
+      if (batchId) {
+        const response = await getActiveExams(
+          dispatch,
+          page,
+          pageSize,
+          searchQuery,
+          batchId
+        );
+        if (response.isSuccessful) {
+          if (response.listContent.length === 0) {
+            setData([]);
+            toast.error(response.message);
+            return;
+          }
+          setData(response.listContent);
+        } else {
+          setData([]);
+          toast.error(response.message);
+        }
+      }
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (error: any) {
+      if (error.response) {
+        if (error.response.status === 401) {
+          toast.error("Unauthorized access. Please login again.");
+          LogoutAction();
+        } else {
+          toast.error(error.response.data.message);
+        }
+      }
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   useEffect(() => {
-    if (!dialog.createDialog || dialog.viewDialog) {
-      // fetchData(page);
+    const page = JSON.parse(sessionStorage.getItem("examPage") || "1");
+    if (!dialog.createDialog) {
+      fetchData(page);
+    } else if (dialog.viewDialog) {
+      fetchData(page);
     }
   }, [dialog]);
 
   useEffect(() => {
     dispatch(
-      setQuestionBankPage(
-        JSON.parse(sessionStorage.getItem("QuestionBankPage") || "1")
+      setExamPage(
+        JSON.parse(sessionStorage.getItem("ExamPage") || "1")
       )
     );
     dispatch(
-      setQuestionBankTotalPages(
-        JSON.parse(sessionStorage.getItem("totalBatchPages") || "0")
+      setExamTotalPages(
+        JSON.parse(sessionStorage.getItem("totalExamPages") || "0")
       )
     );
     dispatch(
-      setQuestionBankNextPage(
-        JSON.parse(sessionStorage.getItem("nextBatchPage") || "-1")
+      setExamNextPage(
+        JSON.parse(sessionStorage.getItem("nextExamPage") || "-1")
       )
     );
     dispatch(
-      setQuestionBankPrevPage(
-        JSON.parse(sessionStorage.getItem("prevBatchPage") || "-1")
+      setExamPrevPage(
+        JSON.parse(sessionStorage.getItem("prevExamPage") || "-1")
       )
     );
     dispatch(
@@ -83,16 +139,19 @@ export function DataTable() {
     dispatch(
       setViewDialogId(JSON.parse(sessionStorage.getItem("viewDialogId") || "0"))
     );
-    // fetchData(page);
+    const page = JSON.parse(sessionStorage.getItem("ExamPage") || "1");
+    fetchData(page);
   }, []);
 
   useEffect(() => {
-    // fetchData(page);
+    const page = JSON.parse(sessionStorage.getItem("ExamPage") || "1");
+    fetchData(page);
   }, [pageSize]);
 
   useEffect(() => {
-    // fetchData(page);
-  }, [searchQuery]);
+    const page = JSON.parse(sessionStorage.getItem("ExamPage") || "1");
+    fetchData(page);
+  }, [searchQuery, batchId]);
 
   //eslint-disable-next-line @typescript-eslint/no-unused-vars
   const table = useReactTable({
@@ -118,19 +177,17 @@ export function DataTable() {
     },
   });
 
-  const handleNext = () => {
-    if (page.course.nextPage > page.course.page) {
-      //eslint-disable-next-line @typescript-eslint/no-unused-vars
-      const curPage = page.course.nextPage;
-      // fetchData(curPage);
+  const handleNext = async () => {
+    if (page.exam.nextPage > page.exam.page) {
+      const curPage = page.exam.nextPage;
+      fetchData(curPage);
     }
   };
 
-  const handlePrev = () => {
-    if (page.course.prevPage >= 0) {
-      //eslint-disable-next-line @typescript-eslint/no-unused-vars
-      const curPage = page.course.prevPage;
-      // fetchData(curPage);
+  const handlePrev = async () => {
+    if (page.exam.prevPage >= 0) {
+      const curPage = page.exam.prevPage;
+      fetchData(curPage);
     }
   };
 
@@ -175,34 +232,44 @@ export function DataTable() {
             </div>
           </div>
         </div>
-      </div>
+        <div className="rounded-2xl border shadow-sm overflow-hidden w-full">
+          <ExamCards data={data} router={router} />
+        </div>
+        {/* <div className="rounded-2xl border shadow-sm overflow-hidden w-full ">
+          {data.length > 0 ? (
+            data.map((item: any, index: number) => (
+              <Qcard key={index} data={item} />
+            ))
+          ) : (
+            <p className="text-center col-span-full text-muted-foreground">
+              No data available
+            </p>
+          )}
+        </div> */}
 
-      <div className="rounded-2xl border shadow-sm overflow-hidden w-full">
-        <ExamCards />
-      </div>
-
-      <div className="flex items-center justify-center gap-4 mt-4">
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={handlePrev}
-          disabled={page.course.prevPage <= 0}
-        >
-          1 Previous
-        </Button>
-        <span className="text-sm font-medium text-gray-700 dark:text-gray-200">
-          Page {page.course.page} of {page.course.totalPages}
-        </span>
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={handleNext}
-          disabled={
-            page.course.nextPage === -1 || page.course.nextPage === null
-          }
-        >
-          Next
-        </Button>
+        <div className="flex items-center justify-center gap-4 mt-4">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={handlePrev}
+            disabled={page.exam.prevPage <= 0}
+          >
+            1 Previous
+          </Button>
+          <span className="text-sm font-medium text-gray-700 dark:text-gray-200">
+            Page {page.exam.page} of {page.exam.totalPages}
+          </span>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={handleNext}
+            disabled={
+              page.exam.nextPage === -1 || page.exam.nextPage === null
+            }
+          >
+            Next
+          </Button>
+        </div>
       </div>
     </div>
   );

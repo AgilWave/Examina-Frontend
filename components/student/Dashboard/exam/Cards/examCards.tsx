@@ -1,94 +1,189 @@
-import { useState } from "react";
-import { Clock, Calendar, BookCheck, FileType2 } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import Link from "next/link";
+import { Clock, Calendar, BookCheck, Play } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { AppRouterInstance } from 'next/dist/shared/lib/app-router-context.shared-runtime';
+import Cookies from 'js-cookie';
+import { decrypt } from '@/lib/encryption';
 
 // Types
 interface ExamSession {
   id: string;
   examName: string;
-  sessionNumber: number;
-  fuelType: string;
-  date: string;
-  time: string;
-  duration: string;
-  examId: number;
-  type: string;
-  isActive: boolean;
-  openedBy: string;
+  examDate: string;  // ISO date string
+  startTime: string; // ISO date string
+  endTime: string;   // ISO date string
+  examCode: number;
+  examMode: string;
+  status: string;
+  createdBy: string;
 }
 
+// Helper function to format date
+const formatDate = (dateString: string): string => {
+  const date = new Date(dateString);
+  return date.toLocaleDateString('en-US', {
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric'
+  });
+};
+
+// Helper function to format time
+const formatTime = (dateString: string): string => {
+  const date = new Date(dateString);
+  return date.toLocaleTimeString('en-US', {
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: true
+  });
+};
+
+// Helper function to calculate duration
+const calculateDuration = (startTime: string, endTime: string): string => {
+  const start = new Date(startTime);
+  const end = new Date(endTime);
+  const diff = end.getTime() - start.getTime();
+  const hours = Math.floor(diff / (1000 * 60 * 60));
+  const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+  return `${hours}h ${minutes}m`;
+};
+
+// Helper function to get status style
+const getStatusStyle = (status: string) => {
+  switch (status.toLowerCase()) {
+    case 'active':
+      return {
+        bgColor: 'bg-[#47b8812f]',
+        textColor: 'text-[#47B881]',
+        dotColor: 'bg-[#47B881]',
+        borderColor: 'border-[#47B881]'
+      };
+    case 'ongoing':
+      return {
+        bgColor: 'bg-[#47b8812f]',
+        textColor: 'text-[#47B881]',
+        dotColor: 'bg-[#47B881]',
+        borderColor: 'border-[#47B881]'
+      };
+    case 'pending':
+      return {
+        bgColor: 'bg-[#E184192f]',
+        textColor: 'text-[#E18419]',
+        dotColor: 'bg-[#e18419ce]',
+        borderColor: 'border-[#E18419]'
+      };
+    default:
+      return {
+        bgColor: 'bg-gray-200',
+        textColor: 'text-gray-600',
+        dotColor: 'bg-gray-600',
+        borderColor: 'border-gray-600'
+      };
+  }
+};
+
 // ExamCard Component
-const ExamCard = ({ session }: { session: ExamSession }) => {
-  // We're going to use Next.js Link component so we don't need router or mounted state anymore
-  
+const ExamCard = ({ session, router }: { session: ExamSession, router: AppRouterInstance }) => {
+  const userData = Cookies.get("userDetails");
+  let studentId = "";
+  if (userData) {
+    const decryptedData = decrypt(userData);
+    const parsedData = JSON.parse(decryptedData);
+    studentId = parsedData.studentDetails.studentId;
+  }
+  const statusStyle = getStatusStyle(session.status);
+  const duration = calculateDuration(session.startTime, session.endTime);
+  const formattedDate = formatDate(session.examDate);
+  const formattedStartTime = formatTime(session.startTime);
+
   return (
-    <div className="rounded-lg border border-gray-200 shadow-sm bg-white dark:bg-[#0A0A0A] dark:border-teal-900 overflow-hidden w-full">
-      <div className="border-b-4 border-primary/50 dark:border-teal-900 px-4 py-3 flex justify-between items-center">
-        <div className="flex items-center">
-          <div className="rounded-full bg-primary dark:bg-teal-900 p-2 mr-3"></div>
-          <div>
-            <h3 className="font-medium text-base text-gray-900 dark:text-white">
-              {session.examName}
-            </h3>
-            <p className="text-xs text-gray-600">
-              Session #{session.sessionNumber}
-            </p>
+    <div className="group relative rounded-lg border border-gray-200 shadow-md bg-white dark:bg-[#0A0A0A] dark:border-teal-900 overflow-hidden w-full transition-all duration-300 hover:shadow-lg hover:scale-[1.01] hover:border-primary/30 dark:hover:border-teal-700">
+      {/* Gradient overlay for visual appeal */}
+      <div className="absolute inset-0 bg-gradient-to-br from-transparent via-transparent to-primary/5 dark:to-teal-900/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+
+      {/* Header with enhanced styling */}
+      <div className="relative border-b border-primary/20 dark:border-teal-900/50 px-4 py-3 bg-gradient-to-r from-primary/5 to-transparent dark:from-teal-900/10">
+        <div className="flex justify-between items-start">
+          <div className="flex items-start space-x-3">
+            <div className="relative">
+              <div className="rounded-lg bg-gradient-to-br from-primary to-primary/80 dark:from-teal-900 dark:to-teal-800 p-2 shadow-md">
+                <BookCheck className="text-white" size={16} />
+              </div>
+              <div className="absolute -top-0.5 -right-0.5 w-2 h-2 bg-white dark:bg-gray-800 rounded-full border border-primary dark:border-teal-700"></div>
+            </div>
+            <div className="flex-1 min-w-0">
+              <h3 className="font-semibold text-sm text-gray-900 dark:text-white leading-tight mb-1 group-hover:text-primary dark:group-hover:text-teal-400 transition-colors">
+                {session.examName}
+              </h3>
+              <div className="flex items-center space-x-2">
+                <span className="text-xs font-medium text-primary dark:text-teal-400 bg-primary/10 dark:bg-teal-900/20 px-1.5 py-0.5 rounded">
+                  #{session.examCode}
+                </span>
+                <span className="text-xs text-gray-500 dark:text-gray-400">
+                  {session.examMode}
+                </span>
+              </div>
+            </div>
           </div>
-        </div>
-        <div>
-          <span
-            className={`inline-flex items-center font-medium px-2 py-1 rounded-full text-xs ${
-              session.isActive
-                ? "bg-[#47b8812f] text-[#47B881]"
-                : "bg-[#E184192f] text-[#E18419]"
-            }`}
-          >
-            <span
-              className={`w-2 h-2 rounded-full mr-1 ${
-                session.isActive ? "bg-[#47B881]" : "bg-[#e18419ce]"
-              }`}
-            ></span>
-            {session.isActive ? "Active" : "Upcoming"}
-          </span>
+
+          {/* Enhanced status badge */}
+          <div className="flex-shrink-0">
+            <span className={`inline-flex items-center font-medium px-2 py-1 rounded-full text-xs shadow-sm border ${statusStyle.bgColor} ${statusStyle.textColor} ${statusStyle.borderColor}`}>
+              <span className={`w-1.5 h-1.5 rounded-full mr-1.5 ${statusStyle.dotColor} animate-pulse`}></span>
+              {session.status}
+            </span>
+          </div>
         </div>
       </div>
 
-      <div className="p-4 space-y-3">
-        <div className="grid grid-cols-2 gap-4">
-          <div className="flex items-center text-sm">
-            <Calendar className="text-teal-600 mr-2" size={16} />
-            <span className="dark:text-white/60  text-black/80">
-              {session.date}
-            </span>
+      {/* Content with improved layout */}
+      <div className="relative p-4 space-y-3">
+        <div className="grid grid-cols-1 gap-2">
+          <div className="flex items-center p-2 rounded-md bg-gray-50 dark:bg-gray-900/50 hover:bg-gray-100 dark:hover:bg-gray-900/70 transition-colors">
+            <Calendar className="text-teal-600 dark:text-teal-400 mr-2 flex-shrink-0" size={14} />
+            <div>
+              <p className="text-xs text-gray-500 dark:text-gray-400">Date</p>
+              <p className="text-xs font-semibold dark:text-white/90 text-black/90">{formattedDate}</p>
+            </div>
           </div>
-          <div className="flex items-center text-sm">
-            <Clock className="text-teal-600 mr-2" size={16} />
-            <span className="dark:text-white/60  text-black/80">
-              Duration: {session.duration}
-            </span>
+
+          <div className="flex items-center p-2 rounded-md bg-gray-50 dark:bg-gray-900/50 hover:bg-gray-100 dark:hover:bg-gray-900/70 transition-colors">
+            <Clock className="text-teal-600 dark:text-teal-400 mr-2 flex-shrink-0" size={14} />
+            <div>
+              <p className="text-xs text-gray-500 dark:text-gray-400">Duration</p>
+              <p className="text-xs font-semibold dark:text-white/90 text-black/90">{duration}</p>
+            </div>
           </div>
-          <div className="flex items-center text-sm">
-            <BookCheck className="text-teal-600 mr-2" size={16} />
-            <span className="dark:text-white/60  text-black/80">
-              Exam ID: {session.examId}
-            </span>
+
+          <div className="flex items-center p-2 rounded-md bg-gray-50 dark:bg-gray-900/50 hover:bg-gray-100 dark:hover:bg-gray-900/70 transition-colors">
+            <BookCheck className="text-teal-600 dark:text-teal-400 mr-2 flex-shrink-0" size={14} />
+            <div>
+              <p className="text-xs text-gray-500 dark:text-gray-400">Start Time</p>
+              <p className="text-xs font-semibold dark:text-white/90 text-black/90">{formattedStartTime}</p>
+            </div>
           </div>
-          <div className="flex items-center text-sm">
-            <FileType2 className="text-teal-600 mr-2" size={16} />
-            <span className="dark:text-white/60  text-black/80">
-              Type: {session.type}
-            </span>
-          </div>
-        </div>        <div className="flex justify-between items-center pt-2">
-          <div className="text-xs text-gray-500">
-            Opened by: {session.openedBy}
-          </div>
-          <Link href={`/entry?examId=${session.examId}`}>
-            <Button>
-              Enter
+        </div>
+
+        {/* Footer with enhanced styling */}
+        <div className="pt-3 border-t border-gray-100 dark:border-gray-800">
+          <div className="flex justify-between items-center">
+            <div className="text-xs text-gray-500 dark:text-gray-400">
+              <span className="font-medium">Created by:</span> {session.createdBy}
+            </div>
+            <Button
+              variant="outline"
+              size="sm"
+              className="group/btn relative overflow-hidden text-xs font-semibold hover:bg-primary hover:text-white dark:border-teal-900 dark:text-teal-500 dark:hover:bg-teal-900 dark:hover:text-white transition-all duration-300 hover:scale-105"
+              onClick={() => {
+                router.push(`/entry?examId=${session.id}&studentId=${studentId}`);
+              }}
+            >
+              <span className="relative z-10 flex items-center">
+                <Play className="mr-1" size={12} />
+                Enter
+              </span>
+              <div className="absolute inset-0 bg-gradient-to-r from-primary to-primary/80 dark:from-teal-900 dark:to-teal-800 transform scale-x-0 group-hover/btn:scale-x-100 transition-transform origin-left"></div>
             </Button>
-          </Link>
+          </div>
         </div>
       </div>
     </div>
@@ -96,177 +191,29 @@ const ExamCard = ({ session }: { session: ExamSession }) => {
 };
 
 // ExamGrid Component to display multiple cards in a responsive grid
-const ExamGrid = ({ sessions }: { sessions: ExamSession[] }) => {
+const ExamGrid = ({ sessions, router }: { sessions: ExamSession[], router: AppRouterInstance }) => {
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
       {sessions.map((session) => (
-        <ExamCard key={session.id} session={session} />
+        <ExamCard key={session.id} session={session} router={router} />
       ))}
     </div>
   );
 };
 
-// Main component that brings everything together
-const ExamDashboard = () => {
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [activeSessions, setActiveSessions] = useState<ExamSession[]>([
-    {
-      id: "1",
-      examName: "Data Management",
-      sessionNumber: 11,
-      fuelType: "Petrol 95",
-      date: "Apr 30, 01:35 AM",
-      time: "01:35 AM",
-      duration: "10h 18m",
-      examId: 3,
-      type: "MCQ",
-      isActive: true,
-      openedBy: "a",
-    },
-    {
-      id: "2",
-      examName: "Data Management",
-      sessionNumber: 13,
-      fuelType: "Petrol 95",
-      date: "Apr 29, 10:12 PM",
-      time: "10:12 PM",
-      duration: "13h 40m",
-      examId: 12,
-      type: "Structure",
-      isActive: true,
-      openedBy: "a",
-    },
-    {
-      id: "3",
-      examName: "Data Management",
-      sessionNumber: 9,
-      fuelType: "Petrol 95",
-      date: "Apr 29, 08:17 PM",
-      time: "08:17 PM",
-      duration: "15h 36m",
-      examId: 12,
-      type: "MCQ",
-      isActive: true,
-      openedBy: "a",
-    },
-    {
-      id: "4",
-      examName: "Data Management",
-      sessionNumber: 8,
-      fuelType: "Petrol 95",
-      date: "Apr 29, 06:05 PM",
-      time: "06:05 PM",
-      duration: "17h 41m",
-      examId: 14,
-      type: "MCQ",
-      isActive: true,
-      openedBy: "a",
-    },
-  ]);
+// Main component that accepts data as a prop
+interface ExamCardsProps {
+  data: ExamSession[];
+  router: AppRouterInstance;
+}
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [upcomingSessions, setUpcomingSessions] = useState<ExamSession[]>([
-    {
-      id: "5",
-      examName: "Data Management",
-      sessionNumber: 7,
-      fuelType: "Petrol 95",
-      date: "May 5, 10:00 AM",
-      time: "10:00 AM",
-      duration: "Scheduled",
-      examId: 14,
-      type: "MCQ",
-      isActive: false,
-      openedBy: "System",
-    },
-    {
-      id: "6",
-      examName: "Data Management",
-      sessionNumber: 5,
-      fuelType: "Petrol 92",
-      date: "May 6, 02:30 PM",
-      time: "02:30 PM",
-      duration: "Scheduled",
-      examId: 12,
-      type: "MCQ",
-      isActive: false,
-      openedBy: "System",
-    },
-    {
-      id: "7",
-      examName: "Data Management",
-      sessionNumber: 5,
-      fuelType: "Petrol 92",
-      date: "May 6, 02:30 PM",
-      time: "02:30 PM",
-      duration: "Scheduled",
-      examId: 12,
-      type: "MCQ",
-      isActive: false,
-      openedBy: "System",
-    },
-    {
-      id: "8",
-      examName: "Data Management",
-      sessionNumber: 5,
-      fuelType: "Petrol 92",
-      date: "May 6, 02:30 PM",
-      time: "02:30 PM",
-      duration: "Scheduled",
-      examId: 12,
-      type: "MCQ",
-      isActive: false,
-      openedBy: "System",
-    },
-    {
-      id: "9",
-      examName: "Data Management",
-      sessionNumber: 5,
-      fuelType: "Petrol 92",
-      date: "May 6, 02:30 PM",
-      time: "02:30 PM",
-      duration: "Scheduled",
-      examId: 12,
-      type: "MCQ",
-      isActive: false,
-      openedBy: "System",
-    },
-    {
-      id: "10",
-      examName: "Data Management",
-      sessionNumber: 5,
-      fuelType: "Petrol 92",
-      date: "May 6, 02:30 PM",
-      time: "02:30 PM",
-      duration: "Scheduled",
-      examId: 12,
-      type: "MCQ",
-      isActive: false,
-      openedBy: "System",
-    },
-    {
-      id: "11",
-      examName: "Data Management",
-      sessionNumber: 5,
-      fuelType: "Petrol 92",
-      date: "May 6, 02:30 PM",
-      time: "02:30 PM",
-      duration: "Scheduled",
-      examId: 12,
-      type: "MCQ",
-      isActive: false,
-      openedBy: "System",
-    },
-  ]);
-
-  const allSessions = [...activeSessions, ...upcomingSessions];
-
+const ExamCards = ({ data, router }: ExamCardsProps) => {
   return (
-    <div className="h-[500px] p-6 bg-gray-50 dark:bg-black/50 max-h-screen overflow-auto scrollbar-custom">
+    <div className="h-[500px] p-6 bg-gradient-to-br from-gray-50 to-gray-100 dark:from-black/50 dark:to-gray-900/20 max-h-screen overflow-auto scrollbar-custom">
       {/* <SectionHeader title="All Exams" count={allSessions.length} /> */}
-      <ExamGrid sessions={allSessions} />
+      <ExamGrid sessions={data} router={router} />
     </div>
   );
 };
 
-export default ExamDashboard;
+export default ExamCards;

@@ -1,5 +1,6 @@
 import { Clock, Calendar, BookCheck, FileType2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { useRouter } from 'next/navigation';
 
 // Types
 interface ExamSession {
@@ -47,6 +48,12 @@ const calculateDuration = (startTime: string, endTime: string): string => {
 // Helper function to get status style
 const getStatusStyle = (status: string) => {
   switch (status.toLowerCase()) {
+    case 'active':
+      return {
+        bgColor: 'bg-[#47b8812f]',
+        textColor: 'text-[#47B881]',
+        dotColor: 'bg-[#47B881]'
+      };
     case 'ongoing':
       return {
         bgColor: 'bg-[#47b8812f]',
@@ -70,13 +77,14 @@ const getStatusStyle = (status: string) => {
 
 // ExamCard Component
 const ExamCard = ({ session }: { session: ExamSession }) => {
+  const router = useRouter();
   const statusStyle = getStatusStyle(session.status);
   const duration = calculateDuration(session.startTime, session.endTime);
   const formattedDate = formatDate(session.examDate);
   const formattedStartTime = formatTime(session.startTime);
 
   return (
-    <div className="rounded-lg border border-gray-200 shadow-sm bg-white dark:bg-[#0A0A0A] dark:border-teal-900 overflow-hidden w-full">
+    <div className="rounded-lg border border-gray-200 shadow-sm bg-white dark:bg-[#0A0A0A] dark:border-teal-900 overflow-hidden w-full hover:scale-105 transition-all duration-300 hover:shadow-lg hover:border-primary/30 dark:hover:border-teal-700">
       <div className="border-b-4 border-primary/50 dark:border-teal-900 px-4 py-3 flex justify-between items-center">
         <div className="flex items-center">
           <div className="rounded-full bg-primary dark:bg-teal-900 p-2 mr-3">
@@ -119,9 +127,12 @@ const ExamCard = ({ session }: { session: ExamSession }) => {
           <Button
             variant="outline"
             size="sm"
-            className="text-xs hover:bg-primary hover:text-white dark:border-teal-900 dark:text-teal-500 dark:hover:bg-teal-900 dark:hover:text-white"
+            className="text-xs hover:bg-primary cursor-pointer hover:text-white dark:border-teal-900 dark:text-teal-500 dark:hover:bg-teal-900 dark:hover:text-white"
+            onClick={() => {
+              router.push(`/admin/dashboard/exams/test?examCode=${session.examCode}`);
+            }}
           >
-            Manage
+            Proctor Exam
           </Button>
         </div>
       </div>

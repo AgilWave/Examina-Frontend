@@ -14,11 +14,23 @@ import { joinExam, updateConnectionStatus } from "@/services/exams/joinExam";
 import { checkParticipantStatus, ParticipantStatus } from "@/services/exams/checkParticipantStatus";
 import { updateParticipantStatus } from "@/services/exams/updateParticipantStatus";
 import { Exam, ExamQuestion } from "@/types/exam";
-import { useSearchParams } from "next/navigation";
+import { useSearchParams, useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { decrypt } from "@/lib/encryption";
 import Cookies from "js-cookie";
 import { Summary } from '@/components/student/Dashboard/exam/ExamEntry/questions/summary/summary';
+import { 
+  CheckCircle, 
+  Clock, 
+  FileX, 
+  Loader2, 
+  ArrowRight,
+  BookOpen,
+  User,
+  CheckSquare
+} from "lucide-react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 
 // Helper function to convert ExamQuestion to QuestionData
 const convertExamQuestionsToQuestionData = (examQuestions: ExamQuestion[]): QuestionData[] => {
@@ -60,7 +72,6 @@ export default function ExamSetupPage() {
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [examData, setExamData] = useState<Exam | null>(null);
   const [loading, setLoading] = useState(true);
-  const [hasJoined, setHasJoined] = useState(false);
   const [participantStatus, setParticipantStatus] = useState<ParticipantStatus | null>(null);
   const [isReturningUser, setIsReturningUser] = useState(false);
   const [showReturningUserMessage, setShowReturningUserMessage] = useState(false);
@@ -72,7 +83,9 @@ export default function ExamSetupPage() {
   const [examEndTime, setExamEndTime] = useState<Date | null>(null);
   const [examEnded, setExamEnded] = useState(false);
   const [examSubmitted, setExamSubmitted] = useState(false);
+  const [justSubmitted, setJustSubmitted] = useState(false);
   const searchParams = useSearchParams();
+  const router = useRouter();
   const examId = searchParams.get("examId");
 
   const totalSteps = isReturningUser ? 2 : 6;
@@ -154,46 +167,11 @@ export default function ExamSetupPage() {
     }
   }, [showReturningUserMessage]);
 
-  // Update the checkIfReturningUser function to set showReturningUserMessage
-  const checkIfReturningUser = async (examId: number, studentId: number) => {
-    try {
-      const status = await checkParticipantStatus(examId, studentId);
-      setParticipantStatus(status);
-      
-      // Check if exam is already submitted
-      if (status.isSubmitted) {
-        setExamSubmitted(true);
-        toast.error("You have already submitted this exam. Cannot attempt again.");
-        return status;
-      }
-      
-      if (status.hasJoined) {
-        setIsReturningUser(true);
-        setShowReturningUserMessage(true);
-        setCurrentStep(5);
-        toast.success("Welcome back! Continuing from where you left off.");
-      }
-      return status;
-    } catch (error) {
-      console.error("Error checking participant status:", error);
-      return null;
-    }
-  };
-
   // Update connection status when component mounts/unmounts
   useEffect(() => {
     const studentDetails = getStudentDetails();
 
-    if (examData && studentDetails?.id) {
-      checkIfReturningUser(examData.id, studentDetails.studentId).then(() => {
-        // Only join if not already joined
-        if (hasJoined) {
-          setHasJoined(true)
-        }
-
-      });
-    }
-
+    // Only update connection status, do not check returning user here
     // Update connection status to connected
     const updateConnection = async () => {
       if (examData && studentDetails?.id) {
@@ -220,7 +198,7 @@ export default function ExamSetupPage() {
       };
       cleanup();
     };
-  }, [examData, hasJoined]);
+  }, [examData]);
 
   // Fetch exam data on component mount
   useEffect(() => {
@@ -262,6 +240,27 @@ export default function ExamSetupPage() {
     fetchExamData();
   }, [examId]);
 
+  // On mount, check if already joined
+  useEffect(() => {
+    const studentDetails = getStudentDetails();
+    if (examData && studentDetails?.id) {
+      checkParticipantStatus(examData.id, studentDetails.studentId).then((status) => {
+        setParticipantStatus(status);
+        if (status?.isSubmitted) {
+          setExamSubmitted(true);
+          toast.error("You have already submitted this exam. Cannot attempt again.");
+          return;
+        }
+        if (status?.hasJoined) {
+          setIsReturningUser(true);
+          setShowReturningUserMessage(true);
+          setCurrentStep(5);
+          toast.success("Welcome back! Continuing from where you left off.");
+        }
+      });
+    }
+  }, [examData]);
+
   const handleNextStep = () => {
     if (currentStep < totalSteps) {
       setCurrentStep(currentStep + 1);
@@ -298,8 +297,59 @@ export default function ExamSetupPage() {
   };
 
   const handleExamComplete = async () => {
-    // Show summary first instead of submitting immediately
-    setShowSummary(true);
+    // Check if this is an auto-submission due to time running out
+    const isAutoSubmission = timeRemaining === "00:00:00" || examEnded;
+    
+    if (isAutoSubmission) {
+      // Auto-submit the exam when time runs out
+      try {
+        if (!examData) {
+          toast.error("No exam data available");
+          return;
+        }
+
+        const studentDetails = getStudentDetails();
+        if (!studentDetails?.id) {
+          toast.error("Student details not found");
+          return;
+        }
+
+        // Convert answers to the format expected by the backend
+        const answerSubmissions: ExamAnswerSubmission[] = Object.entries(answers).map(([questionId, answer]) => ({
+          examId: examData.id,
+          questionId: parseInt(questionId),
+          answer: typeof answer === 'string' ? answer : JSON.stringify(answer),
+          timeTaken: 0, // This will be determined by the backend
+          isCorrect: false // This will be determined by the backend
+        }));
+
+        // Submit answers to backend
+        await submitExamAnswers(answerSubmissions);
+
+        // Mark participant as submitted
+        await updateParticipantStatus({
+          examId: examData.id,
+          studentId: studentDetails.studentId,
+          isSubmitted: true,
+          submittedAt: new Date().toISOString()
+        });
+
+        setExamSubmitted(true);
+        toast.success("Exam auto-submitted due to time expiration!");
+        console.log("Exam auto-completed with answers:", answers);
+
+        // Navigate to student exams page after auto-submission
+        setTimeout(() => {
+          router.push("/student/dashboard/exams");
+        }, 2000);
+      } catch (error) {
+        console.error("Error auto-submitting exam answers:", error);
+        toast.error("Failed to auto-submit exam answers. Please contact support.");
+      }
+    } else {
+      // Show summary first for manual completion
+      setShowSummary(true);
+    }
   };
 
   const handleFinalSubmit = async () => {
@@ -338,11 +388,15 @@ export default function ExamSetupPage() {
       });
 
       setExamSubmitted(true);
+      setJustSubmitted(true);
+      setCurrentStep(7);
       toast.success("Exam completed successfully!");
       console.log("Exam completed with answers:", answers);
 
-      // Move to completion state
-      setCurrentStep(totalSteps + 1);
+      // Navigate to student exams page after successful submission
+      setTimeout(() => {
+        router.push("/student/dashboard/exams");
+      }, 2000);
     } catch (error) {
       console.error("Error submitting exam answers:", error);
       toast.error("Failed to submit exam answers. Please try again.");
@@ -370,21 +424,55 @@ export default function ExamSetupPage() {
     if (!studentDetails?.id) return;
     try {
       await joinExam(examData.id, studentDetails.id);
-      setHasJoined(true);
-      handleNextStep();
+      setCurrentStep(currentStep + 1); // Just go to next step, don't check returning user here
     } catch (error) {
       console.error(error)
       toast.error("Failed to join exam. Please try again.");
     }
   };
 
+  // Auto-navigate after exam ends
+  useEffect(() => {
+    if (examEnded && !examSubmitted) {
+      const timer = setTimeout(() => {
+        router.push("/student/dashboard/exams");
+      }, 5000);
+      return () => clearTimeout(timer);
+    }
+  }, [examEnded, examSubmitted, router]);
+
+  // Auto-navigate after exam is already submitted
+  useEffect(() => {
+    if (examSubmitted) {
+      const timer = setTimeout(() => {
+        router.push("/student/dashboard/exams");
+      }, 5000);
+      return () => clearTimeout(timer);
+    }
+  }, [examSubmitted, router]);
+
   // Show loading state
   if (loading) {
     return (
       <div className="min-h-screen bg-white dark:bg-black flex flex-col items-center justify-center p-4">
         <div className="w-full max-w-4xl mx-auto text-center">
-          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-gray-900 dark:border-white mx-auto"></div>
-          <p className="mt-4 text-gray-600 dark:text-gray-400">Loading exam data...</p>
+          <Card className="max-w-md mx-auto bg-white dark:bg-[#0A0A0A] border border-gray-200 dark:border-teal-900 shadow-lg">
+            <CardContent className="p-8">
+              <div className="flex flex-col items-center space-y-4">
+                <div className="relative">
+                  <Loader2 className="h-16 w-16 text-teal-600 dark:text-teal-400 animate-spin" />
+                </div>
+                <div className="text-center space-y-2">
+                  <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
+                    Loading Exam Data
+                  </h2>
+                  <p className="text-gray-600 dark:text-gray-400 text-sm">
+                    Please wait while we prepare your exam...
+                  </p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
         </div>
       </div>
     );
@@ -395,12 +483,32 @@ export default function ExamSetupPage() {
     return (
       <div className="min-h-screen bg-white dark:bg-black flex flex-col items-center justify-center p-4">
         <div className="w-full max-w-4xl mx-auto text-center">
-          <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-6">
-            <h2 className="text-xl font-semibold text-red-800 dark:text-red-200 mb-2">
-              Error Loading Exam
-            </h2>
-            <p className="text-red-600 dark:text-red-300">Failed to load exam data</p>
-          </div>
+          <Card className="max-w-md mx-auto bg-white dark:bg-[#0A0A0A] border border-red-200 dark:border-red-800 shadow-lg">
+            <CardContent className="p-8">
+              <div className="flex flex-col items-center space-y-4">
+                <div className="relative">
+                  <div className="w-16 h-16 bg-red-100 dark:bg-red-900/20 rounded-full flex items-center justify-center">
+                    <FileX className="h-8 w-8 text-red-600 dark:text-red-400" />
+                  </div>
+                </div>
+                <div className="text-center space-y-2">
+                  <h2 className="text-xl font-semibold text-red-800 dark:text-red-200">
+                    Error Loading Exam
+                  </h2>
+                  <p className="text-red-600 dark:text-red-300 text-sm">
+                    Failed to load exam data. Please check the exam link and try again.
+                  </p>
+                </div>
+                <Button 
+                  onClick={() => router.push("/student/dashboard/exams")}
+                  className="mt-4 bg-teal-600 hover:bg-teal-700 text-white"
+                >
+                  <ArrowRight className="w-4 h-4 mr-2" />
+                  Back to Exams
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
         </div>
       </div>
     );
@@ -411,78 +519,141 @@ export default function ExamSetupPage() {
     return (
       <div className="min-h-screen bg-white dark:bg-black flex flex-col items-center justify-center p-4">
         <div className="w-full max-w-4xl mx-auto text-center">
-          <div className="bg-orange-50 dark:bg-orange-900/20 border border-orange-200 dark:border-orange-800 rounded-lg p-8">
-            <div className="text-6xl mb-4">⏰</div>
-            <h2 className="text-2xl font-semibold text-orange-800 dark:text-orange-200 mb-4">
-              Exam Time Has Ended
-            </h2>
-            <p className="text-orange-600 dark:text-orange-300 text-lg mb-6">
-              The exam period has ended. Your answers have been automatically submitted.
-            </p>
-            <div className="bg-white dark:bg-gray-800 rounded-lg p-6 text-left max-w-md mx-auto">
-              <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-4">
-                Exam Summary
-              </h3>
-              <div className="space-y-2 text-sm">
-                <p className="text-gray-600 dark:text-gray-400">
-                  <span className="font-medium">Exam:</span> {examData.examName}
-                </p>
-                <p className="text-gray-600 dark:text-gray-400">
-                  <span className="font-medium">Total Questions:</span> {examData.examQuestions?.length || 0}
-                </p>
-                <p className="text-gray-600 dark:text-gray-400">
-                  <span className="font-medium">Answered:</span> {Object.keys(answers).length}
-                </p>
-                {examStartTime && (
-                  <p className="text-gray-600 dark:text-gray-400">
-                    <span className="font-medium">Started:</span> {examStartTime.toLocaleString()}
+          <Card className="max-w-lg mx-auto bg-white dark:bg-[#0A0A0A] border border-orange-200 dark:border-orange-800 shadow-lg">
+            <CardContent className="p-8">
+              <div className="flex flex-col items-center space-y-6">
+                <div className="relative">
+                  <div className="w-20 h-20 bg-orange-100 dark:bg-orange-900/20 rounded-full flex items-center justify-center">
+                    <Clock className="h-10 w-10 text-orange-600 dark:text-orange-400" />
+                  </div>
+                </div>
+                <div className="text-center space-y-3">
+                  <h2 className="text-2xl font-bold text-orange-800 dark:text-orange-200">
+                    Exam Time Has Ended
+                  </h2>
+                  <p className="text-orange-600 dark:text-orange-300 text-lg">
+                    The exam period has ended. Your answers have been automatically submitted.
                   </p>
-                )}
-                {examEndTime && (
-                  <p className="text-gray-600 dark:text-gray-400">
-                    <span className="font-medium">Ended:</span> {examEndTime.toLocaleString()}
-                  </p>
-                )}
+                </div>
+                
+                <Card className="w-full bg-gray-50 dark:bg-gray-900/50 border border-gray-200 dark:border-gray-700">
+                  <CardHeader className="pb-3">
+                    <CardTitle className="text-lg font-semibold text-gray-800 dark:text-gray-200 flex items-center gap-2">
+                      <BookOpen className="w-5 h-5 text-teal-600 dark:text-teal-400" />
+                      Exam Summary
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-3 text-sm">
+                    <div className="flex items-center justify-between">
+                      <span className="text-gray-600 dark:text-gray-400 font-medium">Exam:</span>
+                      <span className="text-gray-800 dark:text-gray-200">{examData.examName}</span>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className="text-gray-600 dark:text-gray-400 font-medium">Total Questions:</span>
+                      <span className="text-gray-800 dark:text-gray-200">{examData.examQuestions?.length || 0}</span>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className="text-gray-600 dark:text-gray-400 font-medium">Answered:</span>
+                      <span className="text-gray-800 dark:text-gray-200">{Object.keys(answers).length}</span>
+                    </div>
+                    {examStartTime && (
+                      <div className="flex items-center justify-between">
+                        <span className="text-gray-600 dark:text-gray-400 font-medium">Started:</span>
+                        <span className="text-gray-800 dark:text-gray-200">{examStartTime.toLocaleString()}</span>
+                      </div>
+                    )}
+                    {examEndTime && (
+                      <div className="flex items-center justify-between">
+                        <span className="text-gray-600 dark:text-gray-400 font-medium">Ended:</span>
+                        <span className="text-gray-800 dark:text-gray-200">{examEndTime.toLocaleString()}</span>
+                      </div>
+                    )}
+                  </CardContent>
+                </Card>
+                
+                <Button 
+                  onClick={() => router.push("/student/dashboard/exams")}
+                  className="mt-4 bg-teal-600 hover:bg-teal-700 text-white"
+                >
+                  <ArrowRight className="w-4 h-4 mr-2" />
+                  Back to Exams
+                </Button>
+                
+                <div className="text-sm text-orange-500 dark:text-orange-400">
+                  Redirecting to exams page in 5 seconds...
+                </div>
               </div>
-            </div>
-          </div>
+            </CardContent>
+          </Card>
         </div>
       </div>
     );
   }
 
   // Show already submitted screen
-  if (examSubmitted) {
+  if (examSubmitted && !justSubmitted) {
     return (
       <div className="min-h-screen bg-white dark:bg-black flex flex-col items-center justify-center p-4">
         <div className="w-full max-w-4xl mx-auto text-center">
-          <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-8">
-            <div className="text-6xl mb-4">✅</div>
-            <h2 className="text-2xl font-semibold text-blue-800 dark:text-blue-200 mb-4">
-              Exam Already Submitted
-            </h2>
-            <p className="text-blue-600 dark:text-blue-300 text-lg mb-6">
-              You have already submitted this exam. You cannot attempt it again.
-            </p>
-            <div className="bg-white dark:bg-gray-800 rounded-lg p-6 text-left max-w-md mx-auto">
-              <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-4">
-                Submission Details
-              </h3>
-              <div className="space-y-2 text-sm">
-                <p className="text-gray-600 dark:text-gray-400">
-                  <span className="font-medium">Exam:</span> {examData.examName}
-                </p>
-                {participantStatus?.submittedAt && (
-                  <p className="text-gray-600 dark:text-gray-400">
-                    <span className="font-medium">Submitted:</span> {new Date(participantStatus.submittedAt).toLocaleString()}
+          <Card className="max-w-lg mx-auto bg-white dark:bg-[#0A0A0A] border border-teal-200 dark:border-teal-800 shadow-lg">
+            <CardContent className="p-8">
+              <div className="flex flex-col items-center space-y-6">
+                <div className="relative">
+                  <div className="w-20 h-20 bg-teal-100 dark:bg-teal-900/20 rounded-full flex items-center justify-center">
+                    <CheckCircle className="h-10 w-10 text-teal-600 dark:text-teal-400" />
+                  </div>
+                </div>
+                <div className="text-center space-y-3">
+                  <h2 className="text-2xl font-bold text-teal-800 dark:text-teal-200">
+                    Exam Submitted
+                  </h2>
+                  <p className="text-teal-600 dark:text-teal-300 text-lg">
+                    You have already submitted this exam. You cannot attempt it again.
                   </p>
-                )}
-                <p className="text-gray-600 dark:text-gray-400">
-                  <span className="font-medium">Status:</span> <span className="text-green-600 dark:text-green-400 font-medium">Submitted</span>
-                </p>
+                </div>
+                
+                <Card className="w-full bg-gray-50 dark:bg-gray-900/50 border border-gray-200 dark:border-gray-700">
+                  <CardHeader className="pb-3">
+                    <CardTitle className="text-lg font-semibold text-gray-800 dark:text-gray-200 flex items-center gap-2">
+                      <CheckSquare className="w-4 h-4 text-teal-600 dark:text-teal-400" />
+                      Submission Details
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-3 text-sm">
+                    <div className="flex items-center justify-between">
+                      <span className="text-gray-600 dark:text-gray-400 font-medium">Exam:</span>
+                      <span className="text-gray-800 dark:text-gray-200">{examData.examName}</span>
+                    </div>
+                    {participantStatus?.submittedAt && (
+                      <div className="flex items-center justify-between">
+                        <span className="text-gray-600 dark:text-gray-400 font-medium">Submitted:</span>
+                        <span className="text-gray-800 dark:text-gray-200">{new Date(participantStatus.submittedAt).toLocaleString()}</span>
+                      </div>
+                    )}
+                    <div className="flex items-center justify-between">
+                      <span className="text-gray-600 dark:text-gray-400 font-medium">Status:</span>
+                      <span className="text-green-600 dark:text-green-400 font-medium flex items-center gap-1">
+                        <CheckCircle className="w-4 h-4" />
+                        Submitted
+                      </span>
+                    </div>
+                  </CardContent>
+                </Card>
+                
+                <Button 
+                  onClick={() => router.push("/student/dashboard/exams")}
+                  className="mt-4 bg-teal-600 hover:bg-teal-700 text-white"
+                >
+                  <ArrowRight className="w-4 h-4 mr-2" />
+                  Back to Exams
+                </Button>
+                
+                <div className="text-sm text-teal-500 dark:text-teal-400">
+                  Redirecting to exams page in 5 seconds...
+                </div>
               </div>
-            </div>
-          </div>
+            </CardContent>
+          </Card>
         </div>
       </div>
     );
@@ -493,18 +664,31 @@ export default function ExamSetupPage() {
     return (
       <div className="min-h-screen bg-white dark:bg-black flex flex-col items-center justify-center p-4">
         <div className="w-full max-w-4xl mx-auto text-center">
-          <div className="bg-teal-50 dark:bg-teal-900/20 border border-teal-200 dark:border-teal-800 rounded-lg p-6 mb-8">
-            <h2 className="text-xl font-semibold text-teal-800 dark:text-teal-200 mb-2">
-              Welcome Back!
-            </h2>
-            <p className="text-teal-600 dark:text-teal-300">
-              You previously joined this exam on {new Date(participantStatus.joinedAt).toLocaleString()}
-            </p>
-            <p className="text-sm text-teal-500 dark:text-teal-400 mt-2">
-              Skipping environment checks and continuing to exam...
-            </p>
+          <Card className="max-w-lg mx-auto bg-white dark:bg-[#0A0A0A] border border-teal-200 dark:border-teal-800 shadow-lg mb-8">
+            <CardContent className="p-6">
+              <div className="flex flex-col items-center space-y-4">
+                <div className="relative">
+                  <div className="w-16 h-16 bg-teal-100 dark:bg-teal-900/20 rounded-full flex items-center justify-center">
+                    <User className="h-8 w-8 text-teal-600 dark:text-teal-400" />
+                  </div>
+                </div>
+                <div className="text-center space-y-2">
+                  <h2 className="text-xl font-semibold text-teal-800 dark:text-teal-200">
+                    Welcome Back!
+                  </h2>
+                  <p className="text-teal-600 dark:text-teal-300">
+                    You previously joined this exam on {new Date(participantStatus.joinedAt).toLocaleString()}
+                  </p>
+                  <p className="text-sm text-teal-500 dark:text-teal-400">
+                    Skipping environment checks and continuing to exam...
+                  </p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+          <div className="flex justify-center">
+            <Loader2 className="h-16 w-16 text-teal-500 animate-spin" />
           </div>
-          <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-teal-500 mx-auto"></div>
         </div>
       </div>
     );
@@ -564,48 +748,75 @@ export default function ExamSetupPage() {
       case 7:
         return (
           <div className="text-center space-y-8">
-            <div className="space-y-3">
-              <h1 className="text-3xl font-bold text-black dark:text-white">
-                Exam Completed Successfully!
-              </h1>
-              <p className="text-gray-600 dark:text-gray-400 text-lg">
-                Thank you for completing the exam. Your answers have been submitted and recorded.
-              </p>
-            </div>
-            <div className="bg-white dark:bg-card rounded-xl p-6 shadow-lg max-w-2xl mx-auto">
-              <h3 className="text-xl font-semibold text-black dark:text-white mb-4">
-                Exam Summary
-              </h3>
-              <div className="space-y-2 text-left">
-                <p className="text-gray-600 dark:text-gray-400">
-                  <span className="font-medium">Exam:</span> {examData.examName}
-                </p>
-                <p className="text-gray-600 dark:text-gray-400">
-                  <span className="font-medium">Total Questions:</span> {examData.examQuestions?.length || 0}
-                </p>
-                <p className="text-gray-600 dark:text-gray-400">
-                  <span className="font-medium">Answered:</span> {Object.keys(answers).length}
-                </p>
-                {examStartTime && (
-                  <p className="text-gray-600 dark:text-gray-400">
-                    <span className="font-medium">Started:</span> {examStartTime.toLocaleString()}
-                  </p>
-                )}
-                {examEndTime && (
-                  <p className="text-gray-600 dark:text-gray-400">
-                    <span className="font-medium">Ended:</span> {examEndTime.toLocaleString()}
-                  </p>
-                )}
-                <p className="text-gray-600 dark:text-gray-400">
-                  <span className="font-medium">Time Remaining:</span> {timeRemaining}
-                </p>
-              </div>
-            </div>
-            <div className="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg p-4">
-              <p className="text-green-700 dark:text-green-300">
-                ✅ Your exam has been successfully submitted and recorded in the system.
-              </p>
-            </div>
+            <Card className="max-w-2xl mx-auto bg-white dark:bg-[#0A0A0A] border border-green-200 dark:border-green-800 shadow-lg">
+              <CardContent className="p-8">
+                <div className="flex flex-col items-center space-y-6">
+                  <div className="relative">
+                    <div className="w-20 h-20 bg-green-100 dark:bg-green-900/20 rounded-full flex items-center justify-center">
+                      <CheckCircle className="h-10 w-10 text-green-600 dark:text-green-400" />
+                    </div>
+                  </div>
+                  <div className="text-center space-y-3">
+                    <h1 className="text-3xl font-bold text-green-800 dark:text-green-200">
+                      Exam Completed Successfully!
+                    </h1>
+                    <p className="text-green-600 dark:text-green-300 text-lg">
+                      Thank you for completing the exam. Your answers have been submitted and recorded.
+                    </p>
+                  </div>
+                  
+                  <Card className="w-full bg-gray-50 dark:bg-gray-900/50 border border-gray-200 dark:border-gray-700">
+                    <CardHeader className="pb-3">
+                      <CardTitle className="text-lg font-semibold text-gray-800 dark:text-gray-200 flex items-center gap-2">
+                        <BookOpen className="w-5 h-5 text-teal-600 dark:text-teal-400" />
+                        Exam Summary
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-3 text-sm">
+                      <div className="flex items-center justify-between">
+                        <span className="text-gray-600 dark:text-gray-400 font-medium">Exam:</span>
+                        <span className="text-gray-800 dark:text-gray-200">{examData.examName}</span>
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <span className="text-gray-600 dark:text-gray-400 font-medium">Total Questions:</span>
+                        <span className="text-gray-800 dark:text-gray-200">{examData.examQuestions?.length || 0}</span>
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <span className="text-gray-600 dark:text-gray-400 font-medium">Answered:</span>
+                        <span className="text-gray-800 dark:text-gray-200">{Object.keys(answers).length}</span>
+                      </div>
+                      {examStartTime && (
+                        <div className="flex items-center justify-between">
+                          <span className="text-gray-600 dark:text-gray-400 font-medium">Started:</span>
+                          <span className="text-gray-800 dark:text-gray-200">{examStartTime.toLocaleString()}</span>
+                        </div>
+                      )}
+                      {examEndTime && (
+                        <div className="flex items-center justify-between">
+                          <span className="text-gray-600 dark:text-gray-400 font-medium">Ended:</span>
+                          <span className="text-gray-800 dark:text-gray-200">{examEndTime.toLocaleString()}</span>
+                        </div>
+                      )}
+                      <div className="flex items-center justify-between">
+                        <span className="text-gray-600 dark:text-gray-400 font-medium">Time Remaining:</span>
+                        <span className="text-gray-800 dark:text-gray-200">{timeRemaining}</span>
+                      </div>
+                    </CardContent>
+                  </Card>
+                  
+                  <div className="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg p-4 w-full">
+                    <p className="text-green-700 dark:text-green-300 flex items-center justify-center gap-2">
+                      <CheckCircle className="w-5 h-5" />
+                      Your exam has been successfully submitted and recorded in the system.
+                    </p>
+                  </div>
+                  
+                  <div className="text-sm text-gray-500 dark:text-gray-400">
+                    Redirecting to exams page...
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
           </div>
         );
       default:

@@ -71,7 +71,8 @@ export function DataTable() {
         dispatch,
         page,
         pageSize,
-        searchQuery
+        searchQuery,
+        null
       );
       if (response.isSuccessful) {
         if (response.listContent.length === 0) {

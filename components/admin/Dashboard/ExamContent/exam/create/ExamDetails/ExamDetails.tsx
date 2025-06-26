@@ -86,7 +86,7 @@ export default function ExamDetailsForm() {
       const moduleCode = selectedModule.name.substring(0, 6).toUpperCase();
       const examType = 'MID'; // You can make this dynamic based on exam type if needed
 
-      return `${batchCode}-${moduleCode}-${examType}`;
+      return `${batchCode}-${moduleCode}-${examType}-${new Date().getDate()}-${new Date().getMinutes()}`;
     };
   }, [examState.batchId, examState.moduleId, batches, modules]);
 

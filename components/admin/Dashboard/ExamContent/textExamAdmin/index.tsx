@@ -7,6 +7,7 @@ import MessageInbox from '@/components/common/MessageInbox';
 import { Video, Mic, MicOff, VideoOff, Hand, MessageCircle, User, VolumeX, AlertTriangle } from 'lucide-react';
 import { Tooltip, TooltipTrigger, TooltipContent } from '@/components/ui/tooltip';
 import { toast } from "sonner";
+import { useSearchParams } from "next/navigation";
 
 
 interface StreamData {
@@ -14,11 +15,9 @@ interface StreamData {
   stream: MediaStream;
 }
 
-interface AdminViewProps {
-  examId: string;
-}
-
-export default function AdminView({ examId }: AdminViewProps) {
+export default function AdminView() {
+  const searchParams = useSearchParams();
+  const examId = searchParams.get("examCode");
   const [streams, setStreams] = useState<StreamData[]>([]);
   const peerMap = useRef<{ [id: string]: Peer.Instance }>({});
   const connectionStates = useRef<{ [id: string]: string }>({});
@@ -301,7 +300,7 @@ export default function AdminView({ examId }: AdminViewProps) {
   return (
     <div className="flex h-[90vh] w-full bg-gray-50 dark:bg-neutral-900 rounded-lg shadow-lg overflow-hidden">
       <div className="flex-1 p-6 overflow-y-auto">
-        <h2 className="text-2xl font-bold mb-4 text-gray-800 dark:text-gray-100">Admin Live View – Exam ID: {examId}</h2>
+          <h2 className="text-2xl font-bold mb-4 text-gray-800 dark:text-gray-100">Admin Live View – Exam Code: {examId}</h2>
         <div className="mb-4 text-sm text-gray-600 dark:text-gray-300">
           Joined: {streams.length} students
         </div>

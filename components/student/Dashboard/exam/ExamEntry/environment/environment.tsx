@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import QRCode from "react-qr-code";
 import { Loader2, CheckCircle, Smartphone } from "lucide-react";
 import socket from '@/lib/socket';
+import { useSearchParams } from "next/navigation";
 
 
 interface EnvironmentCheckupProps {
@@ -13,14 +14,14 @@ interface EnvironmentCheckupProps {
 }
 
 export function EnvironmentCheckup({ onNext }: EnvironmentCheckupProps) {
+  const searchParams = useSearchParams();
+  const examId = searchParams.get("examId");
+  const studentId = searchParams.get("studentId");
   const [isLoading, setIsLoading] = useState(true);
   const [isCompleted, setIsCompleted] = useState(false);
   const [progressStatus, setProgressStatus] = useState<string>('');
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [connectionStatus, setConnectionStatus] = useState<'connecting' | 'connected' | 'error'>('connecting');
-
-  const examId = "test-exam-123";
-  const studentId = "STUDENT456";
   
   // Mobile URL that includes the environment check page
   const mobileUrl = `${window.location.origin}/exams/enviorment-check?examId=${examId}&studentId=${studentId}`;
