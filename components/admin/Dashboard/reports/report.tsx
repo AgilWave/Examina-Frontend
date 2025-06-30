@@ -1,5 +1,5 @@
 import { FC } from "react";
-import SectionTiles from "@/components/ui/section-tiles";
+import { ExamReport } from './examReport';
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -8,13 +8,13 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
-import {FileText  } from "lucide-react";
+import {UserPen , BookOpenCheck   } from "lucide-react";
+import SectionTiles from "@/components/ui/section-tiles";
 
 const ReportContent: FC = () => {
   const items = [
-    { icon: <FileText   size={30} color="#FFFFFF" />, title: "Report 1", link: "/admin/dashboard/reports/report1" },
-    { icon: <FileText    size={30} color="#FFFFFF" />, title: "Report 2", link: "/admin/dashboard/reports/report1" },
-    { icon: <FileText    size={30} color="#FFFFFF" />, title: "Reoport 3", link: "/admin/dashboard/reports/report1" },
+    { icon: <BookOpenCheck    size={30} color="#FFFFFF" />, title: "Exam Reports", link: "/admin/dashboard/reports/exam_reports" },
+    { icon: <UserPen     size={30} color="#FFFFFF" />, title: "Student Reports", link: "/admin/dashboard/reports/student_reports" },
   ];
 
   return (
@@ -44,7 +44,7 @@ const ReportContent: FC = () => {
               Reports Section
             </h1>
             <p className="text-gray-500 dark:text-gray-400">
-              Manage all reports and analysis here.
+              Manage all reports here.
             </p>
           </div>
         </div>

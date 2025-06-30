@@ -15,7 +15,7 @@ const Dashboard: FC = () => {
     { icon: <GraduationCap size={30} color="#FFFFFF" />, title: "Manage Exams", link: "/admin/dashboard/exams/manage-exams" },
     { icon: <Code size={30} color="#FFFFFF" />, title: "Manage Course Work", link: "/admin/dashboard/exams/manage-coursework" },
     { icon: <ClipboardList size={30} color="#FFFFFF" />, title: "Questions Bank", link: "/admin/dashboard/exams/questions-bank" },
-    { icon: <Shield size={30} color="#FFFFFF" />, title: "Manage Results", link: "/admin/dashboard/exams/manage-results" },
+    // { icon: <Shield size={30} color="#FFFFFF" />, title: "Manage Results", link: "/admin/dashboard/exams/manage-results" },
   ];
 
   return (
