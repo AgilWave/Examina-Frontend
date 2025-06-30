@@ -7,24 +7,66 @@ import { getExamReports } from "./examReportsService";
 import { Exam } from '@/types/reports';
 import ExamDetailsForm from "./filters/sample";
 import { Loader2 } from "lucide-react";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import { RootState } from "@/redux/store";
 import { useQueryState } from "nuqs";
+import { getAllFaculties } from "@/services/Faculty/getAllFaculties";
+import { getAllCourses } from "@/services/Course/getAllCourses";
+import { getAllBatches } from "@/services/Batch/getAllBatches";
 
 function Reports() {
+  const dispatch = useDispatch();
   const [exams, setExams] = useState<Exam[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [faculties, setFaculties] = useState<{id: number, name: string}[]>([]);
+  const [courses, setCourses] = useState<{id: number, name: string, facultyId: number}[]>([]);
+  const [batches, setBatches] = useState<{id: number, batchCode: string, courseId: number}[]>([]);
   
   // Get filter criteria from Redux store
-  const examState = useSelector((state: RootState) => state.exam.createExam);
+  const filterState = useSelector((state: RootState) => state.examReportFilter);
   
   // Get search query from URL state
   const [searchQuery] = useQueryState("searchQuery");
 
+  // Helper functions to map IDs to names
+  const getFacultyNameById = (id: number): string | null => {
+    const faculty = faculties.find(f => f.id === id);
+    return faculty ? faculty.name : null;
+  };
+
+  const getCourseNameById = (id: number): string | null => {
+    const course = courses.find(c => c.id === id);
+    return course ? course.name : null;
+  };
+
+  const getBatchNameById = (id: number): string | null => {
+    const batch = batches.find(b => b.id === id);
+    return batch ? batch.batchCode : null;
+  };
+
+  // Check if any filters are applied
+  const hasActiveFilters = useMemo(() => {
+    return filterState.facultyId !== 0 || 
+           filterState.courseId !== 0 || 
+           filterState.batchId !== 0 || 
+           filterState.moduleId !== 0 ||
+           filterState.examDate !== "";
+  }, [filterState]);
+
   // Filter exams based on selected criteria
   const filteredExams = useMemo(() => {
     if (!exams.length) return [];
+
+    console.log('=== FILTERING DEBUG ===');
+    console.log('Total exams:', exams.length);
+    console.log('Filter state:', filterState);
+    console.log('Search query:', searchQuery);
+    
+    // Log sample exam data
+    if (exams.length > 0) {
+      console.log('Sample exam:', exams[0]);
+    }
 
     return exams.filter((exam) => {
       // Filter by search query if provided
@@ -43,50 +85,124 @@ function Reports() {
       }
 
       // Filter by date if selected
-      if (examState.examDate) {
+      if (filterState.examDate) {
         const examDate = new Date(exam.date).toISOString().split('T')[0];
-        if (examDate !== examState.examDate) {
+        if (examDate !== filterState.examDate) {
           return false;
         }
       }
 
       // Filter by faculty if selected
-      if (examState.facultyId && examState.facultyId !== 0) {
-        // For now, we'll use name matching until proper ID mapping is implemented
-        // You can enhance this by implementing proper ID to name mapping
-        if (exam.faculty && !exam.faculty.toLowerCase().includes('faculty')) {
-          // This is a placeholder - in a real implementation, you'd match by ID
-          // For now, we'll allow all since we don't have faculty IDs in exam data
+      if (filterState.facultyId && filterState.facultyId !== 0) {
+        const selectedFacultyName = getFacultyNameById(filterState.facultyId);
+        console.log('Faculty filter debug:', {
+          selectedFacultyId: filterState.facultyId,
+          selectedFacultyName,
+          examFaculty: exam.faculty,
+          faculties: faculties
+        });
+        
+        if (selectedFacultyName && exam.faculty) {
+          // More flexible matching - check if exam faculty contains key words from selected faculty
+          const examFaculty = exam.faculty.toLowerCase();
+          const selectedFaculty = selectedFacultyName.toLowerCase();
+          
+          // Split by common words and check for matches
+          const facultyWords = selectedFaculty.split(/\s+|faculty\s+of\s+/i).filter(word => word.length > 2);
+          const hasMatch = facultyWords.some(word => examFaculty.includes(word));
+          
+          console.log('Faculty matching:', {
+            examFaculty,
+            selectedFaculty,
+            facultyWords,
+            hasMatch
+          });
+          
+          if (!hasMatch) {
+            console.log('❌ Exam rejected due to faculty mismatch');
+            return false;
+          }
+        } else if (selectedFacultyName) {
+          // If we have a selected faculty but exam has no faculty data, exclude it
+          console.log('❌ Exam rejected due to missing faculty data');
+          return false;
         }
       }
 
-      // Filter by course if selected
-      if (examState.courseId && examState.courseId !== 0) {
-        // Placeholder for course filtering - similar to faculty
+      // Filter by course if selected  
+      if (filterState.courseId && filterState.courseId !== 0) {
+        const selectedCourseName = getCourseNameById(filterState.courseId);
+        if (selectedCourseName && exam.course) {
+          const examCourse = exam.course.toLowerCase();
+          const selectedCourse = selectedCourseName.toLowerCase();
+          
+          // Check for partial matches
+          if (!examCourse.includes(selectedCourse) && !selectedCourse.includes(examCourse)) {
+            return false;
+          }
+        } else if (selectedCourseName) {
+          return false;
+        }
       }
 
       // Filter by batch if selected
-      if (examState.batchId && examState.batchId !== 0) {
-        // Placeholder for batch filtering - similar to faculty
+      if (filterState.batchId && filterState.batchId !== 0) {
+        const selectedBatchName = getBatchNameById(filterState.batchId);
+        if (selectedBatchName && exam.batch) {
+          const examBatch = exam.batch.toLowerCase();
+          const selectedBatch = selectedBatchName.toLowerCase();
+          
+          // Check for partial matches
+          if (!examBatch.includes(selectedBatch) && !selectedBatch.includes(examBatch)) {
+            return false;
+          }
+        } else if (selectedBatchName) {
+          return false;
+        }
       }
 
-      // Filter by module if selected
-      if (examState.moduleId && examState.moduleId !== 0) {
-        // Placeholder for module filtering - similar to faculty
+      // Filter by module - this might require more complex logic as exams don't directly have module info
+      if (filterState.moduleId && filterState.moduleId !== 0) {
+        // Module filtering might need to be based on course or other related data
+        // For now, we'll skip module filtering until we understand the data relationship better
       }
 
-      // All filters passed
       return true;
     });
-  }, [exams, searchQuery, examState.examDate, examState.facultyId, examState.courseId, examState.batchId, examState.moduleId]);
+    
+    console.log('Filtered results:', filteredExams.length);
+  }, [exams, searchQuery, filterState, faculties, courses, batches]);
 
   useEffect(() => {
     const fetchExams = async () => {
       try {
         setLoading(true);
         setError(null);
+        
+        // Fetch exam data
         const examData = await getExamReports();
+        console.log('Loaded exam data:', examData);
         setExams(examData);
+        
+        // Fetch lookup data for filtering
+        const facultyData = await getAllFaculties(null, 1, 100, false, null, null);
+        if (facultyData?.listContent) {
+          console.log('Loaded faculty data:', facultyData.listContent);
+          setFaculties(facultyData.listContent);
+        }
+        
+        const courseData = await getAllCourses(null, 1, 100, false, null, null);
+        if (courseData?.listContent) {
+          console.log('Loaded course data:', courseData.listContent);
+          setCourses(courseData.listContent);
+        }
+        
+        const batchData = await getAllBatches(null, 1, 100, false, null, null);
+        if (batchData?.listContent) {
+          console.log('Loaded batch data:', batchData.listContent);
+          setBatches(batchData.listContent);
+        }
+        
       } catch (err) {
         console.error('Error fetching exam reports:', err);
         setError('Failed to load exam reports. Please try again later.');
@@ -163,10 +279,33 @@ function Reports() {
           <ExamReport exams={filteredExams} />
         ) : exams.length > 0 ? (
           <div className="bg-muted/50 border rounded-lg p-8 text-center">
-            <p className="text-muted-foreground">No exam reports match the selected filters.</p>
-            <p className="text-sm text-muted-foreground mt-1">
-              Try adjusting your search criteria or clear the filters.
-            </p>
+            {hasActiveFilters ? (
+              <>
+                <p className="text-muted-foreground">No exam reports found for the selected criteria.</p>
+                <p className="text-sm text-muted-foreground mt-1">
+                  {filterState.facultyId !== 0 && (
+                    <>Showing results for faculty: <strong>{getFacultyNameById(filterState.facultyId) || 'Unknown Faculty'}</strong><br /></>
+                  )}
+                  {filterState.courseId !== 0 && (
+                    <>Showing results for course: <strong>{getCourseNameById(filterState.courseId) || 'Unknown Course'}</strong><br /></>
+                  )}
+                  {filterState.batchId !== 0 && (
+                    <>Showing results for batch: <strong>{getBatchNameById(filterState.batchId) || 'Unknown Batch'}</strong><br /></>
+                  )}
+                  {filterState.examDate && (
+                    <>Showing results for date: <strong>{filterState.examDate}</strong><br /></>
+                  )}
+                  Try selecting different criteria or clear the filters to see all reports.
+                </p>
+              </>
+            ) : (
+              <>
+                <p className="text-muted-foreground">No exam reports match the selected filters.</p>
+                <p className="text-sm text-muted-foreground mt-1">
+                  Try adjusting your search criteria or clear the filters.
+                </p>
+              </>
+            )}
           </div>
         ) : (
           <div className="bg-muted/50 border rounded-lg p-8 text-center">

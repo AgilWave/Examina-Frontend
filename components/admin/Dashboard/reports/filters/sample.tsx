@@ -6,8 +6,7 @@ import {
   setFilterCourseId,
   setFilterBatchId,
   setFilterModuleId,
-  setFilterExamDate,
-  resetAllFilters
+  setFilterExamDate
 } from "@/redux/features/examReportsSlice";
 import SearchField from "../helpers/Search";
 import { cn } from "@/lib/utils";
@@ -19,7 +18,7 @@ import {
 import { Calendar } from "@/components/ui/calendar";
 import { format } from "date-fns";
 import { Button } from "@/components/ui/button";
-import { CalendarIcon, X } from "lucide-react";
+import { CalendarIcon } from "lucide-react";
 import { CardContent } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import {
@@ -33,8 +32,6 @@ import { getAllFaculties } from "@/services/Faculty/getAllFaculties";
 import { getAllCourses } from "@/services/Course/getAllCourses";
 import { getAllBatches } from "@/services/Batch/getAllBatches";
 import { getAllModules } from "@/services/module/getAllModules";
-
-import { getAllLectures } from "@/services/Lectures/getAllLectures";
 
 interface Faculty {
   id: number;
@@ -73,203 +70,102 @@ export default function ExamDetailsForm() {
   const [batches, setBatches] = useState<Batch[]>([]);
   const [modules, setModules] = useState<Module[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [loading, setLoading] = useState({
-    faculties: false,
-    courses: false,
-    batches: false,
-    modules: false,
-  });
 
-  const fetchFaculties = useMemo(() => async () => {
-    setIsLoading(true);
-    try {
-      const facultiesData = await getAllFaculties(null, 1, 10, false, null, null);
-      if (facultiesData?.listContent) {
-        setFaculties(facultiesData.listContent);
+  // Fetch initial data
+  useEffect(() => {
+    const fetchInitialData = async () => {
+      setIsLoading(true);
+      try {
+        // Fetch all faculties
+        const facultiesData = await getAllFaculties(null, 1, 100, false, null, null);
+        if (facultiesData?.listContent) {
+          setFaculties(facultiesData.listContent);
+        }
+
+        // Fetch all courses
+        const coursesData = await getAllCourses(null, 1, 100, false, null, null);
+        if (coursesData?.listContent) {
+          setCourses(coursesData.listContent);
+        }
+
+        // Fetch all batches
+        const batchesData = await getAllBatches(null, 1, 100, false, null, null);
+        if (batchesData?.listContent) {
+          setBatches(batchesData.listContent);
+        }
+
+        // Fetch all modules
+        const modulesData = await getAllModules(null, 1, 100, false, null, null);
+        if (modulesData?.listContent) {
+          setModules(modulesData.listContent);
+        }
+      } catch (error) {
+        console.error("Error fetching initial data:", error);
+      } finally {
+        setIsLoading(false);
       }
-    } catch (error) {
-      console.error("Error fetching faculties:", error);
-    } finally {
-      setIsLoading(false);
-    }
+    };
+
+    fetchInitialData();
   }, []);
 
-  const fetchCourses = useMemo(() => async () => {
-    if (filterState.facultyId) {
-      setIsLoading(true);
-      try {
-        const coursesData = await getAllCourses(null, 1, 10, false, null, null);
-        if (coursesData?.listContent) {
-          const filteredCourses = coursesData.listContent.filter(
-            (course: Course) => course.facultyId === filterState.facultyId
-          );
-          setCourses(filteredCourses);
-        }
-      } catch (error) {
-        console.error("Error fetching courses:", error);
-      } finally {
-        setIsLoading(false);
-      }
-    } else {
-      setCourses([]);
-    }
-  }, [filterState.facultyId]);
+  // Filter courses based on selected faculty
+  const filteredCourses = useMemo(() => {
+    if (!filterState.facultyId) return [];
+    return courses.filter(course => course.facultyId === filterState.facultyId);
+  }, [courses, filterState.facultyId]);
 
-  const fetchBatches = useMemo(() => async () => {
-    if (filterState.courseId) {
-      setIsLoading(true);
-      try {
-        const batchesData = await getAllBatches(null, 1, 10, false, null, null);
-        if (batchesData?.listContent) {
-          const filteredBatches = batchesData.listContent.filter(
-            (batch: Batch) => batch.courseId === filterState.courseId
-          );
-          setBatches(filteredBatches);
-        }
-      } catch (error) {
-        console.error("Error fetching batches:", error);
-      } finally {
-        setIsLoading(false);
-      }
-    } else {
-      setBatches([]);
-    }
-  }, [filterState.courseId]);
+  // Filter batches based on selected course
+  const filteredBatches = useMemo(() => {
+    if (!filterState.courseId) return [];
+    return batches.filter(batch => batch.courseId === filterState.courseId);
+  }, [batches, filterState.courseId]);
 
-  useEffect(() => {
-    fetchFaculties();
-  }, [fetchFaculties]);
-
-  useEffect(() => {
-    fetchCourses();
-  }, [fetchCourses]);
-
-  useEffect(() => {
-    fetchBatches();
-  }, [fetchBatches]);
-
-  useEffect(() => {
-    if (filterState.courseId) {
-      const selectedCourse = courses.find(course => course.id === filterState.courseId);
-      if (selectedCourse?.modules) {
-        setModules(selectedCourse.modules);
-      } else {
-        setModules([]);
-      }
-    } else {
-      setModules([]);
-    }
-  }, [filterState.courseId, courses]);
+  // Filter modules based on selected course
+  const filteredModules = useMemo(() => {
+    if (!filterState.courseId) return [];
+    const selectedCourse = courses.find(course => course.id === filterState.courseId);
+    return selectedCourse?.modules || [];
+  }, [courses, filterState.courseId]);
 
   const handleFacultyChange = (value: string) => {
-    dispatch(resetAllFilters());
-    dispatch(setFilterFacultyId(parseInt(value)));
+    const facultyId = parseInt(value);
+    dispatch(setFilterFacultyId(facultyId));
+    // Reset dependent filters
+    dispatch(setFilterCourseId(0));
+    dispatch(setFilterBatchId(0));
+    dispatch(setFilterModuleId(0));
   };
 
   const handleCourseChange = (value: string) => {
-    dispatch(resetAllFilters());
-    dispatch(setFilterCourseId(parseInt(value)));
+    const courseId = parseInt(value);
+    dispatch(setFilterCourseId(courseId));
+    // Reset dependent filters
+    dispatch(setFilterBatchId(0));
+    dispatch(setFilterModuleId(0));
   };
 
   const handleBatchChange = (value: string) => {
-    dispatch(resetAllFilters());
     dispatch(setFilterBatchId(parseInt(value)));
   };
 
   const handleModuleChange = (value: string) => {
-    dispatch(resetAllFilters());
     dispatch(setFilterModuleId(parseInt(value)));
   };
 
-  // Fetch data for dropdowns
-  useEffect(() => {
-    const fetchDropdownData = async () => {
-      try {
-        // Fetch faculties
-        setLoading((prev) => ({ ...prev, faculties: true }));
-        const facultyResponse = await getAllFaculties(
-          null,
-          1,
-          100,
-          false,
-          null,
-          "true"
-        );
-        if (facultyResponse?.data?.faculties) {
-          setFaculties(facultyResponse.data.faculties);
-        }
-        setLoading((prev) => ({ ...prev, faculties: false }));
-
-        // Fetch courses
-        setLoading((prev) => ({ ...prev, courses: true }));
-        const courseResponse = await getAllCourses(
-          null,
-          1,
-          100,
-          false,
-          null,
-          "true"
-        );
-        if (courseResponse?.data?.courses) {
-          setCourses(courseResponse.data.courses);
-        }
-        setLoading((prev) => ({ ...prev, courses: false }));
-
-        // Fetch batches
-        setLoading((prev) => ({ ...prev, batches: true }));
-        const batchResponse = await getAllBatches(
-          null,
-          1,
-          100,
-          false,
-          null,
-          "true"
-        );
-        if (batchResponse?.data?.batches) {
-          setBatches(batchResponse.data.batches);
-        }
-        setLoading((prev) => ({ ...prev, batches: false }));
-
-        // Fetch modules
-        setLoading((prev) => ({ ...prev, modules: true }));
-        const moduleResponse = await getAllModules(
-          null,
-          1,
-          100,
-          false,
-          null,
-          "true"
-        );
-        if (moduleResponse?.data?.modules) {
-          setModules(moduleResponse.data.modules);
-        }
-        setLoading((prev) => ({ ...prev, modules: false }));
-      } catch (error) {
-        console.error("Error fetching dropdown data:", error);
-        setLoading({
-          faculties: false,
-          courses: false,
-          batches: false,
-          modules: false,
-        });
-      }
-    };
-
-    fetchDropdownData();
-  }, []);
-
   return (
     <CardContent>
-      <div className="flex justify-between items-center mb-6">
-        <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-          Filter Exam Reports
-        </h3>
-      </div>
-
       {/* Filter Sections */}
       <div className="space-y-6">
         {/* Date Filter and Search Section */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {/* Search Section */}
+          <div>
+            <Label className="text-sm font-medium text-gray-700 dark:text-white mb-2 block">
+              Search Exams
+            </Label>
+            <SearchField />
+          </div>
           {/* Date Filter */}
           <div>
             <Label className="text-sm font-medium text-gray-700 dark:text-white mb-2 block">
@@ -301,7 +197,6 @@ export default function ExamDetailsForm() {
                       : undefined
                   }
                   onSelect={(date) => {
-                    dispatch(resetAllFilters());
                     const newDate = date ? format(date, "yyyy-MM-dd") : "";
                     dispatch(setFilterExamDate(newDate));
                   }}
@@ -319,13 +214,7 @@ export default function ExamDetailsForm() {
             )}
           </div>
 
-          {/* Search Section */}
-          <div>
-            <Label className="text-sm font-medium text-gray-700 dark:text-white mb-2 block">
-              Search Exams
-            </Label>
-            <SearchField />
-          </div>
+          
         </div>
 
         {/* Academic Filters Section */}
@@ -375,10 +264,12 @@ export default function ExamDetailsForm() {
                   <SelectValue placeholder="Select a course (e.g. CS101, SE201)" />
                 </SelectTrigger>
                 <SelectContent>
-                  {courses.length === 0 ? (
-                    <SelectItem value="no-courses" disabled>No courses found</SelectItem>
+                  {filteredCourses.length === 0 ? (
+                    <SelectItem value="no-courses" disabled>
+                      {!filterState.facultyId ? "Please select a faculty first" : "No courses found"}
+                    </SelectItem>
                   ) : (
-                    courses.map((course) => (
+                    filteredCourses.map((course) => (
                       <SelectItem key={course.id} value={course.id.toString()}>
                         {course.name}
                       </SelectItem>
@@ -400,10 +291,12 @@ export default function ExamDetailsForm() {
                   <SelectValue placeholder="Select a module (e.g. Programming, Database)" />
                 </SelectTrigger>
                 <SelectContent>
-                  {modules.length === 0 ? (
-                    <SelectItem value="no-modules" disabled>No modules found</SelectItem>
+                  {filteredModules.length === 0 ? (
+                    <SelectItem value="no-modules" disabled>
+                      {!filterState.courseId ? "Please select a course first" : "No modules found"}
+                    </SelectItem>
                   ) : (
-                    modules.map((module) => (
+                    filteredModules.map((module) => (
                       <SelectItem key={module.id} value={module.id.toString()}>
                         {module.name}
                       </SelectItem>
@@ -425,10 +318,12 @@ export default function ExamDetailsForm() {
                   <SelectValue placeholder="Select a batch (e.g. 2023, 2024)" />
                 </SelectTrigger>
                 <SelectContent>
-                  {batches.length === 0 ? (
-                    <SelectItem value="no-batches" disabled>No batches found</SelectItem>
+                  {filteredBatches.length === 0 ? (
+                    <SelectItem value="no-batches" disabled>
+                      {!filterState.courseId ? "Please select a course first" : "No batches found"}
+                    </SelectItem>
                   ) : (
-                    batches.map((batch) => (
+                    filteredBatches.map((batch) => (
                       <SelectItem key={batch.id} value={batch.id.toString()}>
                         {batch.batchCode}
                       </SelectItem>
