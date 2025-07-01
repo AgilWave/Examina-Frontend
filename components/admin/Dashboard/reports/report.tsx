@@ -8,13 +8,12 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
-import {FileText  } from "lucide-react";
+import {BookOpenCheck, UserPen  } from "lucide-react";
 
 const ReportContent: FC = () => {
   const items = [
-    { icon: <FileText   size={30} color="#FFFFFF" />, title: "Report 1", link: "/admin/dashboard/reports/report1" },
-    { icon: <FileText    size={30} color="#FFFFFF" />, title: "Report 2", link: "/admin/dashboard/reports/report1" },
-    { icon: <FileText    size={30} color="#FFFFFF" />, title: "Reoport 3", link: "/admin/dashboard/reports/report1" },
+     { icon: <BookOpenCheck    size={30} color="#FFFFFF" />, title: "Exam Reports", link: "/admin/dashboard/reports/exam_reports" },
+    { icon: <UserPen     size={30} color="#FFFFFF" />, title: "Student Reports", link: "/admin/dashboard/reports/student_reports" },
   ];
 
   return (
