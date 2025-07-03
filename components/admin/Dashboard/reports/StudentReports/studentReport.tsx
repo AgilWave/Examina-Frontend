@@ -115,7 +115,7 @@ function StudentReport() {
         email: "shehal.herath@student.nibm.lk",
         studentId: studentId,
         faculty: "Faculty of Engineering",
-        course: "Computer Science",
+        course: "Software Engeering",
         batch: "KUHDSE241F",
         enrollmentDate: "2024-01-15",
         isActive: true
