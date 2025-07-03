@@ -14,7 +14,8 @@ import facultyReducer from "./features/FacultySlice";
 import questionBank from "./features/QuestionBankSlice";
 import question from "./features/QuestionSlice";
 import examReducer from "./features/examSlice";
-import resultReducer from "./features/resultSlice"; // Uncomment if you have a resultSlice
+import examReportFilterReducer from "./features/examReportsSlice";
+
 
 const rootReducer = combineReducers({
   dialog: dialogReducer,
@@ -30,7 +31,7 @@ const rootReducer = combineReducers({
   questionBank: questionBank,
   question: question,
   exam: examReducer,
-  result: resultReducer, 
+  examReportFilter: examReportFilterReducer,
 });
 
 export const store = configureStore({

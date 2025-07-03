@@ -35,11 +35,7 @@ const Sidebar = () => {
     { name: "Overview", icon: LayoutGrid, href: "/admin/dashboard/overview" },
     { name: "Exams", icon: GraduationCap, href: "/admin/dashboard/exams" },
     { name: "Reports", icon: BookCopy, href: "/admin/dashboard/reports" },
-    {
-      name: "Configurations",
-      icon: Settings,
-      href: "/admin/dashboard/configs",
-    },
+    { name: "Configurations", icon: Settings, href: "/admin/dashboard/configs" },
     { name: "Admin", icon: UserCog, href: "/admin/dashboard/admin-config" },
   ];
 
