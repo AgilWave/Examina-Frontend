@@ -111,12 +111,12 @@ function StudentReport() {
       // Mock student details - replace with actual API response
       const mockStudentDetails: StudentDetails = {
         id: parseInt(studentId),
-        name: "John Doe",
-        email: "john.doe@example.com",
+        name: "Shehal herath",
+        email: "shehal.herath@student.nibm.lk",
         studentId: studentId,
         faculty: "Faculty of Engineering",
         course: "Computer Science",
-        batch: "CS2024",
+        batch: "KUHDSE241F",
         enrollmentDate: "2024-01-15",
         isActive: true
       };
