@@ -13,7 +13,7 @@ import NIBMCropLight from "@/public/imgs/dashboard/light/NIBMMobileColor.png";
 import PoweredByLight from "@/public/imgs/dashboard/light/ExaminaDeskColor.png";
 import examinaMobileLight from "@/public/imgs/dashboard/light/examinamobilecolor.png";
 import { usePathname } from "next/navigation";
-import { LayoutGrid, BookCopy, GraduationCap, Medal  } from "lucide-react";
+import { LayoutGrid, GraduationCap, Medal  } from "lucide-react";
 import { useTheme } from "next-themes";
 
 const Sidebar = () => {
@@ -28,11 +28,11 @@ const Sidebar = () => {
   const menuItems = [
     { name: "Overview", icon: LayoutGrid, href: "/student/dashboard/overview" },
     { name: "Exams", icon: GraduationCap, href: "/student/dashboard/exams" },
-    {
-      name: "Course Works",
-      icon: BookCopy,
-      href: "/student/dashboard/course-works",
-    },
+    // {
+    //   name: "Course Works",
+    //   icon: BookCopy,
+    //   href: "/student/dashboard/course-works",
+    // },
     {
       name: "Results",
       icon: Medal ,

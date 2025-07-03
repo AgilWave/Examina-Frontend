@@ -1,5 +1,5 @@
 import { FC } from "react";
-import { ClipboardList, Code, GraduationCap } from "lucide-react";
+import { ClipboardList, GraduationCap } from "lucide-react";
 import SectionTiles from "@/components/ui/section-tiles";
 import {
   Breadcrumb,
@@ -13,7 +13,7 @@ import {
 const Dashboard: FC = () => {
   const items = [
     { icon: <GraduationCap size={30} color="#FFFFFF" />, title: "Manage Exams", link: "/admin/dashboard/exams/manage-exams" },
-    { icon: <Code size={30} color="#FFFFFF" />, title: "Manage Course Work", link: "/admin/dashboard/exams/manage-coursework" },
+    // { icon: <Code size={30} color="#FFFFFF" />, title: "Manage Course Work", link: "/admin/dashboard/exams/manage-coursework" },
     { icon: <ClipboardList size={30} color="#FFFFFF" />, title: "Questions Bank", link: "/admin/dashboard/exams/questions-bank" },
     // { icon: <Shield size={30} color="#FFFFFF" />, title: "Manage Results", link: "/admin/dashboard/exams/manage-results" },
   ];

@@ -1,4 +1,4 @@
-import ExamHistory from '@/components/lecturer/Dashboard/exam/history/index'
+import ExamHistory from '@/components/admin/Dashboard/ExamContent/exam/history/index'
 
 const ExamHistoryTab = () => {
     return (

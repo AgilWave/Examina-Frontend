@@ -303,7 +303,7 @@ export function DataTable() {
                     <TableRow
                       key={row.id}
                       onClick={() => {
-                        router.push(`/admin/dashboard/exams/manage-exams/history/${row.original.id}`);
+                        router.push(`/lecturer/dashboard/exams/manage-exams/history/details?examId=${row.original.id}`);
                       }}
                       className="cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800"
                     >

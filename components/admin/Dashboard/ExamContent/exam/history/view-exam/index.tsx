@@ -1,6 +1,6 @@
 "use client";
 import React, { useEffect, useState } from "react";
-import { useParams, useRouter } from "next/navigation";
+import { useSearchParams, useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
@@ -81,7 +81,7 @@ interface ExamDetails {
 }
 
 function ExamHistoryDetails() {
-  const params = useParams();
+  const params = useSearchParams();
   const router = useRouter();
   const [examData, setExamData] = useState<ExamDetails | null>(null);
   const [statistics, setStatistics] = useState<ExamStatistics | null>(null);
@@ -97,12 +97,13 @@ function ExamHistoryDetails() {
   const [selectedImage, setSelectedImage] = useState<string>("");
   const [selectedImageType, setSelectedImageType] = useState<string>("");
 
-  const examId = params.id as string;
+  const examId = params.get("examId")
 
   useEffect(() => {
     const fetchExamDetails = async () => {
       try {
         setLoading(true);
+        if (examId) {
         const response = await getInactiveExamById(examId);
 
         if (response.isSuccessful && response.content) {
@@ -117,6 +118,7 @@ function ExamHistoryDetails() {
         } else {
           setError(response.message || "Failed to fetch exam details");
         }
+      }
         setLoading(false);
       } catch (err: unknown) {
         setError(
