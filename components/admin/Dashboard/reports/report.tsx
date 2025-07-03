@@ -8,12 +8,11 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
-import {UserPen , BookOpenCheck   } from "lucide-react";
-import SectionTiles from "@/components/ui/section-tiles";
+import {BookOpenCheck, UserPen  } from "lucide-react";
 
 const ReportContent: FC = () => {
   const items = [
-    { icon: <BookOpenCheck    size={30} color="#FFFFFF" />, title: "Exam Reports", link: "/admin/dashboard/reports/exam_reports" },
+     { icon: <BookOpenCheck    size={30} color="#FFFFFF" />, title: "Exam Reports", link: "/admin/dashboard/reports/exam_reports" },
     { icon: <UserPen     size={30} color="#FFFFFF" />, title: "Student Reports", link: "/admin/dashboard/reports/student_reports" },
   ];
 
