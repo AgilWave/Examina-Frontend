@@ -11,8 +11,9 @@ import {
   Line,
 } from "recharts";
 import Image from "next/image";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import Link from "next/link";
+import { OverView } from "@/services/dashbord/overview";
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -21,13 +22,6 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
-
-import avatar1 from "@/public/imgs/dashboard/common/overview/avatar1.png";
-import avatar2 from "@/public/imgs/dashboard/common/overview/avatar2.png";
-import avatar3 from "@/public/imgs/dashboard/common/overview/avatar3.png";
-import avatar4 from "@/public/imgs/dashboard/common/overview/avatar4.png";
-import avatar5 from "@/public/imgs/dashboard/common/overview/avatar5.png";
-import avatar6 from "@/public/imgs/dashboard/common/overview/avatar6.png";
 
 import {
   BookCopy,
@@ -39,27 +33,52 @@ import {
 
 type ActivityStatus = "Ongoing" | "Pending" | "Completed";
 
-interface Activity {
-  id: string;
-  icon: "code" | "server";
-  course: string;
-  date: string;
-  type: string;
-  status: ActivityStatus;
-}
-
 interface RecentAccess {
-  id: string;
+  studentName: string;
+  studentId: string;
   time: string;
-  avatar: string;
+  avatar: string | null;
 }
 
-const StatCard: React.FC<{ title: string; value: number; icon?: React.ReactNode; highlight?: boolean }> = ({
-  title,
-  value,
-  icon,
-  highlight,
-}) => {
+interface StatData {
+  count: number;
+  last24h: number;
+}
+
+interface ExaminationSummaryItem {
+  month: string;
+  count: number;
+}
+
+interface StudentParticipationItem {
+  label: string;
+  count: number;
+}
+
+interface UpcomingActivities {
+  title: string;
+  type: string;
+  date: string;
+  status: string;
+}
+
+interface OverviewData {
+  totalExams: StatData;
+  totalStudents: StatData;
+  totalLecturers: StatData;
+  totalHours: StatData;
+  examinationSummary: ExaminationSummaryItem[];
+  studentParticipation: StudentParticipationItem[];
+  recentAccess: RecentAccess[];
+  upcomingActivities?: UpcomingActivities[];
+}
+
+const StatCard: React.FC<{
+  title: string;
+  data: StatData;
+  icon?: React.ReactNode;
+  highlight?: boolean;
+}> = ({ title, data, icon, highlight }) => {
   return (
     <div
       className={`p-6 rounded-2xl transition-all duration-300 transform hover:scale-102
@@ -85,7 +104,7 @@ const StatCard: React.FC<{ title: string; value: number; icon?: React.ReactNode;
       </div>
 
       <div className="flex justify-center items-center flex-grow">
-        <p className="text-4xl font-bold">{value}</p>
+        <p className="text-4xl font-bold">{data.count}</p>
       </div>
 
       <div
@@ -93,13 +112,11 @@ const StatCard: React.FC<{ title: string; value: number; icon?: React.ReactNode;
           highlight ? "text-white" : "text-gray-700 dark:text-white"
         }`}
       >
-        <MoveUp className="w-4 h-4" />
-        Past 24 Hours
+        <MoveUp className="w-4 h-4" />+{data.last24h} Past 24 Hours
       </div>
     </div>
   );
 };
-
 
 const CodeIcon = () => (
   <svg
@@ -194,39 +211,50 @@ const renderIcon = (iconType: "code" | "server") => {
   );
 };
 
-const UpcomingActivities: React.FC<{ activities?: Activity[] }> = ({
-  activities = sampleActivities,
-}) => {
+const UpcomingActivitiesComponent: React.FC<{
+  activities?: UpcomingActivities[];
+}> = ({ activities = [] }) => {
+  const getStatusIcon = (type: string) => {
+    if (type.toLowerCase().includes("exam")) return "code";
+    return "server";
+  };
+
   return (
     <div className="space-y-4">
-      {activities.map((activity) => (
-        <div
-          key={activity.id}
-          className="flex flex-col sm:flex-row sm:items-center sm:justify-between bg-[#F6F6F6]  dark:bg-black/80 rounded-2xl p-5 dark:border border-teal-600/50 hover:border-teal-500 hover:bg-gray-200 dark:hover:bg-black/90 transition-all duration-300 backdrop-blur-sm gap-4"
-        >
-          <div className="flex items-center gap-4">
-            {renderIcon(activity.icon)}
-            <div>
-              <p className="font-medium text-gray-700 dark:text-white">
-                {activity.course}
-              </p>
-              <p className="text-sm text-gray-500 dark:text-gray-400">
-                {activity.type}
+      {activities.length > 0 ? (
+        activities.map((activity, index) => (
+          <div
+            key={index}
+            className="flex flex-col sm:flex-row sm:items-center sm:justify-between bg-[#F6F6F6]  dark:bg-black/80 rounded-2xl p-5 dark:border border-teal-600/50 hover:border-teal-500 hover:bg-gray-200 dark:hover:bg-black/90 transition-all duration-300 backdrop-blur-sm gap-4"
+          >
+            <div className="flex items-center gap-4">
+              {renderIcon(getStatusIcon(activity.type))}
+              <div>
+                <p className="font-medium text-gray-700 dark:text-white">
+                  {activity.title}
+                </p>
+                <p className="text-sm text-gray-500 dark:text-gray-400">
+                  {activity.type}
+                </p>
+              </div>
+            </div>
+
+            <div className="text-left sm:text-center mt-2 sm:mt-0">
+              <p className="text-gray-500 dark:text-gray-400 text-sm">
+                {activity.date}
               </p>
             </div>
-          </div>
 
-          <div className="text-left sm:text-center mt-2 sm:mt-0">
-            <p className="text-gray-500 dark:text-gray-400 text-sm">
-              {activity.date}
-            </p>
+            <div className="text-left sm:text-right mt-2 sm:mt-0">
+              {renderStatus(activity.status as ActivityStatus)}
+            </div>
           </div>
-
-          <div className="text-left sm:text-right mt-2 sm:mt-0">
-            {renderStatus(activity.status)}
-          </div>
+        ))
+      ) : (
+        <div className="flex items-center justify-center py-8 text-gray-500 dark:text-gray-400">
+          <p>No upcoming activities available</p>
         </div>
-      ))}
+      )}
     </div>
   );
 };
@@ -234,6 +262,19 @@ const UpcomingActivities: React.FC<{ activities?: Activity[] }> = ({
 const RecentAccessList: React.FC<{ accesses: RecentAccess[] }> = ({
   accesses,
 }) => {
+  const formatTime = (timeString: string) => {
+    try {
+      const date = new Date(timeString);
+      return date.toLocaleTimeString("en-US", {
+        hour: "2-digit",
+        minute: "2-digit",
+        hour12: true,
+      });
+    } catch {
+      return timeString;
+    }
+  };
+
   return (
     <ul className="space-y-3 max-h-[700px]">
       {accesses.map((user, index) => (
@@ -244,16 +285,23 @@ const RecentAccessList: React.FC<{ accesses: RecentAccess[] }> = ({
         >
           <div className="flex items-center gap-3">
             <div className="relative w-10 h-10 overflow-hidden rounded-full border-2 border-cyan-500/50 dark:border-cyan-500/30">
-              <Image
-                src={user.avatar}
-                alt="User Avatar"
-                fill
-                className="rounded-full object-cover"
-              />
+              {user.avatar ? (
+                <Image
+                  src={user.avatar}
+                  alt="User Avatar"
+                  fill
+                  className="rounded-full object-cover"
+                />
+              ) : (
+                <div className="w-full h-full bg-gray-300 dark:bg-gray-600 flex items-center justify-center text-gray-600 dark:text-gray-300 text-xs font-medium">
+                  {user.studentName.charAt(0).toUpperCase()}
+                </div>
+              )}
             </div>
             <div>
-              <p className="font-medium text-sm">{user.id}</p>
-              <p className="text-xs text-gray-400">{user.time}</p>
+              <p className="font-medium text-sm">{user.studentId}</p>
+              <p className="text-xs text-gray-400">{user.studentName}</p>
+              <p className="text-xs text-gray-400">{formatTime(user.time)}</p>
             </div>
           </div>
           <button className="px-4 py-1.5 text-xs border border-cyan-500/50 dark:border-cyan-400/50 rounded-lg text-cyan-700/80 dark:text-cyan-400 hover:bg-gray-200 dark:hover:bg-cyan-400/10 transition-all duration-300 cursor-pointer">
@@ -265,68 +313,111 @@ const RecentAccessList: React.FC<{ accesses: RecentAccess[] }> = ({
   );
 };
 
-const sampleActivities: Activity[] = [
-  {
-    id: "1",
-    icon: "code",
-    course: "Data Management",
-    date: "12/03/2025",
-    type: "Online Exam",
-    status: "Ongoing",
-  },
-  {
-    id: "2",
-    icon: "server",
-    course: "Network Security",
-    date: "15/03/2025",
-    type: "Practical Lab",
-    status: "Pending",
-  },
-  {
-    id: "3",
-    icon: "code",
-    course: "Web Development",
-    date: "18/03/2025",
-    type: "Assignment",
-    status: "Completed",
-  },
-];
+interface UpcomingActivities {
+  title: string;
+  type: string;
+  date: string;
+  status: string;
+}
 
-const studentParticipation = [
-  { name: "DW", value: 60 },
-  { name: "EW", value: 80 },
-  { name: "EN", value: 50 },
-  { name: "MAO", value: 90 },
-  { name: "FAO", value: 70 },
-  { name: "FR", value: 85 },
-];
-
-const examinationSummary = [
-  { name: "Jan", value: 30 },
-  { name: "Feb", value: 50 },
-  { name: "Mar", value: 45 },
-  { name: "Apr", value: 70 },
-  { name: "May", value: 60 },
-  { name: "Jun", value: 90 },
-];
-
-const recentAccess: RecentAccess[] = [
-  { id: "KUDE524F-042", time: "11:45 AM", avatar: avatar1.src },
-  { id: "KUDE524F-021", time: "11:32 AM", avatar: avatar2.src },
-  { id: "KUDE524F-056", time: "10:15 AM", avatar: avatar3.src },
-  { id: "KUDE524F-071", time: "09:45 AM", avatar: avatar4.src },
-  { id: "KUDE524F-069", time: "Yesterday", avatar: avatar5.src },
-  { id: "KUDE524F-069", time: "Yesterday", avatar: avatar6.src },
-
-  { id: "KUDE524F-069", time: "Yesterday", avatar: avatar1.src },
-  { id: "KUDE524F-069", time: "Yesterday", avatar: avatar2.src },
-  { id: "KUDE524F-069", time: "Yesterday", avatar: avatar3.src },
-  { id: "KUDE524F-069", time: "Yesterday", avatar: avatar4.src },
-  { id: "KUDE524F-069", time: "Yesterday", avatar: avatar5.src },
-  { id: "KUDE524F-069", time: "Yesterday", avatar: avatar6.src },
-];
+// Default data structure
+const defaultOverviewData: OverviewData = {
+  totalExams: { count: 0, last24h: 0 },
+  totalStudents: { count: 0, last24h: 0 },
+  totalLecturers: { count: 0, last24h: 0 },
+  totalHours: { count: 0, last24h: 0 },
+  examinationSummary: [],
+  studentParticipation: [],
+  recentAccess: [],
+};
 
 export default function AdminDashboard() {
+  const [overviewData, setOverviewData] =
+    useState<OverviewData>(defaultOverviewData);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchOverviewData = async () => {
+      try {
+        setLoading(true);
+        const response = await OverView();
+        if (response) {
+          setOverviewData(response);
+        } else {
+          setError("Failed to fetch overview data");
+        }
+      } catch (err) {
+        console.error("Error fetching overview data:", err);
+        setError("Failed to load dashboard data");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchOverviewData();
+  }, []);
+
+  // Transform data for charts with safety checks
+  const chartExaminationSummary =
+    overviewData.examinationSummary?.length > 0
+      ? overviewData.examinationSummary.map((item) => ({
+          name: item.month,
+          value: item.count,
+        }))
+      : [
+          { name: "Jan", value: 0 },
+          { name: "Feb", value: 0 },
+          { name: "Mar", value: 0 },
+          { name: "Apr", value: 0 },
+          { name: "May", value: 0 },
+          { name: "Jun", value: 0 },
+        ];
+
+  const chartStudentParticipation =
+    overviewData.studentParticipation?.length > 0
+      ? overviewData.studentParticipation.map((item) => ({
+          name: item.label.split("-")[1] || item.label, // Extract course code
+          value: item.count,
+        }))
+      : [{ name: "No Data", value: 0 }];
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br text- dark:text-white p-1 md:p-8">
+        <div className="max-w-8xl mx-auto flex items-center justify-center min-h-[400px]">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-teal-500 mx-auto mb-4"></div>
+            <p className="text-gray-600 dark:text-gray-400">
+              Loading dashboard...
+            </p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br text- dark:text-white p-1 md:p-8">
+        <div className="max-w-8xl mx-auto flex items-center justify-center min-h-[400px]">
+          <div className="text-center">
+            <p className="text-red-500 mb-4">Error: {error}</p>
+            <button
+              onClick={() => window.location.reload()}
+              className="px-4 py-2 bg-teal-500 text-white rounded-lg hover:bg-teal-600 transition-colors"
+            >
+              Retry
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Handle empty state for recent access
+  const hasRecentAccess =
+    overviewData.recentAccess && overviewData.recentAccess.length > 0;
   return (
     <div className="min-h-screen bg-gradient-to-br text- dark:text-white p-1 md:p-8">
       <div className="max-w-8xl mx-auto">
@@ -371,26 +462,26 @@ export default function AdminDashboard() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           <div className="col-span-1 md:col-span-2 grid grid-cols-1 sm:grid-cols-2 gap-6 bg-white dark:bg-black p-2.5 rounded-3xl">
             <StatCard
-            title="Total Exams"
-            value={4}
-            icon={<BookCopy className="w-6 h-6" />}
-            highlight
-          />
-          <StatCard
-            title="Total Students"
-            value={210}
-            icon={<BookOpen className="w-5 h-5" />}
-          />
-          <StatCard
-            title="Total Lecturers"
-            value={12}
-            icon={<Users className="w-6 h-6" />}
-          />
-          <StatCard
-            title="Total Hours"
-            value={15}
-            icon={<Hourglass className="w-5 h-5" />}
-          />
+              title="Total Exams"
+              data={overviewData.totalExams}
+              icon={<BookCopy className="w-6 h-6" />}
+              highlight
+            />
+            <StatCard
+              title="Total Students"
+              data={overviewData.totalStudents}
+              icon={<BookOpen className="w-5 h-5" />}
+            />
+            <StatCard
+              title="Total Lecturers"
+              data={overviewData.totalLecturers}
+              icon={<Users className="w-6 h-6" />}
+            />
+            <StatCard
+              title="Total Hours"
+              data={overviewData.totalHours}
+              icon={<Hourglass className="w-5 h-5" />}
+            />
           </div>
 
           <div className="col-span-1 md:col-span-2 bg-white dark:bg-black/80 p-6 rounded-2xl dark:shadow-lg dark:border dark:border-teal-600/50 backdrop-blur-sm">
@@ -399,7 +490,7 @@ export default function AdminDashboard() {
             </h3>
             <div className="h-70">
               <ResponsiveContainer width="100%" height="100%">
-                <LineChart data={examinationSummary}>
+                <LineChart data={chartExaminationSummary}>
                   <XAxis dataKey="name" stroke="#94a3b8" />
                   <Tooltip
                     contentStyle={{
@@ -429,7 +520,7 @@ export default function AdminDashboard() {
             </h3>
             <div className="h-64">
               <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={studentParticipation}>
+                <BarChart data={chartStudentParticipation}>
                   <XAxis dataKey="name" stroke="#94a3b8" />
                   <YAxis stroke="#94a3b8" />
                   <Tooltip
@@ -466,9 +557,14 @@ export default function AdminDashboard() {
               </Link>
             </div>
             <div className="h-[300px] overflow-y-auto scrollbar-custom pr-2 custom-scrollbar">
-              <RecentAccessList accesses={recentAccess} />
+              {hasRecentAccess ? (
+                <RecentAccessList accesses={overviewData.recentAccess} />
+              ) : (
+                <div className="flex items-center justify-center h-full text-gray-500 dark:text-gray-400">
+                  <p>No recent access data available</p>
+                </div>
+              )}
             </div>
-            
           </div>
 
           <div className="col-span-1 md:col-span-4 bg-white dark:bg-black/80 rounded-2xl dakr:shadow-lg dark:border border-teal-600/50 p-6 backdrop-blur-sm">
@@ -483,7 +579,7 @@ export default function AdminDashboard() {
                 View all
               </Link>
             </div>
-            <UpcomingActivities />
+            <UpcomingActivitiesComponent />
           </div>
         </div>
       </div>

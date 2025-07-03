@@ -50,7 +50,6 @@ import {
   setExamHistoryPrevPage,
   setExamHistoryTotalPages,
 } from "@/redux/features/pageSlice";
-import { setViewDialog, setViewDialogId } from "@/redux/features/dialogState";
 import { useDispatch, useSelector } from "react-redux";
 import { toast } from "sonner";
 import { getInactiveExams } from "@/services/history/getInactiveExams";
@@ -59,7 +58,7 @@ import { RefreshCcw } from "lucide-react";
 import Filters from "./filter";
 import { parseAsBoolean, useQueryState } from "nuqs";
 import SearchField from "./helpers/Search";
-import ViewUserDialog from "./view-batch";
+import { useRouter } from "next/navigation";
 
 export function DataTable() {
   const [sorting, setSorting] = useState<SortingState>([]);
@@ -69,8 +68,8 @@ export function DataTable() {
   const page = useSelector((state: RootState) => state.page);
   const [data, setData] = useState([]);
   const [pageSize, setPageSize] = useState(25);
-  const dialog = useSelector((state: RootState) => state.dialog);
   const dispatch = useDispatch();
+  const router = useRouter();
   const [searchQuery] = useQueryState("searchQuery");
   const [isLoading, setIsLoading] = useState(false);
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -80,7 +79,6 @@ export function DataTable() {
   );
   const [filterApplied] = useQueryState("filterApplied", parseAsBoolean);
 
-
   const fetchData = async (page: number) => {
     setIsLoading(true);
     try {
@@ -88,7 +86,7 @@ export function DataTable() {
         dispatch,
         page,
         pageSize,
-        searchQuery,
+        searchQuery
       );
       if (response.isSuccessful) {
         if (response.listContent.length === 0) {
@@ -121,17 +119,10 @@ export function DataTable() {
   }, [filterApplied]);
 
   useEffect(() => {
-    const page = JSON.parse(sessionStorage.getItem("examHistoryPage") || "1");
-    if (!dialog.createDialog) {
-      fetchData(page);
-    } else if (dialog.viewDialog) {
-      fetchData(page);
-    }
-  }, [dialog]);
-
-  useEffect(() => {
     dispatch(
-      setExamHistoryPage(JSON.parse(sessionStorage.getItem("examHistoryPage") || "1"))
+      setExamHistoryPage(
+        JSON.parse(sessionStorage.getItem("examHistoryPage") || "1")
+      )
     );
     dispatch(
       setExamHistoryTotalPages(
@@ -147,12 +138,6 @@ export function DataTable() {
       setExamHistoryPrevPage(
         JSON.parse(sessionStorage.getItem("prevExamHistoryPage") || "-1")
       )
-    );
-    dispatch(
-      setViewDialog(JSON.parse(sessionStorage.getItem("viewDialog") || "false"))
-    );
-    dispatch(
-      setViewDialogId(JSON.parse(sessionStorage.getItem("viewDialogId") || "0"))
     );
     const page = JSON.parse(sessionStorage.getItem("examHistoryPage") || "1");
     fetchData(page);
@@ -284,7 +269,11 @@ export function DataTable() {
           <Filters />
         </div>
         <div className="rounded-lg dark:border-teal-600/50 border shadow-sm overflow-hidden">
-          <Table isLoading={isLoading} loadingColumns={columns.length} loadingRows={10}>
+          <Table
+            isLoading={isLoading}
+            loadingColumns={columns.length}
+            loadingRows={10}
+          >
             <TableHeader>
               {table.getHeaderGroups().map((headerGroup) => (
                 <TableRow key={headerGroup.id}>
@@ -319,9 +308,11 @@ export function DataTable() {
                     <TableRow
                       key={row.id}
                       onClick={() => {
-                        dispatch(setViewDialog(true));
-                        dispatch(setViewDialogId(row.original.id));
+                        router.push(
+                          `/admin/dashboard/exams/manage-exams/history/${row.original.id}`
+                        );
                       }}
+                      className="cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800"
                     >
                       {row.getVisibleCells().map((cell) => {
                         return (
@@ -363,14 +354,14 @@ export function DataTable() {
             size="sm"
             onClick={handleNext}
             disabled={
-              page.examHistory.nextPage === -1 || page.examHistory.nextPage === null
+              page.examHistory.nextPage === -1 ||
+              page.examHistory.nextPage === null
             }
           >
             Next
           </Button>
         </div>
       </div>
-      <ViewUserDialog />
     </>
   );
 }

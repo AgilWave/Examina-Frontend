@@ -105,6 +105,7 @@ function StudentReport() {
     setLoading(true);
     try {
       // Get student details
+        //eslint-disable-next-line 
       const studentData = await getStudentByID(dispatch, studentId);
       
       // Mock student details - replace with actual API response

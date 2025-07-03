@@ -1,8 +1,12 @@
-export type Batch = {
+export type ExamHistory = {
     id: number;
-    batchCode: string;
-    year: string;
-    courseName: string;
-    isBlacklisted: boolean;
+    examName: string;
+    examDate: string;
+    startTime: string;
+    endTime: string;
+    examCode: string;
+    examMode: string;
+    status: string;
+    createdBy: string;
   };
   

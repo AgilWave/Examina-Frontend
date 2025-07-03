@@ -9,8 +9,8 @@ function Header() {
       <div className="flex w-full items-center justify-center md:justify-start">
         <BreadCrumb />
       </div>
-      <h1 className="text-3xl font-bold text-foreground">Exams</h1>
-      <p className="text-muted-foreground">Refer all exams.</p>
+      <h1 className="text-3xl font-bold text-foreground">Manage Exams</h1>
+      <p className="text-muted-foreground">Manage your exams, view exam details and create new exams.</p>
     </div>
   );
 }

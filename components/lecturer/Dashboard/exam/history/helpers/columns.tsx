@@ -1,8 +1,30 @@
 import * as React from "react";
 import { ColumnDef } from "@tanstack/react-table";
-import { Batch } from "./type";
+import { ExamHistory } from "./type";
 
-export const columns: ColumnDef<Batch>[] = [
+const formatDateTime = (date: string) => {
+  const options: Intl.DateTimeFormatOptions = { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' };
+  return new Date(date).toLocaleDateString('en-US', options);
+};
+
+const calculateDuration = (startTime: string, endTime: string) => {
+  const start = new Date(startTime);
+  const end = new Date(endTime);
+  const durationMs = end.getTime() - start.getTime();
+  
+  const seconds = Math.floor((durationMs / 1000) % 60);
+  const minutes = Math.floor((durationMs / (1000 * 60)) % 60);
+  const hours = Math.floor(durationMs / (1000 * 60 * 60));
+
+  const parts = [];
+  if (hours > 0) parts.push(`${hours}h`);
+  if (minutes > 0) parts.push(`${minutes}m`);
+  if (seconds > 0 || parts.length === 0) parts.push(`${seconds}s`);
+  
+  return parts.join(' ');
+};
+
+export const columns: ColumnDef<ExamHistory>[] = [
   {
     accessorKey: "id",
     header: () => (
@@ -19,18 +41,18 @@ export const columns: ColumnDef<Batch>[] = [
       );
     },
   },
-  {
-    accessorKey: "username", 
+  { 
+    accessorKey: "examName", 
     header: () => (
       <div className="max-w-[100px] font-poppins 2xl:text-[14px] text-[11px]">
-        Username
-      </div>
+        Exam Name
+      </div>  
     ),
     cell: ({ row }) => {
-      const userName = row.original.batchCode as string;
+      const examName = row.original.examName as string;
       return (
         <div className="capitalize max-w-[100px] font-poppins 2xl:text-[14px] text-[11px]">
-          {userName}
+          {examName}
         </div>
       );
     },
@@ -43,10 +65,10 @@ export const columns: ColumnDef<Batch>[] = [
       </div>
     ),
     cell: ({ row }) => {
-      const userName = row.original.year as string;
+      const startTime = row.original.startTime as string;
       return (
         <div className="capitalize max-w-[100px] font-poppins 2xl:text-[14px] text-[11px]">
-          {userName}
+          {formatDateTime(startTime)}
         </div>
       );
     },
@@ -59,10 +81,10 @@ export const columns: ColumnDef<Batch>[] = [
       </div>
     ),
     cell: ({ row }) => {
-      const userName = row.original.year as string;
+      const endTime = row.original.endTime as string;
       return (
         <div className="capitalize max-w-[100px] font-poppins 2xl:text-[14px] text-[11px]">
-          {userName}
+          {formatDateTime(endTime)}
         </div>
       );
     },
@@ -75,10 +97,10 @@ export const columns: ColumnDef<Batch>[] = [
       </div>
     ),
     cell: ({ row }) => {
-      const userName = row.original.courseName as string;
+      const duration = calculateDuration(row.original.startTime, row.original.endTime);
       return (
         <div className="capitalize max-w-[100px] font-poppins 2xl:text-[14px] text-[11px]">
-          {userName}
+          {duration}
         </div>
       );
     },
@@ -91,49 +113,12 @@ export const columns: ColumnDef<Batch>[] = [
       </div>
     ),
     cell: ({ row }) => {
-      const userName = row.original.courseName as string;
+      const status = row.original.status as string;
       return (
         <div className="capitalize max-w-[100px] font-poppins 2xl:text-[14px] text-[11px]">
-          {userName}
+            {status}
         </div>
       );
     },
   },
-  {
-    accessorKey: "activity", 
-    header: () => (
-      <div className="max-w-[100px] font-poppins 2xl:text-[14px] text-[11px]">
-        Activity 
-      </div>
-    ),
-    cell: ({ row }) => {
-      const userName = row.original.courseName as string;
-      return (
-        <div className="capitalize max-w-[100px] font-poppins 2xl:text-[14px] text-[11px]">
-          {userName}
-        </div>
-      );
-    },
-  },
-  
-  // {
-  //   accessorKey: "status", 
-  //   header: () => (
-  //     <div className="text-center max-w-[50px] font-poppins 2xl:text-[14px] text-[11px]">
-  //       Status
-  //     </div>
-  //   ),
-  //   cell: ({ row }) => {
-  //     const isActive = row.original.isBlacklisted as boolean;
-  //     return (
-  //       <div className="text-center max-w-[50px] font-poppins 2xl:text-[14px] text-[11px]">
-  //         {isActive ? (
-  //           <AiOutlineCloseSquare className="inline rounded-full text-red-500 text-[22px]" />
-  //         ) : (
-  //           <IoIosCheckbox className="inline rounded-full text-primary text-[22px]" />
-  //         )}
-  //       </div>
-  //     );
-  //   },
-  // },
 ];

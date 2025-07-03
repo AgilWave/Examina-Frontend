@@ -1,5 +1,5 @@
 import { FC } from "react";
-import { ClipboardList, Code, GraduationCap, Shield } from "lucide-react";
+import { ClipboardList, Code, GraduationCap } from "lucide-react";
 import SectionTiles from "@/components/ui/section-tiles";
 import {
   Breadcrumb,

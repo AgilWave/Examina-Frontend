@@ -53,13 +53,14 @@ import {
 import { setViewDialog, setViewDialogId } from "@/redux/features/dialogState";
 import { useDispatch, useSelector } from "react-redux";
 import { toast } from "sonner";
-import { getAllBatches } from "@/services/Batch/getAllBatches";
+import { getStudentExams } from "@/services/exams/getStudentExams";
 import { LogoutAction } from "@/services/actions/auth";
 import { RefreshCcw } from "lucide-react";
 import Filters from "./filter";
 import { parseAsBoolean, useQueryState } from "nuqs";
 import SearchField from "./helpers/Search";
-import ViewUserDialog from "./view-batch";
+import Cookies from "js-cookie";
+import { decrypt } from "@/lib/encryption";
 
 export function DataTable() {
   const [sorting, setSorting] = useState<SortingState>([]);
@@ -78,39 +79,49 @@ export function DataTable() {
     "filterOpen",
     parseAsBoolean
   );
-  const [filterApplied] = useQueryState("filterApplied", parseAsBoolean);
+  const [batchId, setBatchId] = useState("");
+  const [studentId, setStudentId] = useState("");
 
-  const [isActive] = useQueryState("isActive");
+  const [filterApplied] = useQueryState("filterApplied", parseAsBoolean);
 
   const fetchData = async (page: number) => {
     setIsLoading(true);
     try {
-      const response = await getAllBatches(
-        dispatch,
-        page,
-        pageSize,
-        filterApplied,
-        searchQuery,
-        isActive
-      );
-      if (response.isSuccessful) {
-        if (response.listContent.length === 0) {
+      const userData = Cookies.get("userDetails");
+      if (userData) {
+        const decryptedData = decrypt(userData);
+        const parsedData = JSON.parse(decryptedData);
+        console.log(parsedData);
+        setBatchId(parsedData.studentDetails.batchId);
+        setStudentId(parsedData.studentDetails.id);
+      }
+      if (batchId && studentId) {
+        const response = await getStudentExams(
+          dispatch,
+          page,
+          pageSize,
+          studentId,
+          batchId
+        );
+        if (response.isSuccessful) {
+          if (response.listContent.length === 0) {
+            setData([]);
+            toast.error(response.message);
+            return;
+          }
+          setData(response.listContent);
+          dispatch(setBatchPage(response.paginationInfo.page));
+          dispatch(setBatchTotalPages(response.paginationInfo.totalPages));
+          dispatch(setBatchNextPage(response.paginationInfo.nextPage));
+          dispatch(setBatchPrevPage(response.paginationInfo.page - 1));
+        } else {
           setData([]);
           toast.error(response.message);
-          return;
+          dispatch(setBatchPage(1));
+          dispatch(setBatchTotalPages(0));
+          dispatch(setBatchNextPage(-1));
+          dispatch(setBatchPrevPage(-1));
         }
-        setData(response.listContent);
-        dispatch(setBatchPage(response.paginationInfo.page));
-        dispatch(setBatchTotalPages(response.paginationInfo.totalPages));
-        dispatch(setBatchNextPage(response.paginationInfo.nextPage));
-        dispatch(setBatchPrevPage(response.paginationInfo.page - 1));
-      } else {
-        setData([]);
-        toast.error(response.message);
-        dispatch(setBatchPage(1));
-        dispatch(setBatchTotalPages(0));
-        dispatch(setBatchNextPage(-1));
-        dispatch(setBatchPrevPage(-1));
       }
     } catch (error: any) {
       if (error.response) {
@@ -129,7 +140,7 @@ export function DataTable() {
   useEffect(() => {
     const page = JSON.parse(sessionStorage.getItem("batchPage") || "1");
     fetchData(page);
-  }, [filterApplied]);
+  }, [filterApplied, studentId, batchId]);
 
   useEffect(() => {
     const page = JSON.parse(sessionStorage.getItem("batchPage") || "1");
@@ -295,7 +306,11 @@ export function DataTable() {
           <Filters />
         </div>
         <div className="rounded-lg dark:border-teal-600/50 border shadow-sm overflow-hidden">
-          <Table isLoading={isLoading} loadingColumns={columns.length} loadingRows={10}>
+          <Table
+            isLoading={isLoading}
+            loadingColumns={columns.length}
+            loadingRows={10}
+          >
             <TableHeader>
               {table.getHeaderGroups().map((headerGroup) => (
                 <TableRow key={headerGroup.id}>
@@ -327,13 +342,7 @@ export function DataTable() {
               {rows.length > 0 ? (
                 rows.map((row) => {
                   return (
-                    <TableRow
-                      key={row.id}
-                      onClick={() => {
-                        dispatch(setViewDialog(true));
-                        dispatch(setViewDialogId(row.original.id));
-                      }}
-                    >
+                    <TableRow key={row.id}>
                       {row.getVisibleCells().map((cell) => {
                         return (
                           <TableCell key={cell.id}>
@@ -381,7 +390,6 @@ export function DataTable() {
           </Button>
         </div>
       </div>
-      <ViewUserDialog />
     </>
   );
 }

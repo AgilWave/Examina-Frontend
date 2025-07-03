@@ -1,6 +1,7 @@
 "use client";
 import React, { useState, useEffect, useMemo } from "react";
 import Header from "./Header";
+  //eslint-disable-next-line 
 import SearchField from "./helpers/Search";
 import { ExamReport } from "./examReport";
 import { getExamReports } from "./examReportsService";
@@ -15,6 +16,7 @@ import { getAllCourses } from "@/services/Course/getAllCourses";
 import { getAllBatches } from "@/services/Batch/getAllBatches";
 
 function Reports() {
+    //eslint-disable-next-line 
   const dispatch = useDispatch();
   const [exams, setExams] = useState<Exam[]>([]);
   const [loading, setLoading] = useState(true);

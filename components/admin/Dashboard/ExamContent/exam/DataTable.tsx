@@ -75,12 +75,8 @@ export function DataTable() {
         null
       );
       if (response.isSuccessful) {
-        if (response.listContent.length === 0) {
-          setData([]);
-          toast.error(response.message);
-          return;
-        }
-        setData(response.listContent);
+        setData(response.listContent || []);
+        // Don't show error toast for empty results - it's a normal state
       } else {
         setData([]);
         toast.error(response.message);

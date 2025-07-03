@@ -284,16 +284,18 @@ export default function AdminView() {
 
   useEffect(() => {
     const handleSecurityViolation = ({ studentId, violationType, count, socketId }: { studentId: string, violationType: string, count: number, socketId: string }) => {
+      console.log('[Admin] Received security violation:', { studentId, violationType, count, socketId });
       const studentInfo = Object.values(socketToStudentId).find(info => info.studentId === studentId);
       const studentName = studentInfo?.studentName || studentId || socketId;
       toast.error(`Security Violation: ${violationType} (Student: ${studentName}) [Count: ${count}]`, { duration: 7000 });
       // Find the socket id for this studentId
       const sid = Object.keys(socketToStudentId).find(key => socketToStudentId[key].studentId === studentId) || socketId;
+      console.log('[Admin] Setting violation status for sid:', sid, { type: violationType, count });
       setViolationStatus(prev => ({ ...prev, [sid]: { type: violationType, count } }));
     };
-    socket.on('student-security-violation', handleSecurityViolation);
+    socket.on('session-security-violation', handleSecurityViolation);
     return () => {
-      socket.off('student-security-violation', handleSecurityViolation);
+      socket.off('session-security-violation', handleSecurityViolation);
     };
   }, [socketToStudentId]);
 

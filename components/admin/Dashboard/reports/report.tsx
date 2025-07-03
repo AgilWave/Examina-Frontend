@@ -1,5 +1,5 @@
 import { FC } from "react";
-import { ExamReport } from './examReport';
+// import { ExamReport } from './examReport';
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -9,6 +9,7 @@ import {
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
 import {BookOpenCheck, UserPen  } from "lucide-react";
+import SectionTiles from "@/components/ui/section-tiles";
 
 const ReportContent: FC = () => {
   const items = [

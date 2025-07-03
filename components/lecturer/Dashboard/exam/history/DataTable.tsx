@@ -45,21 +45,20 @@ import { columns } from "./helpers/columns";
 import { RootState } from "@/redux/store";
 
 import {
-  setBatchNextPage,
-  setBatchPage,
-  setBatchPrevPage,
-  setBatchTotalPages,
-} from "@/redux/features/BatchSlice";
-import { setViewDialog, setViewDialogId } from "@/redux/features/dialogState";
+  setExamHistoryNextPage,
+  setExamHistoryPage,
+  setExamHistoryPrevPage,
+  setExamHistoryTotalPages,
+} from "@/redux/features/pageSlice";
 import { useDispatch, useSelector } from "react-redux";
 import { toast } from "sonner";
-import { getAllBatches } from "@/services/Batch/getAllBatches";
+import { getInactiveExams } from "@/services/history/getInactiveExams";
 import { LogoutAction } from "@/services/actions/auth";
 import { RefreshCcw } from "lucide-react";
 import Filters from "./filter";
 import { parseAsBoolean, useQueryState } from "nuqs";
 import SearchField from "./helpers/Search";
-import ViewUserDialog from "./view-batch";
+import { useRouter } from "next/navigation";
 
 export function DataTable() {
   const [sorting, setSorting] = useState<SortingState>([]);
@@ -69,8 +68,8 @@ export function DataTable() {
   const page = useSelector((state: RootState) => state.page);
   const [data, setData] = useState([]);
   const [pageSize, setPageSize] = useState(25);
-  const dialog = useSelector((state: RootState) => state.dialog);
   const dispatch = useDispatch();
+  const router = useRouter();
   const [searchQuery] = useQueryState("searchQuery");
   const [isLoading, setIsLoading] = useState(false);
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -80,18 +79,15 @@ export function DataTable() {
   );
   const [filterApplied] = useQueryState("filterApplied", parseAsBoolean);
 
-  const [isActive] = useQueryState("isActive");
 
   const fetchData = async (page: number) => {
     setIsLoading(true);
     try {
-      const response = await getAllBatches(
+      const response = await getInactiveExams(
         dispatch,
         page,
         pageSize,
-        filterApplied,
         searchQuery,
-        isActive
       );
       if (response.isSuccessful) {
         if (response.listContent.length === 0) {
@@ -100,17 +96,9 @@ export function DataTable() {
           return;
         }
         setData(response.listContent);
-        dispatch(setBatchPage(response.paginationInfo.page));
-        dispatch(setBatchTotalPages(response.paginationInfo.totalPages));
-        dispatch(setBatchNextPage(response.paginationInfo.nextPage));
-        dispatch(setBatchPrevPage(response.paginationInfo.page - 1));
       } else {
         setData([]);
         toast.error(response.message);
-        dispatch(setBatchPage(1));
-        dispatch(setBatchTotalPages(0));
-        dispatch(setBatchNextPage(-1));
-        dispatch(setBatchPrevPage(-1));
       }
     } catch (error: any) {
       if (error.response) {
@@ -127,55 +115,40 @@ export function DataTable() {
   };
 
   useEffect(() => {
-    const page = JSON.parse(sessionStorage.getItem("batchPage") || "1");
+    const page = JSON.parse(sessionStorage.getItem("examHistoryPage") || "1");
     fetchData(page);
   }, [filterApplied]);
 
   useEffect(() => {
-    const page = JSON.parse(sessionStorage.getItem("batchPage") || "1");
-    if (!dialog.createDialog) {
-      fetchData(page);
-    } else if (dialog.viewDialog) {
-      fetchData(page);
-    }
-  }, [dialog]);
-
-  useEffect(() => {
     dispatch(
-      setBatchPage(JSON.parse(sessionStorage.getItem("batchPage") || "1"))
+      setExamHistoryPage(JSON.parse(sessionStorage.getItem("examHistoryPage") || "1"))
     );
     dispatch(
-      setBatchTotalPages(
-        JSON.parse(sessionStorage.getItem("totalBatchPages") || "0")
+      setExamHistoryTotalPages(
+        JSON.parse(sessionStorage.getItem("totalExamHistoryPages") || "0")
       )
     );
     dispatch(
-      setBatchNextPage(
-        JSON.parse(sessionStorage.getItem("nextBatchPage") || "-1")
+      setExamHistoryNextPage(
+        JSON.parse(sessionStorage.getItem("nextExamHistoryPage") || "-1")
       )
     );
     dispatch(
-      setBatchPrevPage(
-        JSON.parse(sessionStorage.getItem("prevBatchPage") || "-1")
+      setExamHistoryPrevPage(
+        JSON.parse(sessionStorage.getItem("prevExamHistoryPage") || "-1")
       )
     );
-    dispatch(
-      setViewDialog(JSON.parse(sessionStorage.getItem("viewDialog") || "false"))
-    );
-    dispatch(
-      setViewDialogId(JSON.parse(sessionStorage.getItem("viewDialogId") || "0"))
-    );
-    const page = JSON.parse(sessionStorage.getItem("batchPage") || "1");
+    const page = JSON.parse(sessionStorage.getItem("examHistoryPage") || "1");
     fetchData(page);
   }, []);
 
   useEffect(() => {
-    const page = JSON.parse(sessionStorage.getItem("batchPage") || "1");
+    const page = JSON.parse(sessionStorage.getItem("examHistoryPage") || "1");
     fetchData(page);
   }, [pageSize]);
 
   useEffect(() => {
-    const page = JSON.parse(sessionStorage.getItem("batchPage") || "1");
+    const page = JSON.parse(sessionStorage.getItem("examHistoryPage") || "1");
     fetchData(page);
   }, [searchQuery]);
 
@@ -203,15 +176,15 @@ export function DataTable() {
   });
 
   const handleNext = async () => {
-    if (page.users.nextPage > page.users.page) {
-      const curPage = page.users.nextPage;
+    if (page.examHistory.nextPage > page.examHistory.page) {
+      const curPage = page.examHistory.nextPage;
       fetchData(curPage);
     }
   };
 
   const handlePrev = async () => {
-    if (page.users.prevPage >= 0) {
-      const curPage = page.users.prevPage;
+    if (page.examHistory.prevPage >= 0) {
+      const curPage = page.examHistory.prevPage;
       fetchData(curPage);
     }
   };
@@ -330,9 +303,9 @@ export function DataTable() {
                     <TableRow
                       key={row.id}
                       onClick={() => {
-                        dispatch(setViewDialog(true));
-                        dispatch(setViewDialogId(row.original.id));
+                        router.push(`/admin/dashboard/exams/manage-exams/history/${row.original.id}`);
                       }}
+                      className="cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800"
                     >
                       {row.getVisibleCells().map((cell) => {
                         return (
@@ -362,26 +335,25 @@ export function DataTable() {
             variant="outline"
             size="sm"
             onClick={handlePrev}
-            disabled={page.users.prevPage <= 0}
+            disabled={page.examHistory.prevPage <= 0}
           >
             Previous
           </Button>
           <span className="text-sm font-medium text-gray-700 dark:text-gray-200">
-            Page {page.users.page} of {page.users.totalPages}
+            Page {page.examHistory.page} of {page.examHistory.totalPages}
           </span>
           <Button
             variant="outline"
             size="sm"
             onClick={handleNext}
             disabled={
-              page.users.nextPage === -1 || page.users.nextPage === null
+              page.examHistory.nextPage === -1 || page.examHistory.nextPage === null
             }
           >
             Next
           </Button>
         </div>
       </div>
-      <ViewUserDialog />
     </>
   );
 }
