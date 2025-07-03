@@ -1,5 +1,5 @@
 import { FC } from "react";
-import { UsersRound, FileClock, UserRoundCog } from "lucide-react";
+import { UsersRound, UserRoundCog } from "lucide-react";
 import SectionTiles from "@/components/ui/section-tiles";
 import {
   Breadcrumb,
@@ -17,11 +17,11 @@ const AdminContent: FC = () => {
       title: "Users",
       link: "/admin/dashboard/admin-config/users",
     },
-    {
-      icon: <FileClock size={30} color="#FFFFFF" />,
-      title: "Logs",
-      link: "/admin/dashboard/admin-config/logs",
-    },
+    // {
+    //   icon: <FileClock size={30} color="#FFFFFF" />,
+    //   title: "Logs",
+    //   link: "/admin/dashboard/admin-config/logs",
+    // },
     {
       icon: <UserRoundCog size={30} color="#FFFFFF" />,
       title: "Students",

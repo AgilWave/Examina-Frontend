@@ -212,7 +212,7 @@ function ExamHistoryDetails() {
 
   if (loading) {
     return (
-      <div className="h-fit p-1 md:p-8">
+      <div className="h-fit p-1 md:p-8 bg-black">
         <div className="max-w-8xl mx-auto">
           <div className="flex items-center justify-center h-64">
             <Loader />

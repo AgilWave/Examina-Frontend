@@ -1,5 +1,5 @@
 import { FC } from "react";
-import { FileDiff, Cog, BookOpen, Landmark, BookText   } from "lucide-react";
+import { FileDiff, BookOpen, Landmark, BookText   } from "lucide-react";
 import SectionTiles from "@/components/ui/section-tiles";
 import {
   Breadcrumb,
@@ -32,11 +32,11 @@ const ConfigContent: FC = () => {
       title: "Module Managemnt",
       link: "/admin/dashboard/configs/modules",
     },
-    {
-      icon: <Cog  size={30} color="#FFFFFF" />,
-      title: "System Configurations",
-      link: "/admin/dashboard/configs/system-config",
-    },
+    // {
+    //   icon: <Cog  size={30} color="#FFFFFF" />,
+    //   title: "System Configurations",
+    //   link: "/admin/dashboard/configs/system-config",
+    // },
   ];
 
   return (
