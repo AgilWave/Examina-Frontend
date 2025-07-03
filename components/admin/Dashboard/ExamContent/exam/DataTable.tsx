@@ -87,7 +87,7 @@ export function DataTable() {
           toast.error("Unauthorized access. Please login again.");
           LogoutAction();
         } else {
-          toast.error(error.response.data.message);
+          // toast.error(error.response.data.message);
         }
       }
     } finally {

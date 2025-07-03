@@ -1,12 +1,11 @@
-import ExamHistory from '@/components/admin/Dashboard/ExamContent/exam/history/index'
+import ExamHistoryDetails from '@/components/admin/Dashboard/ExamContent/exam/history/view-exam/index'
 
-const ExamHistoryTab = () => {
+const ExamHistoryDetailsPage = () => {
     return (
       <div>
-        <ExamHistory />
+        <ExamHistoryDetails />
       </div>
     );
   };
   
-  export default ExamHistoryTab;
-  
+  export default ExamHistoryDetailsPage;

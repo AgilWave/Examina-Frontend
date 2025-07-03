@@ -309,7 +309,7 @@ export function DataTable() {
                       key={row.id}
                       onClick={() => {
                         router.push(
-                          `/admin/dashboard/exams/manage-exams/history/${row.original.id}`
+                          `/admin/dashboard/exams/manage-exams/history?examId=${row.original.id}`
                         );
                       }}
                       className="cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800"

@@ -1,6 +1,6 @@
 "use client";
 import React, { useEffect, useState } from "react";
-import { useParams, useRouter } from "next/navigation";
+import { useSearchParams, useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
@@ -81,7 +81,7 @@ interface ExamDetails {
 }
 
 function ExamHistoryDetails() {
-  const params = useParams();
+  const params = useSearchParams();
   const router = useRouter();
   const [examData, setExamData] = useState<ExamDetails | null>(null);
   const [statistics, setStatistics] = useState<ExamStatistics | null>(null);
@@ -97,26 +97,30 @@ function ExamHistoryDetails() {
   const [selectedImage, setSelectedImage] = useState<string>("");
   const [selectedImageType, setSelectedImageType] = useState<string>("");
 
-  const examId = params.id as string;
+
+  const examId = params.get("examId")
 
   useEffect(() => {
     const fetchExamDetails = async () => {
       try {
         setLoading(true);
-        const response = await getInactiveExamById(examId);
+        if (examId) {
+          const response = await getInactiveExamById(examId);
 
-        if (response.isSuccessful && response.content) {
-          const {
-            examDetails,
-            statistics: statsData,
-            students: studentsData,
-          } = response.content;
-          setExamData(examDetails);
-          setStatistics(statsData);
-          setStudents(studentsData);
-        } else {
-          setError(response.message || "Failed to fetch exam details");
+          if (response.isSuccessful && response.content) {
+            const {
+              examDetails,
+              statistics: statsData,
+              students: studentsData,
+            } = response.content;
+            setExamData(examDetails);
+            setStatistics(statsData);
+            setStudents(studentsData);
+          } else {
+            setError(response.message || "Failed to fetch exam details");
+          }
         }
+
         setLoading(false);
       } catch (err: unknown) {
         setError(
@@ -427,11 +431,10 @@ function ExamHistoryDetails() {
                   students.slice(0, 10).map((student) => (
                     <div
                       key={student.studentId}
-                      className={`flex items-center justify-between p-2 border rounded-lg ${
-                        student.violations && student.violations.length > 0
+                      className={`flex items-center justify-between p-2 border rounded-lg ${student.violations && student.violations.length > 0
                           ? "cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
                           : ""
-                      }`}
+                        }`}
                       onClick={() => handleStudentViolationClick(student)}
                     >
                       <div className="flex-1">
@@ -627,83 +630,83 @@ function ExamHistoryDetails() {
                   {/* Screenshots Section */}
                   {(violation.webcamScreenshotPath ||
                     violation.screenScreenshotPath) && (
-                    <div className="space-y-2">
-                      <label className="text-xs font-medium text-gray-600 dark:text-gray-400">
-                        Evidence Screenshots
-                      </label>
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        {violation.webcamScreenshotPath && (
-                          <div className="space-y-2">
-                            <div className="flex items-center gap-2 text-xs text-gray-600 dark:text-gray-400">
-                              <Camera className="w-3 h-3" />
-                              Webcam Screenshot
-                            </div>
-                            <div
-                              className="relative border rounded-lg overflow-hidden bg-gray-100 dark:bg-gray-800 cursor-pointer hover:opacity-80 transition-opacity"
-                              onClick={() =>
-                                handleImageClick(
-                                  violation.webcamScreenshotPath!,
-                                  "Webcam Screenshot"
-                                )
-                              }
-                            >
-                              <img
-                                src={
-                                  BACKEND_URL + violation.webcamScreenshotPath
+                      <div className="space-y-2">
+                        <label className="text-xs font-medium text-gray-600 dark:text-gray-400">
+                          Evidence Screenshots
+                        </label>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          {violation.webcamScreenshotPath && (
+                            <div className="space-y-2">
+                              <div className="flex items-center gap-2 text-xs text-gray-600 dark:text-gray-400">
+                                <Camera className="w-3 h-3" />
+                                Webcam Screenshot
+                              </div>
+                              <div
+                                className="relative border rounded-lg overflow-hidden bg-gray-100 dark:bg-gray-800 cursor-pointer hover:opacity-80 transition-opacity"
+                                onClick={() =>
+                                  handleImageClick(
+                                    violation.webcamScreenshotPath!,
+                                    "Webcam Screenshot"
+                                  )
                                 }
-                                alt="Webcam violation evidence"
-                                className="w-full h-32 object-cover"
-                                onError={(e) => {
-                                  const target = e.target as HTMLImageElement;
-                                  target.style.display = "none";
-                                  const parent = target.parentElement;
-                                  if (parent) {
-                                    parent.innerHTML =
-                                      '<div class="flex items-center justify-center h-32 text-gray-400 text-xs">Image not available</div>';
+                              >
+                                <img
+                                  src={
+                                    BACKEND_URL + violation.webcamScreenshotPath
                                   }
-                                }}
-                              />
+                                  alt="Webcam violation evidence"
+                                  className="w-full h-32 object-cover"
+                                  onError={(e) => {
+                                    const target = e.target as HTMLImageElement;
+                                    target.style.display = "none";
+                                    const parent = target.parentElement;
+                                    if (parent) {
+                                      parent.innerHTML =
+                                        '<div class="flex items-center justify-center h-32 text-gray-400 text-xs">Image not available</div>';
+                                    }
+                                  }}
+                                />
+                              </div>
                             </div>
-                          </div>
-                        )}
+                          )}
 
-                        {violation.screenScreenshotPath && (
-                          <div className="space-y-2">
-                            <div className="flex items-center gap-2 text-xs text-gray-600 dark:text-gray-400">
-                              <Monitor className="w-3 h-3" />
-                              Screen Screenshot
-                            </div>
-                            <div
-                              className="relative border rounded-lg overflow-hidden bg-gray-100 dark:bg-gray-800 cursor-pointer hover:opacity-80 transition-opacity"
-                              onClick={() =>
-                                handleImageClick(
-                                  violation.screenScreenshotPath!,
-                                  "Screen Screenshot"
-                                )
-                              }
-                            >
-                              <img
-                                src={
-                                  BACKEND_URL + violation.screenScreenshotPath
+                          {violation.screenScreenshotPath && (
+                            <div className="space-y-2">
+                              <div className="flex items-center gap-2 text-xs text-gray-600 dark:text-gray-400">
+                                <Monitor className="w-3 h-3" />
+                                Screen Screenshot
+                              </div>
+                              <div
+                                className="relative border rounded-lg overflow-hidden bg-gray-100 dark:bg-gray-800 cursor-pointer hover:opacity-80 transition-opacity"
+                                onClick={() =>
+                                  handleImageClick(
+                                    violation.screenScreenshotPath!,
+                                    "Screen Screenshot"
+                                  )
                                 }
-                                alt="Screen violation evidence"
-                                className="w-full h-32 object-cover"
-                                onError={(e) => {
-                                  const target = e.target as HTMLImageElement;
-                                  target.style.display = "none";
-                                  const parent = target.parentElement;
-                                  if (parent) {
-                                    parent.innerHTML =
-                                      '<div class="flex items-center justify-center h-32 text-gray-400 text-xs">Image not available</div>';
+                              >
+                                <img
+                                  src={
+                                    BACKEND_URL + violation.screenScreenshotPath
                                   }
-                                }}
-                              />
+                                  alt="Screen violation evidence"
+                                  className="w-full h-32 object-cover"
+                                  onError={(e) => {
+                                    const target = e.target as HTMLImageElement;
+                                    target.style.display = "none";
+                                    const parent = target.parentElement;
+                                    if (parent) {
+                                      parent.innerHTML =
+                                        '<div class="flex items-center justify-center h-32 text-gray-400 text-xs">Image not available</div>';
+                                    }
+                                  }}
+                                />
+                              </div>
                             </div>
-                          </div>
-                        )}
+                          )}
+                        </div>
                       </div>
-                    </div>
-                  )}
+                    )}
                 </div>
               ))}
 
