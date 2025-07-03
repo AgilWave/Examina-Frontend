@@ -1,5 +1,5 @@
 import { FC } from "react";
-import SectionTiles from "@/components/ui/section-tiles";
+import { ExamReport } from './examReport';
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -43,7 +43,7 @@ const ReportContent: FC = () => {
               Reports Section
             </h1>
             <p className="text-gray-500 dark:text-gray-400">
-              Manage all reports and analysis here.
+              Manage all reports here.
             </p>
           </div>
         </div>
