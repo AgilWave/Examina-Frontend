@@ -8,12 +8,26 @@ import Peer, { Instance as PeerInstance } from "simple-peer";
 import socket from "@/lib/socket";
 import { toast } from "sonner";
 import MessageInbox from "@/components/common/MessageInbox";
-import { Mic, AlertTriangle, Hand } from "lucide-react";
+import { Mic, AlertTriangle, Hand, Wifi, WifiOff } from "lucide-react";
 import { decrypt } from "@/lib/encryption";
 import Cookies from "js-cookie";
 import * as tf from "@tensorflow/tfjs";
 import "@tensorflow/tfjs-backend-webgl";
 import * as blazeface from "@tensorflow-models/blazeface";
+import {
+  saveAnswerOffline,
+  getOfflineAnswers,
+  clearOfflineAnswers,
+  // saveViolationOffline,
+  getOfflineViolations,
+  clearOfflineViolations,
+  // saveMediaOffline,
+  getOfflineMedia,
+  clearOfflineMedia,
+  saveVideoChunkOffline,
+  getOfflineVideoChunks,
+  clearOfflineVideoChunks,
+} from '@/utils/offlineStorage';
 
 // console.log('[Student] question.tsx file loaded');
 
@@ -160,6 +174,123 @@ export function QuestionComponent({
   const [audioLevels, setAudioLevels] = useState<number[]>([]);
   const audioDetectionIntervalRef = useRef<NodeJS.Timeout | null>(null);
 
+  // --- MediaRecorder for camera and screen recording ---
+  const cameraRecorderRef = useRef<MediaRecorder | null>(null);
+  const screenRecorderRef = useRef<MediaRecorder | null>(null);
+  const cameraChunksRef = useRef<Blob[]>([]);
+  const screenChunksRef = useRef<Blob[]>([]);
+
+  // Start camera recording
+  const startCameraRecording = useCallback((stream: MediaStream) => {
+    if (cameraRecorderRef.current) {
+      cameraRecorderRef.current.stop();
+      cameraRecorderRef.current = null;
+    }
+    const recorder = new MediaRecorder(stream, { mimeType: 'video/webm' });
+    cameraRecorderRef.current = recorder;
+    recorder.ondataavailable = (e) => {
+      if (e.data && e.data.size > 0) {
+        cameraChunksRef.current.push(e.data);
+        if (!navigator.onLine) {
+          saveVideoChunkOffline({ type: 'camera', blob: e.data, meta: { examId, studentId, timestamp: Date.now() } });
+        }
+      }
+    };
+    recorder.start(30000); // 30s chunks
+  }, [examId, studentId]);
+
+  // Start screen recording
+  const startScreenRecording = useCallback(async () => {
+    try {
+      const screenStream = await navigator.mediaDevices.getDisplayMedia({ video: true });
+      if (screenRecorderRef.current) {
+        screenRecorderRef.current.stop();
+        screenRecorderRef.current = null;
+      }
+      const recorder = new MediaRecorder(screenStream, { mimeType: 'video/webm' });
+      screenRecorderRef.current = recorder;
+      recorder.ondataavailable = (e) => {
+        if (e.data && e.data.size > 0) {
+          screenChunksRef.current.push(e.data);
+          if (!navigator.onLine) {
+            saveVideoChunkOffline({ type: 'screen', blob: e.data, meta: { examId, studentId, timestamp: Date.now() } });
+          }
+        }
+      };
+      recorder.start(30000); // 30s chunks
+      //eslint-disable-next-line @typescript-eslint/no-unused-vars
+    } catch (err) {
+      // User may deny screen sharing
+    }
+  }, [examId, studentId]);
+
+  // Stop all recordings
+  const stopAllRecordings = () => {
+    if (cameraRecorderRef.current) {
+      cameraRecorderRef.current.stop();
+      cameraRecorderRef.current = null;
+    }
+    if (screenRecorderRef.current) {
+      screenRecorderRef.current.stop();
+      screenRecorderRef.current = null;
+    }
+  };
+
+  // Start camera recording when localStream is available
+  useEffect(() => {
+    if (localStream) {
+      startCameraRecording(localStream);
+    }
+    return () => {
+      stopAllRecordings();
+    };
+  }, [localStream, startCameraRecording]);
+
+  // Optionally, start screen recording on exam start (or on user action)
+  useEffect(() => { startScreenRecording(); }, []);
+
+  // --- Sync offline video chunks on reconnect ---
+  useEffect(() => {
+    const syncVideoChunks = async () => {
+      const chunks = await getOfflineVideoChunks();
+      if (chunks.length > 0) {
+        for (const chunk of chunks) {
+          try {
+            const formData = new FormData();
+
+            // Add the video file - must be MP4, WebM, or OGG format
+            formData.append('file', chunk.blob, `${chunk.type}_${chunk.meta?.timestamp || Date.now()}.webm`);
+
+            // Add any required metadata from CreateExamResourceDto
+            formData.append('examId', chunk.examId); // You'll need to track this
+            formData.append('resourceType', 'VIDEO');
+            formData.append('description', 'Recorded exam session video');
+
+            const response = await fetch('/api/exams/upload-resource', {
+              method: 'POST',
+              headers: {
+                'Authorization': `Bearer ${Cookies.get('jwt')}`
+              },
+              body: formData
+            });
+
+            if (!response.ok) {
+              const error = await response.json();
+              throw new Error(error.message || 'Failed to upload video');
+            }
+
+          } catch (error) {
+            console.error('Failed to upload video chunk:', error);
+            // You might want to implement retry logic or store failed uploads
+          }
+        }
+        await clearOfflineVideoChunks();
+      }
+    };
+
+    window.addEventListener('online', syncVideoChunks);
+    return () => window.removeEventListener('online', syncVideoChunks);
+  }, []);
   // Get stream with specific devices
   const getStream = useCallback(async () => {
     const constraints: MediaStreamConstraints = {
@@ -448,9 +579,9 @@ export function QuestionComponent({
           const landmarks = prediction.landmarks
             ? Array.isArray(prediction.landmarks)
               ? prediction.landmarks.map((landmark: number[]) => ({
-                  x: landmark[0],
-                  y: landmark[1],
-                }))
+                x: landmark[0],
+                y: landmark[1],
+              }))
               : [] // Handle Tensor2D case
             : [];
 
@@ -660,7 +791,7 @@ export function QuestionComponent({
           signalData,
         }: {
           sender: string;
-           // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
           signalData: any;
         }) => {
           if (!mounted) return;
@@ -814,6 +945,111 @@ export function QuestionComponent({
     }
   }, []);
 
+  // Add this effect at the top level of the component (after useState declarations)
+  useEffect(() => {
+    const syncOfflineData = async () => {
+      // Sync answers
+      const answers = await getOfflineAnswers();
+      if (answers.length > 0) {
+        for (const ans of answers) {
+          // You may want to batch this, but for now, send individually
+          // Replace with your actual answer submission logic
+          try {
+            // You may need to adjust the payload to match your backend
+            socket.emit('submit-offline-answer', ans);
+            //eslint-disable-next-line @typescript-eslint/no-unused-vars
+          } catch (e) { /* handle error */ }
+        }
+        await clearOfflineAnswers();
+      }
+      // Sync violations
+      const violations = await getOfflineViolations();
+      if (violations.length > 0) {
+        for (const v of violations) {
+          try {
+            socket.emit('session-security-violation', v);
+            //eslint-disable-next-line @typescript-eslint/no-unused-vars
+          } catch (e) { /* handle error */ }
+        }
+        await clearOfflineViolations();
+      }
+      // Sync media
+      const media = await getOfflineMedia();
+      if (media.length > 0) {
+        //eslint-disable-next-line @typescript-eslint/no-unused-vars
+        for (const m of media) {
+          // You may want to POST to a REST endpoint for file uploads
+          // For now, emit via socket (or implement upload logic)
+          // socket.emit('upload-media', m);
+        }
+        await clearOfflineMedia();
+      }
+    };
+    window.addEventListener('online', syncOfflineData);
+    return () => window.removeEventListener('online', syncOfflineData);
+  }, []);
+
+  // --- Answer change handlers ---
+  // MCQ selection handler
+  const handleMcqSelect = (index: number) => {
+    setMcqSelected(index);
+    if (onAnswerChange) onAnswerChange(index);
+    // Save answer offline if offline
+    if (!navigator.onLine) {
+      saveAnswerOffline({
+        examId,
+        questionId: questions[currentQuestionIndex]?.id,
+        answer: index,
+        type: 'mcq',
+        timestamp: Date.now(),
+      });
+    }
+    updateActivity();
+  };
+  // MultiSelect selection handler
+  const handleMultiSelectSelect = (index: number) => {
+    const newSelected = (prev: number[]) => {
+      // If already selected, remove it
+      if (prev.includes(index)) {
+        return prev.filter((i: number) => i !== index);
+      }
+      // Otherwise add it
+      return [...prev, index];
+    };
+
+    setMultiSelectSelected((prev) => {
+      const updated = newSelected(prev);
+      if (onAnswerChange) onAnswerChange(updated);
+      if (!navigator.onLine) {
+        saveAnswerOffline({
+          examId,
+          questionId: questions[currentQuestionIndex]?.id,
+          answer: updated,
+          type: 'multiSelect',
+          timestamp: Date.now(),
+        });
+      }
+      return updated;
+    });
+    updateActivity();
+  };
+  // Structured question answer handler
+  const handleStructuredAnswerChange = (value: string) => {
+    setStructuredAnswer(value);
+    if (onAnswerChange) onAnswerChange(value);
+    if (!navigator.onLine) {
+      saveAnswerOffline({
+        examId,
+        questionId: questions[currentQuestionIndex]?.id,
+        answer: value,
+        type: 'structured',
+        timestamp: Date.now(),
+      });
+    }
+    updateActivity();
+  };
+
+  // --- Violation handler ---
   const handleSecurityViolation = useCallback(
     async (violationType: string) => {
       const now = Date.now();
@@ -844,68 +1080,68 @@ export function QuestionComponent({
 
         console.log(`[Student] Security violation detected: ${violationType}`);
 
-      // Capture screenshots
-      const webcamScreenshot = await captureWebcamScreenshot();
-      const screenScreenshot = await captureScreenScreenshot();
+        // Capture screenshots
+        const webcamScreenshot = await captureWebcamScreenshot();
+        const screenScreenshot = await captureScreenScreenshot();
 
-      // Check if we should show this violation (30-minute cooldown for display)
-      const lastDisplayTime =
-        lastViolationRef.current[`${violationType}_display`] || 0;
-      const shouldShowViolation =
-        now - lastDisplayTime > VIOLATION_DISPLAY_COOLDOWN_MS;
+        // Check if we should show this violation (30-minute cooldown for display)
+        const lastDisplayTime =
+          lastViolationRef.current[`${violationType}_display`] || 0;
+        const shouldShowViolation =
+          now - lastDisplayTime > VIOLATION_DISPLAY_COOLDOWN_MS;
 
-      setSecurityViolationCount((prev) => {
-        const newCount = prev + 1;
-        const isFaceViolation = violationType.includes("face");
-        const maxViolations = isFaceViolation
-          ? MAX_VIOLATIONS * 2
-          : MAX_VIOLATIONS;
+        setSecurityViolationCount((prev) => {
+          const newCount = prev + 1;
+          const isFaceViolation = violationType.includes("face");
+          const maxViolations = isFaceViolation
+            ? MAX_VIOLATIONS * 2
+            : MAX_VIOLATIONS;
 
-        // Only show toast if within display cooldown
-        if (shouldShowViolation) {
-          if (isFaceViolation) {
-            toast.error(
-              `Please ensure your face is visible on camera. and not looking away from the screen.`
-            );
+          // Only show toast if within display cooldown
+          if (shouldShowViolation) {
+            if (isFaceViolation) {
+              toast.error(
+                `Please ensure your face is visible on camera. and not looking away from the screen.`
+              );
+            }
+            // toast.error(`Security violation: ${violationType}. Violations: ${newCount}/${maxViolations}`);
+            lastViolationRef.current[`${violationType}_display`] = now;
           }
-          // toast.error(`Security violation: ${violationType}. Violations: ${newCount}/${maxViolations}`);
-          lastViolationRef.current[`${violationType}_display`] = now;
-        }
 
-        console.log(`[Student] Emitting security violation to admin:`, {
-          examId,
-          studentId,
-          violationType,
-          count: newCount,
-          socketId: socket.id,
-          webcamScreenshot: webcamScreenshot ? "captured" : "failed",
-          screenScreenshot: screenScreenshot ? "captured" : "failed",
+          console.log(`[Student] Emitting security violation to admin:`, {
+            examId,
+            studentId,
+            violationType,
+            count: newCount,
+            socketId: socket.id,
+            webcamScreenshot: webcamScreenshot ? "captured" : "failed",
+            screenScreenshot: screenScreenshot ? "captured" : "failed",
+          });
+
+          // Always send to backend regardless of display cooldown
+          socket.emit("session-security-violation", {
+            examId,
+            studentId,
+            violationType,
+            count: newCount,
+            socketId: socket.id,
+            timestamp: now,
+            webcamScreenshot,
+            screenScreenshot,
+            studentName,
+          });
+
+          if (newCount >= maxViolations) {
+            toast.error(
+              "Too many security violations. Exam will be auto-submitted."
+            );
+            setTimeout(() => {
+              examActiveRef.current = false;
+              onComplete();
+            }, 2000);
+          }
+          return newCount;
         });
-
-        // Always send to backend regardless of display cooldown
-        socket.emit("session-security-violation", {
-          examId,
-          studentId,
-          violationType,
-          count: newCount,
-          socketId: socket.id,
-          timestamp: now,
-          webcamScreenshot,
-          screenScreenshot,
-          studentName,
-        });
-
-        if (newCount >= maxViolations) {
-          toast.error(
-            "Too many security violations. Exam will be auto-submitted."
-          );
-          setTimeout(() => {
-            examActiveRef.current = false;
-            onComplete();
-          }, 2000);
-        }
-        return newCount;
-      });
 
       } catch (error) {
         console.error(`[Student] Error in handleSecurityViolation:`, error);
@@ -1060,8 +1296,7 @@ export function QuestionComponent({
         e.preventDefault();
         e.stopPropagation();
         handleSecurityViolation(
-          `Blocked key: ${e.key}${e.ctrlKey ? "+Ctrl" : ""}${
-            e.altKey ? "+Alt" : ""
+          `Blocked key: ${e.key}${e.ctrlKey ? "+Ctrl" : ""}${e.altKey ? "+Alt" : ""
           }${e.shiftKey ? "+Shift" : ""}`
         );
 
@@ -1511,42 +1746,23 @@ export function QuestionComponent({
     };
   }, []);
 
+  // Add online/offline state
+  const [isOnline, setIsOnline] = useState(typeof window !== 'undefined' ? navigator.onLine : true);
+
+  useEffect(() => {
+    const handleOnline = () => setIsOnline(true);
+    const handleOffline = () => setIsOnline(false);
+    window.addEventListener('online', handleOnline);
+    window.addEventListener('offline', handleOffline);
+    return () => {
+      window.removeEventListener('online', handleOnline);
+      window.removeEventListener('offline', handleOffline);
+    };
+  }, []);
+
   const currentQuestion = questions[currentQuestionIndex];
   const totalQuestions = questions.length;
   const isLastQuestion = currentQuestionIndex === totalQuestions - 1;
-
-  // MCQ selection handler
-  const handleMcqSelect = (index: number) => {
-    setMcqSelected(index);
-    if (onAnswerChange) onAnswerChange(index);
-    updateActivity();
-  };
-
-  // MultiSelect selection handler
-  const handleMultiSelectSelect = (index: number) => {
-    const newSelected = (prev: number[]) => {
-      // If already selected, remove it
-      if (prev.includes(index)) {
-        return prev.filter((i: number) => i !== index);
-      }
-      // Otherwise add it
-      return [...prev, index];
-    };
-
-    setMultiSelectSelected((prev) => {
-      const updated = newSelected(prev);
-      if (onAnswerChange) onAnswerChange(updated);
-      return updated;
-    });
-    updateActivity();
-  };
-
-  // Structured question answer handler
-  const handleStructuredAnswerChange = (value: string) => {
-    setStructuredAnswer(value);
-    if (onAnswerChange) onAnswerChange(value);
-    updateActivity();
-  };
 
   const handleNextClick = () => {
     if (isLastQuestion) {
@@ -1615,14 +1831,27 @@ export function QuestionComponent({
 
   return (
     <div ref={mainContainerRef} className="relative">
+      {/* Online/Offline Indicator */}
+      <div className="fixed top-4 right-4 z-[9999] flex items-center gap-2">
+        {isOnline ? (
+          <div className="flex items-center gap-1 bg-green-100 border border-green-400 text-green-700 px-3 py-1 rounded-full shadow">
+            <Wifi className="w-5 h-5 text-green-600" />
+            <span className="text-sm font-medium">Online</span>
+          </div>
+        ) : (
+          <div className="flex items-center gap-1 bg-red-100 border border-red-400 text-red-700 px-3 py-1 rounded-full shadow">
+            <WifiOff className="w-5 h-5 text-red-600" />
+            <span className="text-sm font-medium">Offline</span>
+          </div>
+        )}
+      </div>
       {/* Fullscreen Warning */}
       {showFullscreenWarning && !finalFullscreenLockout && (
         <div className="fixed top-0 left-0 w-full z-[9999] bg-yellow-500 text-white px-4 py-3 text-center text-lg font-bold shadow-lg">
           Please do not exit fullscreen mode during the exam.
           <br />
-          {`You have ${
-            MAX_FULLSCREEN_EXITS - fullscreenExitCount
-          } attempt(s) remaining before the exam is auto-submitted.`}
+          {`You have ${MAX_FULLSCREEN_EXITS - fullscreenExitCount
+            } attempt(s) remaining before the exam is auto-submitted.`}
         </div>
       )}
       {finalFullscreenLockout && (
